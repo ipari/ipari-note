@@ -1,13 +1,18 @@
 [TOC]
 
 ## 문법
-[Markdown](https://daringfireball.net/projects/markdown/syntax)을 기본으로 합니다.
-
-## 플러그인
-문서 작성의 편의를 위해 마크다운 확장을 지원합니다.
 
 ### 위키 링크
 위키 문서로의 링크는 `[[표제어]]` 포맷으로 입력해주세요. [[Home]]
+
+[Markdown](https://daringfireball.net/projects/markdown/syntax)을 기본으로 합니다.
+
+### 이미지
+![이미지](image.png)
+
+
+## 플러그인
+문서 작성의 편의를 위해 마크다운 확장을 지원합니다.
 
 
 ### 목차
