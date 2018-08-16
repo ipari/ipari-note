@@ -19,7 +19,11 @@ def view_page(page_path):
     data_path = base_path + '.md'
     with open(data_path, 'r') as f:
         extensions = md_extensions()
-        title = '{} - {}'.format(page_path, config('note')['name'])
+        note_name = config('note')['name']
+        note_description = config('note')['description']
         content = markdown.markdown(f.read(), extensions=extensions)
-        return render_template(
-            'page.html', title=title, pagename=page_path, content=content)
+        return render_template('page.html',
+                               note_name=note_name,
+                               note_description=note_description,
+                               pagename=page_path,
+                               content=content)
