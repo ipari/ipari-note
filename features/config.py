@@ -31,6 +31,7 @@ def md_extensions():
         WikiLinkExtension(base_url='/{}/'.format(base_url)))
     extensions.append('markdown.extensions.fenced_code')
     extensions.append('markdown.extensions.codehilite')
+    extensions.append('markdown.extensions.tables')
     extensions.append('markdown.extensions.admonition')
 
     ext_config = config('markdown_extensions')
