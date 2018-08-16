@@ -8,7 +8,7 @@ from features.config import config, md_extensions
 blueprint = Blueprint('note', __name__)
 
 
-@blueprint.route('/<path:page_path>')
+@blueprint.route('/<path:page_path>', strict_slashes=False)
 def view_page(page_path):
     base_path = os.path.join(current_app.root_path, 'pages', page_path)
     _, file_extension = os.path.splitext(page_path)
