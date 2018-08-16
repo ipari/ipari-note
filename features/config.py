@@ -26,7 +26,7 @@ def config(key=None):
 def md_extensions():
     extensions = []
 
-    base_url = config('wiki')['base_url']
+    base_url = config('note')['base_url']
     extensions.append(
         WikiLinkExtension(base_url='/{}/'.format(base_url)))
     extensions.append('markdown.extensions.fenced_code')

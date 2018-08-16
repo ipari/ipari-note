@@ -1,4 +1,4 @@
-위키의 문서는 [Markdown](https://daringfireball.net/projects/markdown/syntax) 문법을 기반으로 합니다.
+노트의 문서는 [Markdown](https://daringfireball.net/projects/markdown/syntax) 문법을 기반으로 합니다.
 기본 문법과 확장 문법을 구분하지 않고 서술합니다.
 
 [목차]
@@ -8,16 +8,16 @@
 ```markdown
 **굵은** 글자
 *기울어진* 글자
-위키의 첫 페이지 [[Home]]으로 돌아가기.
+[[Home]]으로 가는 노트 내부 링크 걸기
 [구글](https://google.com)로 링크 걸기
-![이미지](image.png)
+![이미지](sample_image.png)
 ```
 
 **굵은** 글자
 *기울어진* 글자
-위키의 첫 페이지 [[Home]]으로 돌아가기
+[[Home]]으로 가는 노트 내부 링크 걸기
 [구글](https://google.com)로 링크 걸기
-![이미지](image.png)
+![이미지](sample_image.png)
 
 
 ## 헤더

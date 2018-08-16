@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, render_template, send_file
 from features.config import config, md_extensions
 
 
-blueprint = Blueprint('wiki', __name__)
+blueprint = Blueprint('note', __name__)
 
 
 @blueprint.route('/<path:page_path>')
@@ -19,7 +19,7 @@ def view_page(page_path):
     data_path = base_path + '.md'
     with open(data_path, 'r') as f:
         extensions = md_extensions()
-        title = '{} - {}'.format(page_path, config('wiki')['name'])
+        title = '{} - {}'.format(page_path, config('note')['name'])
         content = markdown.markdown(f.read(), extensions=extensions)
         return render_template(
             'page.html', title=title, pagename=page_path, content=content)

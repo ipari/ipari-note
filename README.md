@@ -1,1 +1,1 @@
-# ipari-wiki
+# ipari-note
