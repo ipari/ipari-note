@@ -12,7 +12,7 @@ blueprint = Blueprint('note', __name__)
 def view_page(page_path):
     base_path = os.path.join(current_app.root_path, 'pages', page_path)
     _, file_extension = os.path.splitext(page_path)
-    print('ext: {}'.format(file_extension))
+
     if file_extension and file_extension != '.md':
         return send_file(base_path)
 
