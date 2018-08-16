@@ -194,6 +194,87 @@ article p > a:not(.wikilink):not(.footnote-ref):not(.footnote-backref) {
 }
 
 
+/* Admonition */
+div.admonition {
+    margin-bottom: 1.5em;
+    padding: .5em 1em .5em 100px;
+    border: 1px solid;
+    border-radius: 8px;
+}
+
+p.admonition-title {
+    font-weight: bold;
+}
+
+div.admonition p {
+    margin: 0;
+    padding: 0;
+}
+
+div.note {
+    border-color: #666666;
+}
+div.note p.admonition-title {
+    color: #666666;
+}
+
+div.tip {
+    border-color: #4bbec3;
+}
+div.tip p.admonition-title {
+    color: #4bbec3;
+}
+
+div.hint {
+    border-color: #0e84b5;
+}
+div.hint p.admonition-title {
+    color: #0e84b5;
+}
+
+div.attention {
+    border-color: #f28bd7;
+}
+div.attention p.admonition-title {
+    color: #f28bd7;
+}
+
+div.important {
+    border-color: #ffd400;
+}
+div.important p.admonition-title {
+    color: #ffd400;
+}
+
+div.caution {
+    border-color: #ff8e00;
+}
+div.caution p.admonition-title {
+    color: #ff8e00;
+}
+
+div.warning {
+    border-color: #ff4a00;
+}
+div.warning p.admonition-title {
+    color: #ff4a00;
+}
+
+div.danger {
+    border-color: #ff0000;
+}
+div.danger p.admonition-title {
+    color: #ff0000;
+}
+
+div.error {
+    border-color: #a900ff;
+}
+div.error p.admonition-title {
+    color: #a900ff;
+}
+
+
 /* Footnotes */
 div.footnote ol {
     padding: 0 1em;
