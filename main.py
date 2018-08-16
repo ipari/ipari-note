@@ -5,6 +5,7 @@ from features.config import config
 
 
 app = Flask(__name__)
+app.url_map.strict_slashes = False
 
 
 with app.app_context():
