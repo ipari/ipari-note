@@ -1,7 +1,10 @@
 import os
+import re
 import yaml
 
 from flask import current_app
+from markdown.extensions.toc import TocExtension
+from markdown.extensions.wikilinks import WikiLinkExtension
 
 
 def config_path():
@@ -23,18 +26,29 @@ def config(key=None):
 def md_extensions():
     extensions = []
 
-    from markdown.extensions.wikilinks import WikiLinkExtension
     base_url = config('wiki')['base_url']
     extensions.append(
         WikiLinkExtension(base_url='/{}/'.format(base_url)))
+    extensions.append('markdown.extensions.fenced_code')
+    extensions.append('markdown.extensions.codehilite')
+    extensions.append('markdown.extensions.admonition')
 
     ext_config = config('markdown_extensions')
     if ext_config['nl2br']:
         extensions.append('markdown.extensions.nl2br')
     if ext_config['toc']:
-        extensions.append('markdown.extensions.toc')
+        extensions.append(TocExtension(
+            marker='[목차]', permalink=True, slugify=_slugify))
     if ext_config['footnotes']:
         extensions.append('markdown.extensions.footnotes')
     
     return extensions
 
+
+def _slugify(value, _):
+    """
+    기본 slugify는 한글을 날려먹는 문제가 있어 새로 만든다.
+    """
+    value = re.sub(r'[^가-힣\w\s-]', '', value.strip().lower())
+    # value = re.sub(r'[\s]', separator, value)
+    return value
