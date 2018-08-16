@@ -4,7 +4,7 @@ import yaml
 
 from flask import current_app
 from markdown.extensions.toc import TocExtension
-from markdown.extensions.wikilinks import WikiLinkExtension
+from markdown.extensions.wikilinks import WikiLinkExtension, WikiLinks
 
 
 def config_path():
@@ -28,7 +28,7 @@ def md_extensions():
 
     base_url = config('note')['base_url']
     extensions.append(
-        WikiLinkExtension(base_url='/{}/'.format(base_url)))
+        WikiLinkExtensionCustom(base_url='/{}/'.format(base_url)))
     extensions.append('markdown.extensions.fenced_code')
     extensions.append('markdown.extensions.codehilite')
     extensions.append('markdown.extensions.tables')
@@ -53,3 +53,24 @@ def _slugify(value, _):
     value = re.sub(r'[^가-힣\w\s-]', '', value.strip().lower())
     # value = re.sub(r'[\s]', separator, value)
     return value
+
+
+class WikiLinkExtensionCustom(WikiLinkExtension):
+    """
+    기본 WikiLinkExtension이 '/'가 있으면 링크로 인식하지 않는 문제를 해결.
+    wikilink_re에 '/' 을 추가한다.
+    """
+
+    md = None
+
+    def __init__(self, *args, **kwargs):
+        super(WikiLinkExtensionCustom, self).__init__(*args, **kwargs)
+
+    def extendMarkdown(self, md, md_globals):
+        self.md = md
+
+        # append to end of inline patterns
+        wikilink_re = r'\[\[([\w0-9_ -/]+)\]\]'
+        wikilink_pattern = WikiLinks(wikilink_re, self.getConfigs())
+        wikilink_pattern.md = md
+        md.inlinePatterns.add('wikilink', wikilink_pattern, "<not_strong")
