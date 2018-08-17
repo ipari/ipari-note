@@ -203,7 +203,7 @@ article p > a:not(.wikilink):not(.footnote-ref):not(.footnote-backref) {
 /* Admonition */
 div.admonition {
     margin-bottom: 1.5em;
-    padding: .5em 1em .5em 100px;
+    padding: .5em 1em .5em 80px;
     border: 1px solid;
     border-radius: 8px;
 }
@@ -217,67 +217,52 @@ div.admonition p {
     padding: 0;
 }
 
-div.note {
-    border-color: #666666;
-}
-div.note p.admonition-title {
-    color: #666666;
-}
-
-div.tip {
+div.info {
     border-color: #4bbec3;
+    background: url('../img/info.png') no-repeat 1em center;
 }
-div.tip p.admonition-title {
+div.info p.admonition-title {
     color: #4bbec3;
 }
 
-div.hint {
-    border-color: #0e84b5;
+div.help {
+    border-color: #7baabe;
+    background: url('../img/help.png') no-repeat 1em center;
 }
-div.hint p.admonition-title {
-    color: #0e84b5;
+div.help p.admonition-title {
+    color: #7baabe;
 }
 
-div.attention {
-    border-color: #f28bd7;
+div.tip {
+    border-color: #dfc600;
+    background: url('../img/tip.png') no-repeat 1em center;
 }
-div.attention p.admonition-title {
-    color: #f28bd7;
+div.tip p.admonition-title {
+    color: #dfc600;
+}
+
+div.todo {
+    border-color: #99C764;
+    background: url('../img/todo.png') no-repeat 1em center;
+}
+div.todo p.admonition-title {
+    color: #99C764;
 }
 
 div.important {
-    border-color: #ffd400;
+    border-color: #ff8e00;
+    background: url('../img/important.png') no-repeat 1em center;
 }
 div.important p.admonition-title {
-    color: #ffd400;
-}
-
-div.caution {
-    border-color: #ff8e00;
-}
-div.caution p.admonition-title {
     color: #ff8e00;
 }
 
-div.warning {
-    border-color: #ff4a00;
-}
-div.warning p.admonition-title {
-    color: #ff4a00;
-}
-
-div.danger {
+div.alert {
     border-color: #ff0000;
+    background: url('../img/alert.png') no-repeat 1em center;
 }
-div.danger p.admonition-title {
+div.alert p.admonition-title {
     color: #ff0000;
-}
-
-div.error {
-    border-color: #a900ff;
-}
-div.error p.admonition-title {
-    color: #a900ff;
 }
 
 

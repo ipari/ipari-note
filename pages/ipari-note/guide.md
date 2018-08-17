@@ -103,6 +103,7 @@ def blah():
 ```
 
 ## 안내
+안내하고 싶은 내용이 있을 때, 상자 모양으로 강조하여 알려줄 수 있습니다.
 
 ```markdown
 !!! tip "차가운 맥주가 없을 땐"
@@ -112,4 +113,6 @@ def blah():
 !!! tip "차가운 맥주가 없을 땐"
     급한 상황에 차갑게 해 놓은 맥주가 없을 땐 맥주에 얼음을 넣어 마시면 된다.
     
-아무 유형이나 사용할 수 있지만, [rST](http://docutils.sourceforge.net/docs/ref/rst/directives.html#specific-admonitions)에서는 다음 유형을 권장합니다: attention, caution, danger, error, hint, important, note, tip, warning
+info, help, tip, todo, important, alert 를 사용할 수 있습니다. 각 유형의 생김새는 [[ipari-note/admonition]] 페이지를 참고해주세요.
+
+위의 항목 이외에 어떤 유형이든 사용할 수 있습니다. 대신 이 경우 스타일이 정의되어있지 않으므로, css에 스타일을 정의하고 사용해야 합니다.
