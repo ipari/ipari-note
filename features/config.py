@@ -33,15 +33,13 @@ def md_extensions():
     extensions.append('markdown.extensions.codehilite')
     extensions.append('markdown.extensions.tables')
     extensions.append('markdown.extensions.admonition')
+    extensions.append('markdown.extensions.nl2br')
+    extensions.append('markdown.extensions.footnotes')
 
     ext_config = config('markdown_extensions')
-    if ext_config['nl2br']:
-        extensions.append('markdown.extensions.nl2br')
-    if ext_config['toc']:
-        extensions.append(TocExtension(
-            marker='[목차]', permalink=True, slugify=_slugify))
-    if ext_config['footnotes']:
-        extensions.append('markdown.extensions.footnotes')
+    toc_marker = ext_config['toc_marker']
+    extensions.append(TocExtension(
+        marker=toc_marker, permalink=True, slugify=_slugify))
     
     return extensions
 
