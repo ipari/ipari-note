@@ -200,7 +200,8 @@ article p > a:not(.wikilink):not(.footnote-ref):not(.footnote-backref) {
 }
 
 
-/* Admonition */
+/* Admonition
+   Use or modified icons from https://github.com/icons8/flat-color-icons */
 div.admonition {
     margin-bottom: 1.5em;
     padding: .5em 1em .5em 80px;
@@ -219,7 +220,8 @@ div.admonition p {
 
 div.info {
     border-color: #4bbec3;
-    background: url('../img/info.png') no-repeat 1em center;
+    background: url('../img/info.svg') no-repeat 1em center;
+    background-size: 48px;
 }
 div.info p.admonition-title {
     color: #4bbec3;
@@ -227,23 +229,26 @@ div.info p.admonition-title {
 
 div.help {
     border-color: #7baabe;
-    background: url('../img/help.png') no-repeat 1em center;
+    background: url('../img/help.svg') no-repeat 1em center;
+    background-size: 48px;
 }
 div.help p.admonition-title {
     color: #7baabe;
 }
 
 div.tip {
-    border-color: #dfc600;
-    background: url('../img/tip.png') no-repeat 1em center;
+    border-color: #ead000;
+    background: url('../img/tip.svg') no-repeat 1em center;
+    background-size: 48px;
 }
 div.tip p.admonition-title {
-    color: #dfc600;
+    color: #ead000;
 }
 
 div.todo {
     border-color: #99C764;
-    background: url('../img/todo.png') no-repeat 1em center;
+    background: url('../img/todo.svg') no-repeat 1em center;
+    background-size: 48px;
 }
 div.todo p.admonition-title {
     color: #99C764;
@@ -251,18 +256,20 @@ div.todo p.admonition-title {
 
 div.important {
     border-color: #ff8e00;
-    background: url('../img/important.png') no-repeat 1em center;
+    background: url('../img/important.svg') no-repeat 1em center;
+    background-size: 48px;
 }
 div.important p.admonition-title {
     color: #ff8e00;
 }
 
 div.alert {
-    border-color: #ff0000;
-    background: url('../img/alert.png') no-repeat 1em center;
+    border-color: #f44336;
+    background: url('../img/alert.svg') no-repeat 1em center;
+    background-size: 48px;
 }
 div.alert p.admonition-title {
-    color: #ff0000;
+    color: #f44336;
 }
 
 
