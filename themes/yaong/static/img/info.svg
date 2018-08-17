@@ -1,0 +1,9 @@
+<svg enable-background="new 0 0 48 48" version="1" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <g>
+  <circle cx="24" cy="24" r="21" fill="#4bbec3"/>
+ </g>
+ <g fill="#fff">
+  <rect x="22" y="22" width="4" height="11"/>
+  <circle cx="24" cy="16.5" r="2.5"/>
+ </g>
+</svg>
