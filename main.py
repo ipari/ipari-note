@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for
 
-from features import note
+from features import note, user
 from features.config import config
 
 
@@ -15,6 +15,7 @@ with app.app_context():
 
     url_prefix = '/{}'.format(config('note')['base_url'])
     app.register_blueprint(note.blueprint, url_prefix=url_prefix)
+    app.register_blueprint(user.blueprint)
 
 
 @app.route("/")
