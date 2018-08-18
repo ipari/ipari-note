@@ -38,14 +38,20 @@ def render_page(page_path):
 
     with open(path, 'r') as f:
         extensions = md_extensions()
-        note_name = config('note')['name']
-        note_description = config('note')['description']
         content = markdown.markdown(f.read(), extensions=extensions)
+        meta = note_meta()
         return render_template('page.html',
-                               note_name=note_name,
-                               note_description=note_description,
+                               meta=meta,
                                pagename=page_path,
                                content=content)
+
+
+def note_meta():
+    note_config = config('note')
+    meta = dict()
+    meta['note_name'] = note_config['name']
+    meta['note_description'] = note_config['description']
+    return meta
 
 
 @blueprint.route('/<path:page_path>')

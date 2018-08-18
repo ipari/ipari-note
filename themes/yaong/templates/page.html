@@ -1,4 +1,8 @@
 {% extends "_base.html" %}
+
+{% block pagename %}{{ pagename }}{% endblock %}
+
 {% block content %}
-{{ content|safe }}
+  <h1>{{ pagename }}</h1>
+  {{ content|safe }}
 {% endblock %}

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ pagename }} - {{ notename }}</title>
+  <title>{% block pagename %}{% endblock %} - {{ meta.note_name }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/pygments/arduino.css') }}" />
@@ -11,13 +11,12 @@
 <body>
   <header>
     <div class="page">
-      <h1><a href="/">{{ note_name }}</a></h1>
-      <p>{{ note_description }}</p>
+      <h1><a href="/">{{ meta.note_name }}</a></h1>
+      <p>{{ meta.note_description }}</p>
     </div>
   </header>
   <article>
     <div class="page">
-      <h1>{{ pagename }}</h1>
       {% block content %}{% endblock %}
     </div>
   </article>
