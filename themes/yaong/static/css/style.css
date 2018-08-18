@@ -29,6 +29,12 @@ body {
     body {
         font-size: 16px;
     }
+
+    header button {
+        width: 32px;
+        height: 32px;
+        background-size: 32px;
+    }
 }
 
 article {
@@ -103,6 +109,35 @@ header {
     background-color: #4bbec3;
 }
 
+header div.page {
+    position: relative;
+}
+
+header div.page::after {
+    display: block;
+    clear: both;
+    content: ' ';
+}
+
+header div.left {
+    float: left;
+}
+
+header div.right {
+    float: right;
+}
+
+header button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    outline: none;
+    background: url('../img/menu.svg') no-repeat right center;
+    background-size: 40px;
+    text-indent: -9999px;
+    cursor: pointer;
+}
+
 header h1 {
     margin: 0;
     padding: 0;
@@ -129,6 +164,12 @@ header h1 a:hover {
 header p {
     margin: -0.1em 0 0;
     color: rgba(255,255,255,0.6);
+}
+
+
+/* Nav */
+nav {
+    background-color: #fbfbfb;
 }
 
 

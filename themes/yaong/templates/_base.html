@@ -11,10 +11,33 @@
 <body>
   <header>
     <div class="page">
-      <h1><a href="/">{{ meta.note_name }}</a></h1>
-      <p>{{ meta.note_description }}</p>
+      <div class="left">
+        <h1><a href="/">{{ meta.note_name }}</a></h1>
+        <p>{{ meta.note_description }}</p>
+      </div>
+      <div class="right">
+        <button>Menu</button>
+      </div>
     </div>
   </header>
+  <nav>
+    <div class="page">
+      <ul>
+        <li>
+          <a href="/login">로그인</a>
+        </li>
+        <li>
+          <a href="#">편집/작성</a>
+        </li>
+        <li>
+          <a href="/pagetree">문서목록</a>
+        </li>
+        <li>
+          <a href="/config">설정</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
   <article>
     <div class="page">
       {% block content %}{% endblock %}
