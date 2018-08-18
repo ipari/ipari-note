@@ -1,4 +1,5 @@
 import base64
+import hashlib
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
@@ -39,3 +40,11 @@ def decrypt(encrypted):
         return unpad(decrypted, AES.block_size).decode('utf-8')
     except ValueError:
         return None
+
+
+def do_hash(text):
+    return hashlib.sha256(text.encode()).hexdigest()
+
+
+def compare_hash_with_text(hashed, text):
+    return hashed == do_hash(text)
