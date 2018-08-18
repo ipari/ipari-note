@@ -1,10 +1,10 @@
 import os
 import yaml
-from flask import Blueprint, current_app, request, redirect, render_template, url_for
+from flask import Blueprint, current_app, request, redirect, render_template,\
+    session
 
 from .cryptography import compare_hash_with_text
 from .note import note_meta
-from .config import config
 
 
 blueprint = Blueprint('user', __name__)
@@ -26,11 +26,17 @@ def user_info(key):
         return data.get(key, None)
 
 
+def logged_in():
+    return 'user' in session
+
+
 @blueprint.route('/login', methods=['GET', 'POST'])
 def view_login():
     if request.method == 'GET':
-        meta = note_meta()
-        return render_template('login.html', meta=meta)
+        if logged_in():
+            return redirect('/')
+        form = {'referrer': request.referrer}
+        return render_template('login.html', meta=note_meta(), form=form)
 
     user_email = user_info('email')
     user_password = user_info('password')
@@ -47,19 +53,24 @@ def view_login():
     password_valid = compare_hash_with_text(user_password, form_password)
 
     if email_valid and password_valid:
-        # TODO: 로그인 처리
+        session['user'] = user_email
 
         # 리다이렉트
         if form_referrer:
             return redirect(form_referrer)
+        return redirect('/')
 
-        main_page = config('note')['main_page']
-        return redirect(url_for('note.view_page', page_path=main_page))
-
-    # TODO: 로그인 실패 페이지
-    meta = note_meta()
     form = {
         'email': form_email,
-        'referrer': form_referrer
+        'referrer': form_referrer,
+        'error': True
     }
-    return render_template('login.html', meta=meta, form=form)
+    return render_template('login.html', meta=note_meta(), form=form)
+
+
+@blueprint.route('/logout')
+def view_logout():
+    session.pop('user', None)
+    if request.referrer is None:
+        return redirect('/login')
+    return redirect(request.referrer)

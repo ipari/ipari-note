@@ -4,12 +4,10 @@
 
 {% block content %}
   <h1>로그인</h1>
-  {% if form is defined %}
+  {% if 'error' in form %}
   <div class="error">
   이메일 또는 비밀번호가 잘못되었습니다.
   </div>
-  {% else %}
-  {% set form = None %}
   {% endif %}
   <form method="post">
     <div>
@@ -21,7 +19,7 @@
       <input type="password" name="password" id="password"  required />
     </div>
 
-    <input type="hidden" name="referrer" {% if form.referrer %}value="{{ form.referrer }}" {% endif %}/>
+    <input type="hidden" name="referrer" {% if form.referrer is not none %}value="{{ form.referrer }}" {% endif %}/>
     <input type="submit" value="로그인" />
   </form>
 {% endblock %}

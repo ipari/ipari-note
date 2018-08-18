@@ -9,6 +9,8 @@ app.url_map.strict_slashes = False
 
 
 with app.app_context():
+    app.secret_key = config('secret')['key']
+
     theme = config('note')['template']
     app.static_folder = 'themes/{}/static'.format(theme)
     app.template_folder = 'themes/{}/templates'.format(theme)

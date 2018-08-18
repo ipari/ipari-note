@@ -56,6 +56,8 @@ def note_meta():
 
 @blueprint.route('/<path:page_path>')
 def view_page(page_path, force_allow=False):
+    from .user import logged_in
+
     from_link = False
     decrypted_page_path = decrypt(page_path)
     if decrypted_page_path is not None:
@@ -63,7 +65,6 @@ def view_page(page_path, force_allow=False):
         from_link = True
 
     _, file_extension = os.path.splitext(page_path)
-
     # .md 로 접근하면 페이지를 렌더링한다.
     if file_extension == '.md':
         page_path = page_path[:-3]
@@ -73,10 +74,14 @@ def view_page(page_path, force_allow=False):
     if file_exists(page_path):
         if file_extension:
             # 파일인 경우 URL 직접 접속과 외부 접속을 차단한다.
-            if request.referrer and request.url_root in request.referrer:
+            if logged_in() \
+                    or (request.referrer and
+                        request.url_root in request.referrer):
                 return send_file(file_path(page_path))
         else:
-            if permission == 2 or (force_allow and permission >= 1):
+            if logged_in() \
+                    or permission == 2 \
+                    or (force_allow and permission >= 1):
                 return render_page(page_path)
             elif from_link and permission == 1:
                 return view_page(page_path, force_allow=True)
