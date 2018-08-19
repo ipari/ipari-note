@@ -25,18 +25,6 @@ body {
     color: #333333;
 }
 
-@media only screen and (max-width: 600px) {
-    body {
-        font-size: 16px;
-    }
-
-    header button {
-        width: 32px;
-        height: 32px;
-        background-size: 32px;
-    }
-}
-
 article {
     background-color: #FFFFFF;
 }
@@ -169,7 +157,61 @@ header p {
 
 /* Nav */
 nav {
+    display: none;
     background-color: #fbfbfb;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+nav li {
+    float: left;
+}
+
+nav li a {
+    display: block;
+    margin-right: .4em;
+    padding: .4em .8em .4em 1.6em;
+}
+
+nav li a,
+nav li a:link,
+nav li a:visited {
+    color: #333333;
+}
+
+nav li a:hover {
+    color: #33bbdf;
+}
+
+nav li a.menu-login {
+    background: url('../img/menu-login.svg') no-repeat left center;
+    background-size: 24px;
+}
+
+nav li a.menu-logout {
+    background: url('../img/menu-logout.svg') no-repeat left center;
+    background-size: 24px;
+}
+
+nav li a.menu-edit,
+nav li a.menu-write {
+    background: url('../img/menu-edit.svg') no-repeat left center;
+    background-size: 24px;
+}
+
+nav li a.menu-archive {
+    background: url('../img/menu-archive.svg') no-repeat left center;
+    background-size: 24px;
+}
+
+nav li a.menu-config {
+    background: url('../img/menu-config.svg') no-repeat left center;
+    background-size: 24px;
 }
 
 
@@ -379,7 +421,6 @@ input[type=submit] {
 }
 
 
-
 /* Footer */
 footer {
     position: fixed;
@@ -388,4 +429,28 @@ footer {
     padding: 0.6em 0;
     background-color: #7baabe;
     color: rgba(255,255,255,0.6);
+}
+
+
+/* Mobile */
+@media only screen and (max-width: 600px) {
+    body {
+        font-size: 16px;
+    }
+
+    header button {
+        width: 32px;
+        height: 32px;
+        background-size: 32px;
+    }
+
+    nav li {
+        float: none;
+    }
+
+    nav li a {
+        margin: 0;
+        border-bottom: 1px solid #eeeeee;
+        padding-left: 2em;
+    }
 }

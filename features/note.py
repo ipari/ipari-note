@@ -33,7 +33,7 @@ def page_permission(page_path):
         return 0
 
 
-def render_page(page_path):
+def render_page(page_path, menu):
     path = file_path(page_path)
 
     with open(path, 'r') as f:
@@ -43,6 +43,7 @@ def render_page(page_path):
         return render_template('page.html',
                                meta=meta,
                                pagename=page_path,
+                               menu=menu,
                                content=content)
 
 
@@ -52,6 +53,25 @@ def note_meta():
     meta['note_name'] = note_config['name']
     meta['note_description'] = note_config['description']
     return meta
+
+
+def menu_list(page_path=None, file_exists=False):
+    from .user import logged_in
+    items = []
+    if logged_in():
+        items.append({'type': 'logout', 'url': '/logout'})
+        if page_path is not None:
+            url = '/edit/{}'.format(page_path)
+            if file_exists:
+                items.append({'type': 'edit', 'url': url})
+            else:
+                items.append({'type': 'write', 'url': url})
+        items.append({'type': 'archive', 'url': '/archive'})
+        items.append({'type': 'config', 'url': '/config'})
+    else:
+        items.append({'type': 'login', 'url': '/login'})
+        items.append({'type': 'archive', 'url': '/archive'})
+    return items
 
 
 @blueprint.route('/<path:page_path>')
@@ -82,7 +102,8 @@ def view_page(page_path, force_allow=False):
             if logged_in() \
                     or permission == 2 \
                     or (force_allow and permission >= 1):
-                return render_page(page_path)
+                menu = menu_list(page_path=page_path, file_exists=True)
+                return render_page(page_path, menu)
             elif from_link and permission == 1:
                 return view_page(page_path, force_allow=True)
             else:

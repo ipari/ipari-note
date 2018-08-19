@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   <title>{% block pagename %}{% endblock %} - {{ meta.note_name }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
@@ -23,18 +24,19 @@
   <nav>
     <div class="page">
       <ul>
+      {% set menu_name = {
+        'login': '로그인',
+        'logout': '로그아웃',
+        'write': '작성',
+        'edit': '편집',
+        'archive': '목록',
+        'config': '설정' }
+      %}
+      {% for item in menu %}
         <li>
-          <a href="/login">로그인</a>
+          <a class="menu-{{ item.type }}" href="{{ item.url }}">{{ menu_name[item.type] }}</a>
         </li>
-        <li>
-          <a href="#">편집/작성</a>
-        </li>
-        <li>
-          <a href="/pagetree">문서목록</a>
-        </li>
-        <li>
-          <a href="/config">설정</a>
-        </li>
+      {% endfor %}
       </ul>
     </div>
   </nav>

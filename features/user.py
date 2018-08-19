@@ -4,7 +4,7 @@ from flask import Blueprint, current_app, request, redirect, render_template,\
     session
 
 from .cryptography import compare_hash_with_text
-from .note import note_meta
+from .note import menu_list, note_meta
 
 
 blueprint = Blueprint('user', __name__)
@@ -32,11 +32,13 @@ def logged_in():
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 def view_login():
+    menu = menu_list()
     if request.method == 'GET':
         if logged_in():
             return redirect('/')
         form = {'referrer': request.referrer}
-        return render_template('login.html', meta=note_meta(), form=form)
+        return render_template('login.html',
+                               meta=note_meta(), menu=menu, form=form)
 
     user_email = user_info('email')
     user_password = user_info('password')
@@ -65,7 +67,8 @@ def view_login():
         'referrer': form_referrer,
         'error': True
     }
-    return render_template('login.html', meta=note_meta(), form=form)
+    return render_template('login.html',
+                           meta=note_meta(), menu=menu, form=form)
 
 
 @blueprint.route('/logout')
