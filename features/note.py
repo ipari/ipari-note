@@ -24,14 +24,17 @@ def file_exists(page_path):
     return os.path.isfile(file_path(page_path))
 
 
-def page_permission(page_path):
+def page_permissions():
     path = os.path.join(current_app.root_path, 'meta', 'permission.yml')
     try:
         with open(path, 'r') as f:
-            permission = yaml.load(f)
-            return permission.get(page_path, 0)
+            return yaml.load(f)
     except IOError:
-        return 0
+        return {}
+
+
+def page_permission(page_path):
+    return page_permissions().get(page_path, 0)
 
 
 def render_page(page_path, menu):

@@ -1,0 +1,13 @@
+{% extends "_base.html" %}
+
+{% block pagename %}목록{% endblock %}
+
+{% block content %}
+<h1>목록</h1>
+권한이 있는 노트의 목록입니다.
+<ul>
+  {% for page in pages %}
+  <li><a href="{{ base_url }}/{{ page }}">{{ page }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}
