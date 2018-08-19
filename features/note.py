@@ -53,6 +53,14 @@ def render_page(page_path, meta, menu):
                                content=content)
 
 
+def error_page(page_path, meta, menu, message):
+    return render_template('error.html',
+                           meta=meta,
+                           pagename=page_path,
+                           menu=menu,
+                           message=message)
+
+
 def note_meta():
     note_config = config('note')
     meta = dict()
@@ -94,6 +102,10 @@ def process_page(page_path, force_allow=False):
         file_extension = None
 
     permission = page_permission(page_path)
+    meta = note_meta()
+    meta['logged_in'] = logged_in()
+    meta['permission'] = permission
+
     if file_exists(page_path):
         if file_extension:
             # 파일인 경우 URL 직접 접속과 외부 접속을 차단한다.
@@ -105,9 +117,7 @@ def process_page(page_path, force_allow=False):
             if logged_in() \
                     or permission == 2 \
                     or (force_allow and permission >= 1):
-                meta = note_meta()
-                meta['logged_in'] = logged_in()
-                meta['permission'] = permission
+
                 if permission == 1:
                     link = encrypt(page_path)
                     base_url = config('note')['base_url']
@@ -117,12 +127,22 @@ def process_page(page_path, force_allow=False):
                 return render_page(page_path, meta, menu)
             elif from_link and permission == 1:
                 return process_page(page_path, force_allow=True)
-            else:
-                # TODO: 로그인 중이면 새 페이지 만들기로 보낸다.
-                pass
 
-    # TODO: 에러 페이지를 제대로 만들자...
-    return "문서가 없거나, 혹은 접근할 권한이 없습니다."
+    # 파일이 없을 때 처리
+    menu = menu_list()
+    message = "문서가 없거나, 혹은 접근할 권한이 없습니다."
+
+    if logged_in():
+        if file_extension:
+            message = "파일이 없습니다."
+        else:
+            menu = menu_list(page_path=page_path, file_exists=False)
+            message = "문서가 없습니다."
+
+    return error_page(page_path=page_path,
+                      meta=meta,
+                      menu=menu,
+                      message=message)
 
 
 def config_page(page_path, form):
