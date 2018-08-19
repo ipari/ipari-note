@@ -395,7 +395,7 @@ form div {
     margin-bottom: .6em;
 }
 
-label {
+div.login label {
     display: inline-block;
     min-width: 6em;
 }

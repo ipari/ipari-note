@@ -9,17 +9,19 @@
   이메일 또는 비밀번호가 잘못되었습니다.
   </div>
   {% endif %}
-  <form method="post">
-    <div>
-      <label for="email">Email</label>
-      <input type="text" name="email" id="email" {% if form.email %}value="{{ form.email }}" {% endif %}required />
-    </div>
-    <div>
-      <label for="password">Password</label>
-      <input type="password" name="password" id="password"  required />
-    </div>
+  <div class="login">
+    <form method="post">
+      <div>
+        <label for="email">Email</label>
+        <input type="text" name="email" id="email" {% if form.email %}value="{{ form.email }}" {% endif %}required />
+      </div>
+      <div>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password"  required />
+      </div>
 
-    <input type="hidden" name="referrer" {% if form.referrer is not none %}value="{{ form.referrer }}" {% endif %}/>
-    <input type="submit" value="로그인" />
-  </form>
+      <input type="hidden" name="referrer" {% if form.referrer is not none %}value="{{ form.referrer }}" {% endif %}/>
+      <input type="submit" value="로그인" />
+    </form>
+  </div>
 {% endblock %}
