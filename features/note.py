@@ -59,7 +59,6 @@ def note_meta():
 def menu_list(page_path=None, file_exists=False):
     items = []
     if logged_in():
-        items.append({'type': 'logout', 'url': '/logout'})
         if page_path is not None:
             url = '/edit/{}'.format(page_path)
             if file_exists:
@@ -68,9 +67,10 @@ def menu_list(page_path=None, file_exists=False):
                 items.append({'type': 'write', 'url': url})
         items.append({'type': 'archive', 'url': '/archive'})
         items.append({'type': 'config', 'url': '/config'})
+        items.append({'type': 'logout', 'url': '/logout'})
     else:
-        items.append({'type': 'login', 'url': '/login'})
         items.append({'type': 'archive', 'url': '/archive'})
+        items.append({'type': 'login', 'url': '/login'})
     return items
 
 
