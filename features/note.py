@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, request, render_template, send_file
 
 from features.config import config, md_extensions
 from features.cryptography import decrypt, encrypt
-from .user import logged_in
+from .user import logged_in, user_info
 
 
 blueprint = Blueprint('note', __name__)
@@ -58,6 +58,7 @@ def note_meta():
     meta = dict()
     meta['note_name'] = note_config['name']
     meta['note_description'] = note_config['description']
+    meta['user_name'] = user_info('name')
     return meta
 
 
