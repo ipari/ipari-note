@@ -4,7 +4,6 @@ from flask import Blueprint, current_app, request, redirect, render_template,\
     session
 
 from .cryptography import compare_hash_with_text
-from .note import menu_list, note_meta
 
 
 blueprint = Blueprint('user', __name__)
@@ -32,6 +31,8 @@ def logged_in():
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 def view_login():
+    from .note import menu_list, note_meta
+
     menu = menu_list()
     if request.method == 'GET':
         if logged_in():

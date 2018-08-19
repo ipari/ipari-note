@@ -5,6 +5,7 @@ from flask import Blueprint, current_app, request, render_template, send_file
 
 from features.config import config, md_extensions
 from features.cryptography import decrypt
+from .user import logged_in
 
 
 blueprint = Blueprint('note', __name__)
@@ -56,7 +57,6 @@ def note_meta():
 
 
 def menu_list(page_path=None, file_exists=False):
-    from .user import logged_in
     items = []
     if logged_in():
         items.append({'type': 'logout', 'url': '/logout'})
@@ -76,8 +76,6 @@ def menu_list(page_path=None, file_exists=False):
 
 @blueprint.route('/<path:page_path>')
 def view_page(page_path, force_allow=False):
-    from .user import logged_in
-
     from_link = False
     decrypted_page_path = decrypt(page_path)
     if decrypted_page_path is not None:
