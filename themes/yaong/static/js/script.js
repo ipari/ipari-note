@@ -8,6 +8,15 @@ document.addEventListener("DOMContentLoaded", function() {
     // nav 에 초기값 지정
     let nav = select("nav");
     nav.style.display = "none";
+
+    // 노트 권한 폼
+    let radios = selects("div.permission input[type=radio]");
+
+    for (let radio of radios) {
+        radio.addEventListener("change", function() {
+            select("div.permission form").submit();
+        });
+    }
 });
 
 window.addEventListener("load", function() {

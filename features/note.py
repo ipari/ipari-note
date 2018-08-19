@@ -4,7 +4,7 @@ import yaml
 from flask import Blueprint, current_app, request, render_template, send_file
 
 from features.config import config, md_extensions
-from features.cryptography import decrypt
+from features.cryptography import decrypt, encrypt
 from .user import logged_in
 
 
@@ -24,10 +24,13 @@ def file_exists(page_path):
     return os.path.isfile(file_path(page_path))
 
 
+def permission_path():
+    return os.path.join(current_app.root_path, 'meta', 'permission.yml')
+
+
 def page_permissions():
-    path = os.path.join(current_app.root_path, 'meta', 'permission.yml')
     try:
-        with open(path, 'r') as f:
+        with open(permission_path(), 'r') as f:
             return yaml.load(f)
     except IOError:
         return {}
@@ -37,13 +40,12 @@ def page_permission(page_path):
     return page_permissions().get(page_path, 0)
 
 
-def render_page(page_path, menu):
+def render_page(page_path, meta, menu):
     path = file_path(page_path)
 
     with open(path, 'r') as f:
         extensions = md_extensions()
         content = markdown.markdown(f.read(), extensions=extensions)
-        meta = note_meta()
         return render_template('page.html',
                                meta=meta,
                                pagename=page_path,
@@ -77,8 +79,7 @@ def menu_list(page_path=None, file_exists=False):
     return items
 
 
-@blueprint.route('/<path:page_path>')
-def view_page(page_path, force_allow=False):
+def process_page(page_path, force_allow=False):
     from_link = False
     decrypted_page_path = decrypt(page_path)
     if decrypted_page_path is not None:
@@ -103,13 +104,41 @@ def view_page(page_path, force_allow=False):
             if logged_in() \
                     or permission == 2 \
                     or (force_allow and permission >= 1):
+                meta = note_meta()
+                meta['logged_in'] = logged_in()
+                meta['permission'] = permission
+                if permission == 1:
+                    link = encrypt(page_path)
+                    base_url = config('note')['base_url']
+                    meta['link'] = '{}{}/{}'.format(
+                        request.url_root, base_url, link)
                 menu = menu_list(page_path=page_path, file_exists=True)
-                return render_page(page_path, menu)
+                return render_page(page_path, meta, menu)
             elif from_link and permission == 1:
-                return view_page(page_path, force_allow=True)
+                return process_page(page_path, force_allow=True)
             else:
                 # TODO: 로그인 중이면 새 페이지 만들기로 보낸다.
                 pass
 
     # TODO: 에러 페이지를 제대로 만들자...
     return "문서가 없거나, 혹은 접근할 권한이 없습니다."
+
+
+def config_page(page_path, form):
+    if not logged_in():
+        return "로그인하지 않은 사용자가 페이지 설정을 변경하려고 하였습니다."
+
+    if 'permission' in form:
+        permissions = page_permissions()
+        permissions[page_path] = int(form['permission'])
+        with open(permission_path(), 'w') as f:
+            yaml.dump(permissions, f, default_flow_style=False)
+    return process_page(page_path)
+
+
+@blueprint.route('/<path:page_path>', methods=['GET', 'POST'])
+def view_page(page_path):
+    if request.method == 'GET':
+        return process_page(page_path)
+    else:
+        return config_page(page_path, request.form)
