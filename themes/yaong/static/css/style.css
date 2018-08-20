@@ -418,6 +418,22 @@ div.alert p.admonition-title {
 }
 
 
+/* Editor */
+form.editor {
+    margin: 1.5em 0;
+}
+
+form div.buttons {
+    text-align: right;
+}
+
+form a.button {
+    display: inline-block;
+    margin-top: .4em;
+    padding: .5em .8em;
+}
+
+
 /* Footnotes */
 div.footnote ol {
     padding: 0 1em;
@@ -457,7 +473,7 @@ div.error {
     margin-bottom: .6em;
 }
 
-form div {
+div.login form div {
     margin-bottom: .6em;
 }
 
@@ -480,6 +496,10 @@ input[type=submit] {
     background-color: #7baabe;
     color: #ffffff;
     cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: #6cb0bf;
 }
 
 

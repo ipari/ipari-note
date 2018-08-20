@@ -40,17 +40,28 @@ def page_permission(page_path):
     return page_permissions().get(page_path, 0)
 
 
-def render_page(page_path, meta, menu):
+def raw_page(page_path):
     path = file_path(page_path)
+    try:
+        with open(path, 'r') as f:
+            return f.read()
+    except IOError:
+        return None
 
-    with open(path, 'r') as f:
-        extensions = md_extensions()
-        content = markdown.markdown(f.read(), extensions=extensions)
-        return render_template('page.html',
-                               meta=meta,
-                               pagename=page_path,
-                               menu=menu,
-                               content=content)
+
+def render_markdown(raw_md):
+    extensions = md_extensions()
+    return markdown.markdown(raw_md, extensions=extensions)
+
+
+def render_page(page_path, meta, menu):
+    raw_md = raw_page(page_path)
+    content = render_markdown(raw_md)
+    return render_template('page.html',
+                           meta=meta,
+                           pagename=page_path,
+                           menu=menu,
+                           content=content)
 
 
 def error_page(page_path, meta, menu, message):

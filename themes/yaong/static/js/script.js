@@ -70,17 +70,31 @@ function selects(query) {
     return document.querySelectorAll(query);
 }
 
-
 function getElementValue(query, property) {
     let elem = select(query);
     let style = window.getComputedStyle(elem, null);
     return style.getPropertyValue(property);
 }
 
-
 function setElementValue(query, property, value) {
     let elements = selects(query);
     for (let element of elements) {
         element.style[property] = value;
     }
+}
+
+function previewMarkdown(preview, plainText) {
+  let ajax = new XMLHttpRequest();
+  let parameters = {
+    "raw_md": plainText
+  };
+
+  ajax.open("POST", "/preview", true);
+  ajax.setRequestHeader("Content-type", "application/json");
+  ajax.onreadystatechange = function() {
+      if (ajax.readyState === 4 && ajax.status === 200) {
+          preview.innerHTML = ajax.responseText;
+      }
+  };
+  ajax.send(JSON.stringify(parameters));
 }

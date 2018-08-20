@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  {% block script %}{% endblock %}
   <title>{% block pagename %}{% endblock %} - {{ meta.note_name }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/pygments/arduino.css') }}" />
+  {% block css %}{% endblock %}
 </head>
 <body>
   <header>
