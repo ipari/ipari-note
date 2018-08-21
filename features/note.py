@@ -46,7 +46,7 @@ def raw_page(page_path):
         with open(path, 'r') as f:
             return f.read()
     except IOError:
-        return None
+        return ''
 
 
 def render_markdown(raw_md):
