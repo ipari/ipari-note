@@ -1,9 +1,8 @@
 import re
-from flask import Blueprint, redirect, request, render_template
+from flask import Blueprint, redirect, request, render_template, url_for
 
 from .config import config
-from .note import file_path, menu_list, note_meta, process_page, raw_page, \
-    render_markdown
+from .note import file_path, menu_list, note_meta, raw_page, render_markdown
 from .user import logged_in
 
 
@@ -56,4 +55,4 @@ def view_edit(page_path):
             return edit_page(page_path)
         else:
             save_note(page_path, request.form['md'])
-            return process_page(page_path)
+            return redirect(url_for('note.view_page', page_path=page_path))
