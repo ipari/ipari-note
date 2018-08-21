@@ -35,7 +35,7 @@ def permission_path():
 def page_permissions():
     try:
         with open(permission_path(), 'r') as f:
-            return yaml.load(f)
+            return yaml.load(f) or {}
     except IOError:
         return {}
 
