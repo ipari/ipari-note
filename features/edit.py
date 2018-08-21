@@ -2,7 +2,7 @@ import re
 from flask import Blueprint, redirect, request, render_template, url_for
 
 from .config import config
-from .note import file_path, menu_list, note_meta, raw_page, render_markdown
+from .note import *
 from .user import logged_in
 
 
