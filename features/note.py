@@ -8,6 +8,10 @@ from features.cryptography import decrypt, encrypt
 from .user import logged_in, user_info
 
 
+__all__ = ['error_page', 'file_path', 'menu_list', 'note_meta',
+           'permission_path', 'raw_page', 'render_markdown']
+
+
 blueprint = Blueprint('note', __name__)
 
 
