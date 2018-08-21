@@ -64,7 +64,11 @@ def render_page(page_path, meta, menu):
                            content=content)
 
 
-def error_page(page_path, meta, menu, message):
+def error_page(page_path, meta=None, menu=None, message=''):
+    if meta is None:
+        meta = note_meta()
+    if menu is None:
+        menu = menu_list(page_path)
     return render_template('error.html',
                            meta=meta,
                            pagename=page_path,
@@ -158,7 +162,10 @@ def process_page(page_path, force_allow=False):
 
 def config_page(page_path, form):
     if not logged_in():
-        return "로그인하지 않은 사용자가 페이지 설정을 변경하려고 하였습니다."
+        message = \
+            "로그인하지 않은 사용자가 페이지 설정을 변경하려고 하였습니다."
+        return error_page(page_path=page_path,
+                          message=message)
 
     if 'permission' in form:
         permissions = page_permissions()

@@ -49,7 +49,9 @@ def preview():
 @blueprint.route('/edit/<path:page_path>', methods=['GET', 'POST'])
 def view_edit(page_path):
     if not logged_in():
-        return redirect('/login')
+        message = "로그인 후에 편집할 수 있습니다."
+        return error_page(page_path=page_path,
+                          message=message)
     else:
         if request.method == 'GET':
             return edit_page(page_path)
