@@ -1,4 +1,6 @@
+import os
 import re
+import yaml
 from flask import Blueprint, redirect, request, render_template, url_for
 
 from .config import config
@@ -26,6 +28,22 @@ def edit_page(page_path):
                            base_url=base_url,
                            menu=menu_list(),
                            content=content)
+
+
+def delete_page(page_path):
+    # 노트 제거
+    path = file_path(page_path)
+    os.remove(path)
+
+    # 퍼미션 제거
+    with open(permission_path(), 'r') as f:
+        permissions = yaml.load(f) or {}
+        try:
+            del permissions[page_path]
+        except KeyError:
+            pass
+    with open(permission_path(), 'w') as f:
+        yaml.dump(permissions, f, default_flow_style=False)
 
 
 @blueprint.route('/preview', methods=['POST'])
@@ -56,5 +74,9 @@ def view_edit(page_path):
         if request.method == 'GET':
             return edit_page(page_path)
         else:
-            save_note(page_path, request.form['md'])
+            raw_md = request.form['md']
+            if raw_md:
+                save_note(page_path, request.form['md'])
+            else:
+                delete_page(page_path)
             return redirect(url_for('note.view_page', page_path=page_path))
