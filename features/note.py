@@ -1,15 +1,15 @@
 import markdown
 import os
-import yaml
 from flask import Blueprint, current_app, request, render_template, send_file
 
-from features.config import config, md_extensions
-from features.cryptography import decrypt, encrypt
+from .config import config, md_extensions
+from .cryptography import decrypt, encrypt
+from .permission import page_permission, set_permission
 from .user import logged_in, user_info
 
 
-__all__ = ['error_page', 'file_path', 'menu_list', 'note_meta',
-           'permission_path', 'raw_page', 'render_markdown']
+__all__ = ['error_page', 'file_path', 'menu_list', 'note_meta', 'raw_page',
+           'render_markdown']
 
 
 blueprint = Blueprint('note', __name__)
@@ -26,22 +26,6 @@ def file_path(page_path):
 
 def file_exists(page_path):
     return os.path.isfile(file_path(page_path))
-
-
-def permission_path():
-    return os.path.join(current_app.root_path, 'meta', 'permission.yml')
-
-
-def page_permissions():
-    try:
-        with open(permission_path(), 'r') as f:
-            return yaml.load(f) or {}
-    except IOError:
-        return {}
-
-
-def page_permission(page_path):
-    return page_permissions().get(page_path, 0)
 
 
 def raw_page(page_path):
@@ -172,10 +156,9 @@ def config_page(page_path, form):
                           message=message)
 
     if 'permission' in form:
-        permissions = page_permissions()
-        permissions[page_path] = int(form['permission'])
-        with open(permission_path(), 'w') as f:
-            yaml.dump(permissions, f, default_flow_style=False)
+        permission = int(form['permission'])
+        set_permission(page_path, permission)
+
     return process_page(page_path)
 
 

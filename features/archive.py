@@ -2,7 +2,8 @@ import os
 from flask import Blueprint, render_template
 
 from .config import config
-from .note import menu_list, note_meta, page_permissions
+from .note import menu_list, note_meta
+from .permission import page_permissions
 from .user import logged_in
 
 

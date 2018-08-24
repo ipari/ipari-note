@@ -1,10 +1,10 @@
 import os
 import re
-import yaml
 from flask import Blueprint, redirect, request, render_template, url_for
 
 from .config import config
 from .note import *
+from .permission import delete_permission
 from .user import logged_in
 
 
@@ -32,19 +32,13 @@ def edit_page(page_path):
 
 
 def delete_page(page_path):
+    # 퍼미션 제거
+    delete_permission(page_path)
+
     # 노트 제거
     path = file_path(page_path)
     os.remove(path)
 
-    # 퍼미션 제거
-    with open(permission_path(), 'r') as f:
-        permissions = yaml.load(f) or {}
-        try:
-            del permissions[page_path]
-        except KeyError:
-            pass
-    with open(permission_path(), 'w') as f:
-        yaml.dump(permissions, f, default_flow_style=False)
 
 
 @blueprint.route('/preview', methods=['POST'])
