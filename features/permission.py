@@ -1,10 +1,9 @@
 import os
 import yaml
-from flask import current_app
 
 
 def permission_path():
-    return os.path.join(current_app.root_path, 'meta', 'permission.yml')
+    return os.path.join('meta', 'permission.yml')
 
 
 def page_permissions():

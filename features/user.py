@@ -1,6 +1,6 @@
 import os
 import yaml
-from flask import Blueprint, current_app, request, redirect, render_template,\
+from flask import Blueprint, request, redirect, render_template,\
     session
 
 from .cryptography import compare_hash_with_text
@@ -10,7 +10,7 @@ blueprint = Blueprint('user', __name__)
 
 
 def user_info_path():
-    return os.path.join(current_app.root_path, 'meta', 'user.yml')
+    return os.path.join('meta', 'user.yml')
 
 
 def user_info(key):
