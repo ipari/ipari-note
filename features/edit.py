@@ -39,6 +39,14 @@ def delete_page(page_path):
     path = file_path(page_path)
     os.remove(path)
 
+    # 빈 디렉터리 제거
+    dirs = os.path.dirname(path).split('/')
+    for x in range(len(dirs), 0, -1):
+        subdir = os.path.join(*dirs[:x])
+        try:
+            os.rmdir(subdir)
+        except OSError:
+            continue
 
 
 @blueprint.route('/preview', methods=['POST'])
