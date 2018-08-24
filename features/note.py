@@ -98,25 +98,29 @@ def process_page(page_path, force_allow=False):
         page_path = decrypted_page_path
         from_link = True
 
-    _, file_extension = os.path.splitext(page_path)
-    # .md 로 접근하면 페이지를 렌더링한다.
-    if file_extension == '.md':
-        page_path = page_path[:-3]
-        file_extension = None
+    is_file = False
+    path, extension = os.path.splitext(page_path)
+    if extension:
+        if extension == '.md':
+            page_path = path
+        else:
+            is_file = True
 
-    permission = page_permission(page_path)
     meta = note_meta()
     meta['logged_in'] = logged_in()
-    meta['permission'] = permission
 
     if file_exists(page_path):
-        if file_extension:
+        if is_file:
             # 파일인 경우 URL 직접 접속과 외부 접속을 차단한다.
             if logged_in() \
                     or (request.referrer and
                         request.url_root in request.referrer):
                 return send_file(file_path(page_path))
         else:
+            # 노트인 경우 권한에 따라 다르게 처리한다.
+            permission = page_permission(page_path)
+            meta['permission'] = permission
+
             if logged_in() \
                     or permission == 2 \
                     or (force_allow and permission >= 1):
@@ -136,7 +140,7 @@ def process_page(page_path, force_allow=False):
     message = "문서가 없거나, 혹은 접근할 권한이 없습니다."
 
     if logged_in():
-        if file_extension:
+        if is_file:
             message = "파일이 없습니다."
         else:
             menu = menu_list(page_path=page_path, file_exists=False)
