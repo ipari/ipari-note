@@ -91,6 +91,12 @@ def menu_list(page_path=None, file_exists=False):
     return items
 
 
+def encrypt_url(page_path):
+    base_url = config('note')['base_url']
+    url = '{}{}/{}'.format(request.url_root, base_url, encrypt(page_path))
+    return url
+
+
 def process_page(page_path, force_allow=False):
     from_link = False
     decrypted_page_path = decrypt(page_path)
@@ -126,10 +132,8 @@ def process_page(page_path, force_allow=False):
                     or (force_allow and permission >= 1):
 
                 if permission == 1:
-                    link = encrypt(page_path)
-                    base_url = config('note')['base_url']
-                    meta['link'] = '{}{}/{}'.format(
-                        request.url_root, base_url, link)
+                    # 노트를 공유할 수 있는 암호화된 링크를 보여준다.
+                    meta['link'] = encrypt_url(page_path)
                 menu = menu_list(page_path=page_path, file_exists=True)
                 return render_page(page_path, meta, menu)
             elif from_link and permission == 1:
