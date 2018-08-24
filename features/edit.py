@@ -13,6 +13,7 @@ blueprint = Blueprint('edit', __name__)
 
 def save_note(page_path, content):
     path = file_path(page_path)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w') as f:
         f.write(content)
 
