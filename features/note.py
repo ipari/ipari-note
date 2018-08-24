@@ -159,7 +159,7 @@ def process_page(page_path, force_allow=False):
 def config_page(page_path, form):
     if not logged_in():
         message = \
-            "로그인하지 않은 사용자가 페이지 설정을 변경하려고 하였습니다."
+            "페이지 설정 변경에 실패하였습니다."
         return error_page(page_path=page_path,
                           message=message)
 
