@@ -1,6 +1,6 @@
 import markdown
 import os
-from flask import Blueprint, request, render_template, send_file
+from flask import Blueprint, current_app, request, render_template, send_file
 
 from .config import config, md_extensions
 from .cryptography import decrypt, encrypt
@@ -16,7 +16,7 @@ blueprint = Blueprint('note', __name__)
 
 
 def file_path(page_path):
-    base_path = os.path.join('pages', page_path)
+    base_path = os.path.join(current_app.root_path, 'pages', page_path)
     _, file_extension = os.path.splitext(page_path)
 
     if file_extension:

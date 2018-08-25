@@ -1,13 +1,16 @@
+import os
 import re
 import yaml
+from flask import current_app
 
 from markdown.extensions.toc import TocExtension
 from markdown.extensions.wikilinks import WikiLinkExtension, WikiLinks
 
 
 def config(key=None):
+    path = os.path.join(current_app.root_path, 'config.yml')
     try:
-        with open('config.yml', 'r') as f:
+        with open(path, 'r') as f:
             data = yaml.load(f)
     except IOError:
         print('no config')

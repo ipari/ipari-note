@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, render_template
+from flask import Blueprint, current_app, render_template
 
 from .config import config
 from .note import menu_list, note_meta
@@ -13,15 +13,15 @@ blueprint = Blueprint('archive', __name__)
 @blueprint.route('/archive')
 def view_archive():
     permissions = page_permissions()
-    path = os.path.join('pages')
+    page_root = os.path.join(current_app.root_path, 'pages')
     pages = []
-    for root, subdirs, files in os.walk(path):
-        page_dir = '/'.join(root.split('/')[1:])
+    for root, subdirs, files in os.walk(page_root):
         for file in files:
             name, ext = os.path.splitext(file)
             if ext != '.md':
                 continue
-            page_path = os.path.join(page_dir, name)
+            abs_path = os.path.join(root, name)
+            page_path = os.path.relpath(abs_path, page_root)
             permission = permissions.get(page_path, 0)
             if logged_in() or permission == 2:
                 pages.append(page_path)
