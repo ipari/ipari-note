@@ -19,14 +19,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-window.addEventListener("load", function() {
-    setArticleMinHeight();
-});
-
-window.addEventListener("resize", function() {
-    setArticleMinHeight();
-});
-
 function toggleNav() {
     // nav 를 토글한다.
     let nav = select("nav");
@@ -34,25 +26,6 @@ function toggleNav() {
         nav.style.display = "block";
     } else {
         nav.style.display = "none";
-    }
-    setArticleMinHeight();
-}
-
-function setArticleMinHeight() {
-    // article 의 최소 크기를 footer 가 바닥에 닿을 정도로 설정한다.
-    let windowHeight = window.innerHeight;
-    let headerHeight = select("header").getBoundingClientRect().height;
-    let navHeight = select("nav").getBoundingClientRect().height;
-
-    let article = select("article");
-    article.style.height = "auto";
-    let articleHeight = select("article").getBoundingClientRect().height;
-
-    let footerHeight = select("footer").getBoundingClientRect().height;
-    let minArticleHeight = windowHeight - headerHeight - navHeight - footerHeight;
-
-    if (minArticleHeight > articleHeight) {
-        article.style.height = minArticleHeight + "px";
     }
 }
 
@@ -62,19 +35,6 @@ function select(query) {
 
 function selects(query) {
     return document.querySelectorAll(query);
-}
-
-function getElementValue(query, property) {
-    let elem = select(query);
-    let style = window.getComputedStyle(elem, null);
-    return style.getPropertyValue(property);
-}
-
-function setElementValue(query, property, value) {
-    let elements = selects(query);
-    for (let element of elements) {
-        element.style[property] = value;
-    }
 }
 
 function previewMarkdown(preview, plainText) {

@@ -14,9 +14,13 @@ html,
 body {
     margin: 0;
     padding: 0;
+    height: 100%;
 }
 
 body {
+    display: flex;
+    flex-direction: column;
+
     font: normal 18px/1.5 'Apple SD Gothic Neo', 'Malgun Gothic', Helvetica, Arial, Sans-serif;
     letter-spacing: -0.5px;
     -webkit-text-size-adjust: 100%;
@@ -26,6 +30,7 @@ body {
 }
 
 article {
+    flex: 1 1 auto;
     background-color: #FFFFFF;
 }
 
