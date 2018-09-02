@@ -20,12 +20,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 window.addEventListener("load", function() {
-    // header 의 햄버거 메뉴 수직 가운데 정렬
-    let headerHeight = parseInt(getElementValue("header div.page", "height"));
-    let menuButtonHeight = parseInt(getElementValue("header button", "height"));
-    let marginTop = (headerHeight - menuButtonHeight) / 2 + "px";
-    setElementValue("header button", "marginTop", marginTop);
-
     setArticleMinHeight();
 });
 
