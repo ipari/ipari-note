@@ -25,7 +25,7 @@ def set_permission(page_path, value):
         permissions = page_permissions()
         permissions[page_path] = permission
         with open(permission_path(), 'w') as f:
-            yaml.dump(permissions, f, default_flow_style=False)
+            yaml.dump(permissions, f, default_flow_style=False, allow_unicode=True)
     else:
         delete_permission(page_path)
 
@@ -38,4 +38,4 @@ def delete_permission(page_path):
         except KeyError:
             pass
     with open(permission_path(), 'w') as f:
-        yaml.dump(permissions, f, default_flow_style=False)
+        yaml.dump(permissions, f, default_flow_style=False, allow_unicode=True)
