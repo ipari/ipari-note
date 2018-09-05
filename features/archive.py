@@ -27,6 +27,7 @@ def view_archive():
                 pages.append(page_path)
 
     base_url = config('note')['base_url']
+    pages = sorted(pages)
     return render_template('archive.html',
                            meta=note_meta(), menu=menu_list(),
                            base_url=base_url, pages=pages)
