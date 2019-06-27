@@ -1,7 +1,7 @@
 click==6.7
 Flask==1.0.2
 itsdangerous==0.24
-Jinja2==2.10
+Jinja2==2.10.1
 Markdown==2.6.11
 MarkupSafe==1.0
 pycryptodome==3.6.6
