@@ -16,7 +16,7 @@ def user_info_path():
 def user_info(key):
     try:
         with open(user_info_path(), 'r') as f:
-            data = yaml.load(f)
+            data = yaml.full_load(f)
     except IOError:
         print('no user info in {}'.format(user_info_path()))
     else:

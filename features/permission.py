@@ -10,7 +10,7 @@ def permission_path():
 def page_permissions():
     try:
         with open(permission_path(), 'r') as f:
-            return yaml.load(f) or {}
+            return yaml.full_load(f) or {}
     except IOError:
         return {}
 
@@ -32,7 +32,7 @@ def set_permission(page_path, value):
 
 def delete_permission(page_path):
     with open(permission_path(), 'r') as f:
-        permissions = yaml.load(f) or {}
+        permissions = yaml.full_load(f) or {}
         try:
             del permissions[page_path]
         except KeyError:

@@ -12,7 +12,7 @@ def config(key=None):
     path = os.path.join(current_app.root_path, 'config.yml')
     try:
         with open(path, 'r') as f:
-            data = yaml.load(f)
+            data = yaml.full_load(f)
     except IOError:
         print('no config')
     else:
