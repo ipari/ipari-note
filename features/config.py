@@ -4,7 +4,8 @@ import yaml
 from flask import current_app
 
 from markdown.extensions.toc import TocExtension
-from markdown.extensions.wikilinks import WikiLinkExtension, WikiLinks
+from markdown.extensions.wikilinks \
+    import WikiLinkExtension, WikiLinksInlineProcessor
 
 
 def config(key=None):
@@ -52,8 +53,8 @@ def _slugify(value, _):
 
 class WikiLinkExtensionCustom(WikiLinkExtension):
     """
-    기본 WikiLinkExtension이 '/'가 있으면 링크로 인식하지 않는 문제를 해결.
-    wikilink_re에 '/' 을 추가한다.
+    기본 WikiLinkExtension 은  '/'가 있으면 링크로 인식하지 않는다.
+    wikilink_re에 '/' 을 추가하여 문제를 해결한다.
     """
 
     md = None
@@ -61,11 +62,12 @@ class WikiLinkExtensionCustom(WikiLinkExtension):
     def __init__(self, *args, **kwargs):
         super(WikiLinkExtensionCustom, self).__init__(*args, **kwargs)
 
-    def extendMarkdown(self, md, md_globals):
+    def extendMarkdown(self, md):
         self.md = md
 
         # append to end of inline patterns
         wikilink_re = r'\[\[([\w0-9_ -/]+)\]\]'
-        wikilink_pattern = WikiLinks(wikilink_re, self.getConfigs())
+        wikilink_pattern = \
+            WikiLinksInlineProcessor(wikilink_re, self.getConfigs())
         wikilink_pattern.md = md
-        md.inlinePatterns.add('wikilink', wikilink_pattern, "<not_strong")
+        md.inlinePatterns.register(wikilink_pattern, 'wikilink', 75)
