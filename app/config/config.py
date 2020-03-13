@@ -6,14 +6,16 @@ CONFIG_FILENAME = 'data/configs/note.yml'
 CONFIG_PATH = os.path.join(os.getcwd(), CONFIG_FILENAME)
 
 
-def get_config(key, default=None):
+def get_config(key=None, default=None):
     try:
         with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
             data = yaml.full_load(f)
     except IOError:
         init_config()
-        return get_config(key, default=default)
+        return get_config(key=key, default=default)
     else:
+        if key is None:
+            return data
         return data.get(key, default)
 
 
