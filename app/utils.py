@@ -3,10 +3,10 @@ import operator
 import random
 import string
 from functools import reduce
-from app.config.config import get_config
 
 
 def config(path=None, default=None):
+    from app.config.config import get_config
     return get_config(path=path, default=default)
 
 
