@@ -1,22 +1,30 @@
 import os
 import yaml
+from app.utils import get_value_by_path, set_value_by_path
 
 
 CONFIG_FILENAME = 'data/configs/note.yml'
 CONFIG_PATH = os.path.join(os.getcwd(), CONFIG_FILENAME)
 
 
-def get_config(key=None, default=None):
+def get_config(path=None, default=None):
     try:
         with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
             data = yaml.full_load(f)
     except IOError:
         init_config()
-        return get_config(key=key, default=default)
+        return get_config(path=path, default=default)
     else:
-        if key is None:
+        if path is None:
             return data
-        return data.get(key, default)
+        return get_value_by_path(data, path, default=default)
+
+
+def set_config(path, value):
+    config = get_config(path, value)
+    config = set_value_by_path(config, path, value)
+    with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
+        yaml.dump(config, f)
 
 
 def is_config_exist():
