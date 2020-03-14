@@ -21,10 +21,9 @@ def get_config(path=None, default=None):
 
 
 def set_config(path, value):
-    config = get_config(path, value)
-    config = set_value_by_path(config, path, value)
+    config = set_value_by_path(get_config(), path, value)
     with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
-        yaml.dump(config, f)
+        yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
 
 
 def is_config_exist():
