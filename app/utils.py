@@ -60,9 +60,15 @@ def set_value_by_path(d, path, value):
 
     if isinstance(path, str):
         path = path.split('.')
+
     new_d = copy.deepcopy(d)
-    part = get_value_by_path(new_d, path[:-1], reduce_func=custom_reduce)
-    part[path[-1]].update(value)
+    target = get_value_by_path(new_d, path[:-1], reduce_func=custom_reduce)
+    key = path[-1]
+    if isinstance(target[key], dict) and isinstance(value, dict):
+        target[key].update(value)
+    else:
+        target[key] = value
+
     return new_d
 
 
