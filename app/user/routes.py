@@ -1,6 +1,7 @@
+from flask import render_template
 from app.user import bp
 
 
 @bp.route('/user')
 def route_user():
-    return f'User page.'
+    return render_template('user.html')

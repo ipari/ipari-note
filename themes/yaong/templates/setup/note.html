@@ -1,10 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-노트 이름, 노트 설명
-</body>
-</html>
+{% extends "setup/_base.html" %}
+
+{% block title %}
+어떤 노트인가요?
+{% endblock %}
+
+{% block content %}
+<form action="" method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.title.label }}<br>
+        {{ form.title(size=32, placeholder="ipari-note") }}
+    </p>
+    <p>
+        {{ form.subtitle.label }}<br>
+        {{ form.subtitle(size=32, placeholder="Written by a cat.") }}
+    </p>
+    <p>{{ form.submit() }}</p>
+</form>
+{% endblock %}

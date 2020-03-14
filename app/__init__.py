@@ -8,6 +8,9 @@ def create_app():
     if not config.is_config_exist():
         config.init_config()
 
+    secret = config.get_config('secret')['key']
+    app.config['SECRET_KEY'] = secret
+
     theme = config.get_config('note')['theme']
     app.static_folder = '../themes/{}/static'.format(theme)
     app.template_folder = '../themes/{}/templates'.format(theme)

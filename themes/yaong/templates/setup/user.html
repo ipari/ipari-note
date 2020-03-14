@@ -1,10 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-사용자 필명, 이메일, 비밀번호, 비밀번호 확인
-</body>
-</html>
+{% extends "setup/_base.html" %}
+
+{% block title %}
+당신은 누구인가요?
+{% endblock %}
+
+{% block content %}
+<form action="" method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.name.label }}<br>
+        {{ form.name(size=32, placeholder="Love Quinn") }}
+        {% for error in form.name.errors %}
+        {{ error }}
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.email.label }}<br>
+        {{ form.email(size=32, placeholder="someone@gmail.com") }}
+        {% for error in form.email.errors %}
+        {{ error }}
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.password.label }}<br>
+        {{ form.password(size=32) }}
+        {% for error in form.password.errors %}
+        {{ error }}
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.password_confirm.label }}<br>
+        {{ form.password_confirm(size=32) }}
+        {% for error in form.password_confirm.errors %}
+        {{ error }}
+        {% endfor %}
+    </p>
+    <p>{{ form.submit() }}</p>
+</form>
+{% endblock %}
