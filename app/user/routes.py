@@ -1,5 +1,5 @@
 from flask import flash, redirect, render_template, request, session
-from app.note.note import get_note_meta
+from app.note.note import get_menu_list, get_note_meta
 from app.user import bp
 from app.user.forms import LoginForm
 from app.user.user import is_logged_in, log_in
@@ -19,7 +19,8 @@ def route_login():
     if request.method == 'GET':
         form.referrer = request.referrer
         meta = get_note_meta()
-        return render_template('login.html', form=form, meta=meta)
+        menu = get_menu_list()
+        return render_template('login.html', form=form, meta=meta, menu=menu)
 
     if log_in(form):
         if form.referrer:

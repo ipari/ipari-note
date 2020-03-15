@@ -26,17 +26,9 @@
   <nav>
     <div class="page">
       <ul>
-      {% set menu_name = {
-        'login': '로그인',
-        'logout': '로그아웃',
-        'write': '작성',
-        'edit': '편집',
-        'archive': '목록',
-        'config': '설정' }
-      %}
       {% for item in menu %}
         <li>
-          <a class="menu-{{ item.type }}" href="{{ item.url }}">{{ menu_name[item.type] }}</a>
+          <a class="menu-{{ item.type }}" href="{{ item.url }}">{{ item.label }}</a>
         </li>
       {% endfor %}
       </ul>
