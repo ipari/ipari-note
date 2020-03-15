@@ -1,5 +1,7 @@
 import os
 import yaml
+from flask import session
+from werkzeug.security import check_password_hash
 from app.utils import get_value_by_path
 
 
@@ -26,3 +28,16 @@ def set_user(d):
 
 def is_user_exists():
     return os.path.isfile(USER_PATH)
+
+
+def is_logged_in():
+    return 'user' in session
+
+
+def log_in(form):
+    user = get_user()
+    is_valid_email = user['email'] == form.email.data
+    is_valid_password = check_password_hash(user['password'], form.password.data)
+    if is_valid_email and is_valid_password:
+        session['user'] = user['email']
+        return True
