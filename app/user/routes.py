@@ -32,7 +32,9 @@ def route_login():
 
 @bp.route('/logout')
 def route_logout():
-    session.pop('user')
-    if request.referrer is None:
-        return redirect('/login')
-    return redirect(request.referrer)
+    if is_logged_in():
+        session.pop('user')
+
+    if request.referrer:
+        return redirect(request.referrer)
+    return redirect('/')
