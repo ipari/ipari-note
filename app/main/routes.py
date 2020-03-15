@@ -1,4 +1,4 @@
-from flask import redirect
+from flask import redirect, url_for
 
 from app.main import bp
 from app.config import config
@@ -6,8 +6,9 @@ from app.user import user
 
 
 @bp.route('/')
-def index():
-    return 'Hello, ipari.'
+def route_index():
+    main_page = config.get_config('note')['main_page']
+    return redirect(url_for('note.route_page', page_path=main_page))
 
 
 @bp.before_request
