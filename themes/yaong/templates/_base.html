@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   {% block script %}{% endblock %}
-  <title>{% block pagename %}{% endblock %} - {{ meta.note_name }}</title>
+  <title>{% block pagename %}{% endblock %} - {{ meta.note_title }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/pygments/arduino.css') }}" />
@@ -15,8 +15,8 @@
   <header>
     <div class="page">
       <div class="left">
-        <h1><a href="/">{{ meta.note_name }}</a></h1>
-        <p>{{ meta.note_description }}</p>
+        <h1><a href="/">{{ meta.note_title }}</a></h1>
+        <p>{{ meta.note_subtitle }}</p>
       </div>
       <div class="right">
         <button>Menu</button>
@@ -48,7 +48,7 @@
     </div>
   </article>
   <footer>
-    <div class="page">&copy; Copyright 2018 by {{ meta.user_name }}.</div>
+    <div class="page">&copy; Copyright {{ meta.year }} by {{ meta.user_name }}.</div>
   </footer>
 </body>
 </html>
