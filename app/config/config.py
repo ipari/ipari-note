@@ -25,8 +25,12 @@ def set_config(d):
         yaml.dump(d, f, default_flow_style=False, allow_unicode=True)
 
 
+def is_file_exist(path):
+    return os.path.isfile(path)
+
+
 def is_config_exist():
-    return os.path.isfile(CONFIG_PATH)
+    return is_file_exist(CONFIG_PATH)
 
 
 def is_require_setup():
