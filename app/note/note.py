@@ -1,6 +1,12 @@
+import os
 from datetime import datetime
-from app.config.config import get_config
+from flask import render_template, request, send_file
+from app.config.config import get_config, is_file_exist
+from app.note.markdown import render_markdown
 from app.user.user import get_user, is_logged_in
+
+
+NOTE_EXT = ('.md', '.html')
 
 
 def get_note_meta():
@@ -29,3 +35,42 @@ def get_menu_list(page_path=None, page_exist=False):
         items.append({'type': 'archive', 'url': '/archive', 'label': '목록'})
         items.append({'type': 'login', 'url': '/login', 'label': '로그인'})
     return items
+
+
+def render_page(file_path, page_path):
+    content = render_markdown(file_path)
+    meta = get_note_meta()
+    menu = get_menu_list()
+    return render_template('page.html',
+                           meta=meta,
+                           menu=menu,
+                           pagename=page_path,
+                           content=content)
+
+
+def process_page(page_path):
+    file_path = get_file_path(page_path)
+    if file_path:
+        _, ext = os.path.splitext(file_path)
+        if ext not in NOTE_EXT:
+            # 파일인 경우 URL 직접 접속과 외부 접속을 차단한다.
+            if is_logged_in() or (request.referrer and request.url_root in request.referrer):
+                return send_file(file_path)
+        # 노트는 권한에 따라 다르게 처리한다.
+        return render_page(file_path, page_path)
+
+    return 'page not exists'
+
+
+def get_file_path(page_path):
+    base_path = os.path.join(os.getcwd(), 'data/pages', page_path)
+    _, ext = os.path.splitext(page_path)
+
+    if ext and is_file_exist(base_path):
+        return base_path
+
+    for ext in NOTE_EXT:
+        file_path = base_path + ext
+        if is_file_exist(file_path):
+            return file_path
+    return None
