@@ -1,6 +1,8 @@
 import os
 from datetime import datetime
-from flask import flash, render_template, request, send_file
+from flask import flash, redirect, render_template, request, send_file, url_for
+
+from app.crypto import decrypt
 from app.config.config import get_config, is_file_exist
 from app.note.markdown import render_markdown
 from app.note.permission import Permission, get_permission
@@ -51,11 +53,15 @@ def render_page(file_path, page_path):
 
 def process_page(page_path, link_verified=False):
 
-    # 페이지 암호화를 풀고,
+    if not link_verified:
+        decrypted_page_path = decrypt(page_path)
+        if decrypted_page_path is not None:
+            permission = get_permission(decrypted_page_path)
+            if permission == Permission.LINK_ACCESS:
+                return process_page(decrypted_page_path, link_verified=True)
 
     # 올바른 암호면, 퍼미션을 확인하여 리턴한다.
     permission = get_permission(page_path)
-    # return process_page(page_path, link_verified=True)
 
     file_path = get_file_path(page_path)
     if file_path:
