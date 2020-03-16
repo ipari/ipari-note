@@ -17,7 +17,7 @@ def route_login():
 
     form = LoginForm()
     if request.method == 'GET':
-        form.referrer = request.referrer
+        form.referrer.data = request.referrer
         meta = get_note_meta()
         menu = get_menu_list()
         return render_template('login.html', form=form, meta=meta, menu=menu)
