@@ -3,6 +3,7 @@ from flask import Flask
 
 def create_app():
     app = Flask(__name__)
+    app.url_map.strict_slashes = False
 
     from app.config import config
     if not config.is_config_exist():
