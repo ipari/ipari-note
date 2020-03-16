@@ -1,8 +1,9 @@
 import os
 from datetime import datetime
-from flask import render_template, request, send_file
+from flask import flash, render_template, request, send_file
 from app.config.config import get_config, is_file_exist
 from app.note.markdown import render_markdown
+from app.note.permission import Permission, get_permission
 from app.user.user import get_user, is_logged_in
 
 
@@ -48,7 +49,14 @@ def render_page(file_path, page_path):
                            content=content)
 
 
-def process_page(page_path):
+def process_page(page_path, link_verified=False):
+
+    # 페이지 암호화를 풀고,
+
+    # 올바른 암호면, 퍼미션을 확인하여 리턴한다.
+    permission = get_permission(page_path)
+    # return process_page(page_path, link_verified=True)
+
     file_path = get_file_path(page_path)
     if file_path:
         _, ext = os.path.splitext(file_path)
@@ -57,9 +65,21 @@ def process_page(page_path):
             if is_logged_in() or (request.referrer and request.url_root in request.referrer):
                 return send_file(file_path)
         # 노트는 권한에 따라 다르게 처리한다.
-        return render_page(file_path, page_path)
+        if is_logged_in()\
+                or permission == Permission.PUBLIC\
+                or (permission == Permission.LINK_ACCESS and link_verified):
+            return render_page(file_path, page_path)
 
-    return 'page not exists'
+    meta = get_note_meta()
+    menu = get_menu_list()
+
+    if is_logged_in():
+        message = '문서가 없습니다.'
+    else:
+        message = '문서가 없거나 권한이 없는 문서입니다.'
+
+    flash(message)
+    return render_template('page.html', meta=meta, menu=menu, pagename=page_path)
 
 
 def get_file_path(page_path):
