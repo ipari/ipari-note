@@ -3,8 +3,9 @@
 {% block pagename %}{{ pagename }}{% endblock %}
 
 {% block content %}
-    {% if meta.logged_in %}
     {% set class_names = {0: 'closed', 1: 'allow-link', 2: 'opened'} %}
+
+    {% if meta.logged_in %}
     <div class="permission {{ class_names[meta.permission] }}">
         <div>
         {% if meta.permission == 0 %}
@@ -35,6 +36,15 @@
         </form>
         </div>
     </div>
+    {% else %}
+    {% if meta.permission == 1 %}
+    <div class="permission {{ class_names[meta.permission] }}">
+        <div>
+            <strong>링크 허용 문서</strong> 아래 링크로 접속할 때 보여집니다.<br />
+            <a href="{{ meta.link }}">{{ meta.link }}</a>
+        </div>
+    </div>
+    {% endif %}
     {% endif %}
 
     <h1>{{ pagename }}</h1>

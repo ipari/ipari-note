@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from flask import flash, render_template, request, send_file, session
 
-from app.crypto import decrypt
+from app.crypto import decrypt, encrypt
 from app.config.config import get_config, is_file_exist
 from app.note.markdown import render_markdown
 from app.note.permission import Permission, get_permission
@@ -40,10 +40,8 @@ def get_menu_list(page_path=None, page_exist=False):
     return items
 
 
-def render_page(file_path, page_path):
+def render_page(file_path, page_path, meta, menu):
     content = render_markdown(file_path)
-    meta = get_note_meta()
-    menu = get_menu_list()
     return render_template('page.html',
                            meta=meta,
                            menu=menu,
@@ -68,18 +66,23 @@ def process_page(page_path):
         return error_page(page_path)
 
     _, ext = os.path.splitext(file_path)
+    # 파일인 경우 URL 직접 접속과 외부 접속을 차단한다.
     if ext not in NOTE_EXT:
-        # 파일인 경우 URL 직접 접속과 외부 접속을 차단한다.
         if is_logged_in() or (request.referrer and request.url_root in request.referrer):
             return send_file(file_path)
-    else:
-        # 노트는 권한에 따라 다르게 처리한다.
-        permission = get_permission(page_path)
-        if is_logged_in() or permission == Permission.PUBLIC:
-            return render_page(file_path, page_path)
-        elif permission == Permission.LINK_ACCESS:
-            if decrypt(session.get('key')) == page_path:
-                return render_page(file_path, page_path)
+        return error_page(page_path)
+    # 노트는 권한에 따라 다르게 처리한다.
+    permission = get_permission(page_path)
+    menu = get_menu_list(page_path=page_path, page_exist=True)
+    meta = get_note_meta()
+    meta['logged_in'] = is_logged_in()
+    meta['permission'] = permission
+    meta['link'] = encrypt_url(page_path)
+    if is_logged_in() or permission == Permission.PUBLIC:
+        return render_page(file_path, page_path, meta, menu)
+    elif permission == Permission.LINK_ACCESS:
+        if decrypt(session.get('key')) == page_path:
+            return render_page(file_path, page_path, meta, menu)
 
     return error_page(page_path)
 
@@ -96,3 +99,10 @@ def get_file_path(page_path):
         if is_file_exist(file_path):
             return file_path
     return None
+
+
+def encrypt_url(page_path):
+    url_root = request.url_root
+    base_url = get_config('note.base_url')
+    url = f'{url_root}{base_url}/{encrypt(page_path)}'
+    return url
