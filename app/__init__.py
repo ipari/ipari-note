@@ -25,9 +25,6 @@ def create_app():
     from app.note import bp as note_bp
     app.register_blueprint(note_bp)
 
-    from app.edit import bp as edit_bp
-    app.register_blueprint(edit_bp)
-
     from app.config import bp as config_bp
     app.register_blueprint(config_bp)
 

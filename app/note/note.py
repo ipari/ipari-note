@@ -1,12 +1,11 @@
 import markdown
-import os
 from datetime import datetime
 from flask import flash, render_template, request, send_file, session
 
 from app.crypto import decrypt, encrypt
 from app.config.config import get_config, is_file_exist
 from app.note.markdown import md_extensions
-from app.note.permission import Permission, get_permission, set_permission
+from app.note.permission import *
 from app.user.user import get_user, is_logged_in
 
 
@@ -28,7 +27,8 @@ def get_menu_list(page_path=None, page_exist=False):
     items = []
     if is_logged_in():
         if page_path is not None:
-            url = '/edit/{}'.format(page_path)
+            base_url = get_config('note.base_url')
+            url = f'/{base_url}/{page_path}/edit'
             if page_exist:
                 items.append({'type': 'edit', 'url': url, 'label': '편집'})
             else:
@@ -43,7 +43,8 @@ def get_menu_list(page_path=None, page_exist=False):
 
 
 def render_page(file_path, page_path, meta, menu):
-    content = render_markdown(file_path)
+    raw_md = get_raw_page(file_path)
+    content = render_markdown(raw_md)
     return render_template('page.html',
                            meta=meta,
                            menu=menu,
@@ -101,6 +102,47 @@ def config_page(page_path, form):
     return process_page(page_path)
 
 
+def save_page(page_path, raw_md):
+    file_path = get_file_path(page_path)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.write(raw_md)
+
+
+def delete_page(page_path):
+    # 퍼미션 제거
+    delete_permission(page_path)
+
+    # 파일 제거
+    file_path = get_file_path(page_path)
+    os.remove(file_path)
+
+    # 빈 디렉터리 제거 (첫 2개는 data/pages)
+    page_dir_length = len(PAGE_DIR.split('/'))
+    dirs = os.path.dirname(file_path).split('/')[page_dir_length:]
+    for x in range(len(dirs), 0, -1):
+        subdir = os.path.join(PAGE_DIR, *dirs[:x])
+        try:
+            if len(os.listdir(subdir)) == 0:
+                os.rmdir(subdir)
+        except OSError:
+            continue
+
+
+def edit_page(page_path):
+    file_path = get_file_path(page_path)
+    base_url = get_config('note.base_url')
+    raw_md = get_raw_page(file_path)
+    # ` 문자는 ES6에서 템플릿 문자로 사용되므로 escape 해줘야 한다.
+    raw_md = raw_md.replace('`', '\`')
+    return render_template('edit.html',
+                           pagename=page_path,
+                           meta=get_note_meta(),
+                           menu=get_menu_list(),
+                           base_url=base_url,
+                           raw_md=raw_md)
+
+
 def get_file_path(page_path):
     return os.path.join(PAGE_DIR, page_path + '.md')
 
@@ -134,7 +176,6 @@ def get_raw_page(file_path):
         return ''
 
 
-def render_markdown(file_path):
+def render_markdown(raw_md):
     extensions = md_extensions()
-    raw_md = get_raw_page(file_path)
     return markdown.markdown(raw_md, extensions=extensions)

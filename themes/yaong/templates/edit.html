@@ -25,6 +25,7 @@
 
   {# https://github.com/sparksuite/simplemde-markdown-editor #}
   <script>
+  let postURL = "/{{ base_url }}/preview";
   let simplemde = new SimpleMDE({
       autofocus: true,
       autosave: {
@@ -36,7 +37,7 @@
       indentWithTabs: false,
       previewRender: function(plainText, preview) {
           setTimeout(function() {
-              previewMarkdown(preview, plainText);
+              previewMarkdown(preview, plainText, postURL);
           }, 250);
           return "Loading...";
       },

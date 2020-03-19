@@ -37,13 +37,13 @@ function selects(query) {
     return document.querySelectorAll(query);
 }
 
-function previewMarkdown(preview, plainText) {
+function previewMarkdown(preview, plainText, url) {
   let ajax = new XMLHttpRequest();
   let parameters = {
     "raw_md": plainText
   };
 
-  ajax.open("POST", "/preview", true);
+  ajax.open("POST", url, true);
   ajax.setRequestHeader("Content-type", "application/json");
   ajax.onreadystatechange = function() {
       if (ajax.readyState === 4 && ajax.status === 200) {
