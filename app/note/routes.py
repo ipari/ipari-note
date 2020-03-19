@@ -27,7 +27,7 @@ def preview():
         # ipari-note/guide 는 ipari-note 폴더의 guide.md 파일을 보여준다.
         # 그러므로 각종 경로에 ../ 를 붙여 한 단계 위에서 파일을 찾도록 한다.
         def replace_path(matchobj):
-            return '{}{}/{}{}'.format(matchobj.group(1), "..",
+            return '{}{}/{}{}'.format(matchobj.group(1), '..',
                                       matchobj.group(2), matchobj.group(3))
         pattern = r'(src=\")([^\"]*)(\")'
         html = re.sub(pattern, replace_path, html)
