@@ -72,7 +72,9 @@ def process_page(page_path):
     _, ext = os.path.splitext(file_path)
     # 파일인 경우 URL 직접 접속과 외부 접속을 차단한다.
     if ext not in NOTE_EXT:
-        if is_logged_in() or (request.referrer and request.url_root in request.referrer):
+        if is_logged_in() or \
+                (request.referrer and request.url_root in request.referrer):
+            file_path = os.path.join('..', file_path)
             return send_file(file_path)
         return error_page(page_path)
     # 노트는 권한에 따라 다르게 처리한다.
@@ -134,6 +136,7 @@ def edit_page(page_path):
     base_url = get_config('note.base_url')
     raw_md = get_raw_page(file_path)
     # ` 문자는 ES6에서 템플릿 문자로 사용되므로 escape 해줘야 한다.
+    # https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Template_literals
     raw_md = raw_md.replace('`', '\`')
     return render_template('edit.html',
                            pagename=page_path,
@@ -150,10 +153,8 @@ def get_file_path(page_path):
 def find_file_path(page_path):
     base_path = os.path.join(PAGE_DIR, page_path)
     _, ext = os.path.splitext(page_path)
-
     if ext and is_file_exist(base_path):
         return base_path
-
     for ext in NOTE_EXT:
         file_path = base_path + ext
         if is_file_exist(file_path):
