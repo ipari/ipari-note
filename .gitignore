@@ -5,5 +5,5 @@ run.sh
 
 *.pyc
 data/configs/*
-meta/permission.yml
-meta/user.yml
+data/pages/*
+!data/pages/ipari-note
