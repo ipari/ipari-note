@@ -1,16 +1,8 @@
-import markdown
 import re
 from markdown.extensions.toc import TocExtension
 from markdown.extensions.wikilinks \
     import WikiLinkExtension, WikiLinksInlineProcessor
 from app.config.config import get_config
-
-
-def render_markdown(file_path):
-    extensions = md_extensions()
-    with open(file_path, 'r') as f:
-        raw_md = f.read()
-    return markdown.markdown(raw_md, extensions=extensions)
 
 
 def md_extensions():

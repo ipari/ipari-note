@@ -48,6 +48,6 @@
       tabSize: 4
   });
   {# ES6 템플릿 문자열 ` 을 사용해야 한다. #}
-  simplemde.value(`{{ content|safe }}`);
+  simplemde.value(`{{ raw_md|safe }}`);
   </script>
 {% endblock %}

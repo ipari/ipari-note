@@ -1,15 +1,17 @@
+import markdown
 import os
 from datetime import datetime
 from flask import flash, render_template, request, send_file, session
 
 from app.crypto import decrypt, encrypt
 from app.config.config import get_config, is_file_exist
-from app.note.markdown import render_markdown
+from app.note.markdown import md_extensions
 from app.note.permission import Permission, get_permission, set_permission
 from app.user.user import get_user, is_logged_in
 
 
 NOTE_EXT = ('.md', '.html')
+PAGE_DIR = 'data/pages'
 
 
 def get_note_meta():
@@ -62,7 +64,7 @@ def error_page(page_path, message=None):
 
 
 def process_page(page_path):
-    file_path = get_file_path(page_path)
+    file_path = find_file_path(page_path)
     if not file_path:
         return error_page(page_path)
 
@@ -100,7 +102,11 @@ def config_page(page_path, form):
 
 
 def get_file_path(page_path):
-    base_path = os.path.join(os.getcwd(), 'data/pages', page_path)
+    return os.path.join(PAGE_DIR, page_path + '.md')
+
+
+def find_file_path(page_path):
+    base_path = os.path.join(PAGE_DIR, page_path)
     _, ext = os.path.splitext(page_path)
 
     if ext and is_file_exist(base_path):
@@ -118,3 +124,17 @@ def encrypt_url(page_path):
     base_url = get_config('note.base_url')
     url = f'{url_root}{base_url}/{encrypt(page_path)}'
     return url
+
+
+def get_raw_page(file_path):
+    try:
+        with open(file_path, 'r') as f:
+            return f.read()
+    except IOError:
+        return ''
+
+
+def render_markdown(file_path):
+    extensions = md_extensions()
+    raw_md = get_raw_page(file_path)
+    return markdown.markdown(raw_md, extensions=extensions)

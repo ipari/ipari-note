@@ -33,3 +33,7 @@ def set_permission(page_path, permission):
         permissions[page_path] = permission
     with open(PERMISSION_PATH, 'w') as f:
         yaml.dump(permissions, f, default_flow_style=False, allow_unicode=True)
+
+
+def delete_permission(page_path):
+    set_permission(page_path, Permission.PRIVATE)
