@@ -1,6 +1,6 @@
 from flask import redirect, request, session, url_for
 from app.note import bp
-from app.note.note import process_page
+from app.note.note import config_page, process_page
 from app.crypto import decrypt
 
 
@@ -15,4 +15,4 @@ def route_page(page_path):
             )
         return process_page(page_path)
     if request.method == 'POST':
-        return f'config page: {page_path}'
+        return config_page(page_path, request.form)

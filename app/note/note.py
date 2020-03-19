@@ -5,7 +5,7 @@ from flask import flash, render_template, request, send_file, session
 from app.crypto import decrypt, encrypt
 from app.config.config import get_config, is_file_exist
 from app.note.markdown import render_markdown
-from app.note.permission import Permission, get_permission
+from app.note.permission import Permission, get_permission, set_permission
 from app.user.user import get_user, is_logged_in
 
 
@@ -49,13 +49,14 @@ def render_page(file_path, page_path, meta, menu):
                            content=content)
 
 
-def error_page(page_path):
+def error_page(page_path, message=None):
     meta = get_note_meta()
-    menu = get_menu_list()
-    if is_logged_in():
-        message = '문서가 없습니다.'
-    else:
-        message = '문서가 없거나 권한이 없는 문서입니다.'
+    menu = get_menu_list(page_path=page_path)
+    if message is None:
+        if is_logged_in():
+            message = '문서가 없습니다.'
+        else:
+            message = '문서가 없거나 권한이 없는 문서입니다.'
     flash(message)
     return render_template('page.html', meta=meta, menu=menu, pagename=page_path)
 
@@ -85,6 +86,17 @@ def process_page(page_path):
             return render_page(file_path, page_path, meta, menu)
 
     return error_page(page_path)
+
+
+def config_page(page_path, form):
+    if not is_logged_in():
+        message = "페이지 설정을 변경하지 못하였습니다."
+        return error_page(page_path=page_path, message=message)
+
+    if 'permission' in form:
+        permission = int(form['permission'])
+        set_permission(page_path, permission)
+    return process_page(page_path)
 
 
 def get_file_path(page_path):

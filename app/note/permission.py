@@ -22,3 +22,14 @@ def get_permission(page_path=None):
     if page_path is None:
         return data
     return data.get(page_path, Permission.PRIVATE)
+
+
+def set_permission(page_path, permission):
+    permissions = get_permission()
+    if permission == Permission.PRIVATE:
+        if page_path in permissions:
+            del permissions[page_path]
+    else:
+        permissions[page_path] = permission
+    with open(PERMISSION_PATH, 'w') as f:
+        yaml.dump(permissions, f, default_flow_style=False, allow_unicode=True)
