@@ -30,6 +30,9 @@ def encrypt(text):
 
 
 def decrypt(encrypted):
+    if encrypted is None:
+        return None
+
     key, iv = get_secret()
     try:
         cipher = AES.new(key, AES.MODE_CBC, iv)
