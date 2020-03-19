@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from flask import flash, redirect, render_template, request, send_file, url_for
+from flask import flash, render_template, request, send_file, session
 
 from app.crypto import decrypt
 from app.config.config import get_config, is_file_exist
@@ -51,41 +51,37 @@ def render_page(file_path, page_path):
                            content=content)
 
 
-def process_page(page_path, link_verified=False):
-
-    if not link_verified:
-        decrypted_page_path = decrypt(page_path)
-        if decrypted_page_path is not None:
-            permission = get_permission(decrypted_page_path)
-            if permission == Permission.LINK_ACCESS:
-                return process_page(decrypted_page_path, link_verified=True)
-
-    # 올바른 암호면, 퍼미션을 확인하여 리턴한다.
-    permission = get_permission(page_path)
-
-    file_path = get_file_path(page_path)
-    if file_path:
-        _, ext = os.path.splitext(file_path)
-        if ext not in NOTE_EXT:
-            # 파일인 경우 URL 직접 접속과 외부 접속을 차단한다.
-            if is_logged_in() or (request.referrer and request.url_root in request.referrer):
-                return send_file(file_path)
-        # 노트는 권한에 따라 다르게 처리한다.
-        if is_logged_in()\
-                or permission == Permission.PUBLIC\
-                or (permission == Permission.LINK_ACCESS and link_verified):
-            return render_page(file_path, page_path)
-
+def error_page(page_path):
     meta = get_note_meta()
     menu = get_menu_list()
-
     if is_logged_in():
         message = '문서가 없습니다.'
     else:
         message = '문서가 없거나 권한이 없는 문서입니다.'
-
     flash(message)
     return render_template('page.html', meta=meta, menu=menu, pagename=page_path)
+
+
+def process_page(page_path):
+    file_path = get_file_path(page_path)
+    if not file_path:
+        return error_page(page_path)
+
+    _, ext = os.path.splitext(file_path)
+    if ext not in NOTE_EXT:
+        # 파일인 경우 URL 직접 접속과 외부 접속을 차단한다.
+        if is_logged_in() or (request.referrer and request.url_root in request.referrer):
+            return send_file(file_path)
+    else:
+        # 노트는 권한에 따라 다르게 처리한다.
+        permission = get_permission(page_path)
+        if is_logged_in() or permission == Permission.PUBLIC:
+            return render_page(file_path, page_path)
+        elif permission == Permission.LINK_ACCESS:
+            if decrypt(session.get('key')) == page_path:
+                return render_page(file_path, page_path)
+
+    return error_page(page_path)
 
 
 def get_file_path(page_path):
