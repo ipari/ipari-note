@@ -1,6 +1,6 @@
 import markdown
 from datetime import datetime
-from flask import flash, render_template, request, send_file, session
+from flask import flash, jsonify, render_template, request, send_file, session
 
 from app.crypto import decrypt, encrypt
 from app.config.config import get_config, is_file_exist
@@ -155,6 +155,29 @@ def edit_page(page_path):
                            menu=get_menu_list(),
                            base_url=base_url,
                            raw_md=raw_md)
+
+
+def save_file(page_path, file):
+    filename = request.form.get('filename')
+    if filename is None:
+        now = datetime.now().strftime('%Y%m%d%H%M%S')
+        filename = f'image-{now}.png'
+    name, ext = os.path.splitext(filename)
+    if not ext:
+        ext = '.png'
+        filename += ext
+    page_dir = '/'.join(page_path.split('/')[:-1])
+    i = 0
+    while True:
+        if i > 0:
+            filename = f'{name}-{i}{ext}'
+        file_path = os.path.join(PAGE_ROOT, page_dir, filename)
+        if not is_file_exist(file_path):
+            break
+        i += 1
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    file.save(file_path)
+    return jsonify(success=True, filename=filename)
 
 
 def get_file_path(page_path):

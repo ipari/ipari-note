@@ -54,6 +54,12 @@
     simplemde.value(`{{ raw_md|safe }}`);
     {# 이미지 붙여넣기 업로드 #}
     inlineAttachment.editors.codemirror4.attach(simplemde.codemirror, {
+        onFileReceived: function(file) {
+            let filename = prompt("파일명을 입력해주세요");
+            if (filename) {
+                this.settings.extraParams = {'filename': filename};
+            }
+        },
         onFileUploadResponse: function(xhr) {
             let result = JSON.parse(xhr.responseText);
             let filename = result[this.settings.jsonFieldName];
