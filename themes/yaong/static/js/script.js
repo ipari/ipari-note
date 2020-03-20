@@ -11,12 +11,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // 노트 권한 폼
     let radios = selects("div.permission input[type=radio]");
-
     for (let radio of radios) {
         radio.addEventListener("change", function() {
             select("div.permission form").submit();
         });
     }
+});
+
+window.addEventListener("resize", function() {
+    resizeIFrame();
 });
 
 function toggleNav() {
@@ -51,4 +54,11 @@ function previewMarkdown(preview, plainText, url) {
       }
   };
   ajax.send(JSON.stringify(parameters));
+}
+
+function resizeIFrame() {
+    let iframe = select("iframe");
+    iframe.style.display = "block";
+    iframe.width = iframe.contentWindow.outerWidth;
+    iframe.height = iframe.contentWindow.document.body.scrollHeight;
 }

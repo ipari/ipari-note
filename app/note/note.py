@@ -23,10 +23,10 @@ def get_note_meta():
     return meta
 
 
-def get_menu_list(page_path=None, page_exist=False):
+def get_menu_list(page_path=None, page_exist=False, editable=True):
     items = []
     if is_logged_in():
-        if page_path is not None:
+        if page_path is not None and editable:
             base_url = get_config('note.base_url')
             url = f'/{base_url}/{page_path}/edit'
             if page_exist:
@@ -42,14 +42,26 @@ def get_menu_list(page_path=None, page_exist=False):
     return items
 
 
-def render_page(file_path, page_path, meta, menu):
-    raw_md = get_raw_page(file_path)
-    content = render_markdown(raw_md)
-    return render_template('page.html',
-                           meta=meta,
-                           menu=menu,
-                           pagename=page_path,
-                           content=content)
+def render_page(file_path, page_path, meta):
+    _, ext = os.path.splitext(file_path)
+    if ext == '.md':
+        content = get_raw_page(file_path)
+        content = render_markdown(content)
+        menu = get_menu_list(page_path=page_path, page_exist=True)
+        return render_template('page.html',
+                               meta=meta,
+                               menu=menu,
+                               pagename=page_path,
+                               content=content,
+                               html_url=None)
+    elif ext == '.html':
+        menu = get_menu_list(page_path=page_path, editable=False)
+        return render_template('page.html',
+                               meta=meta,
+                               menu=menu,
+                               pagename=page_path,
+                               content=None,
+                               html_url=page_path + '.html')
 
 
 def error_page(page_path, message=None):
@@ -69,26 +81,26 @@ def process_page(page_path):
     if not file_path:
         return error_page(page_path)
 
-    _, ext = os.path.splitext(file_path)
+    _, ext = os.path.splitext(page_path)
     # 파일인 경우 URL 직접 접속과 외부 접속을 차단한다.
-    if ext not in NOTE_EXT:
+    if ext:
         if is_logged_in() or \
                 (request.referrer and request.url_root in request.referrer):
             file_path = os.path.join('..', file_path)
+            print(file_path)
             return send_file(file_path)
         return error_page(page_path)
     # 노트는 권한에 따라 다르게 처리한다.
     permission = get_permission(page_path)
-    menu = get_menu_list(page_path=page_path, page_exist=True)
     meta = get_note_meta()
     meta['logged_in'] = is_logged_in()
     meta['permission'] = permission
     meta['link'] = encrypt_url(page_path)
     if is_logged_in() or permission == Permission.PUBLIC:
-        return render_page(file_path, page_path, meta, menu)
+        return render_page(file_path, page_path, meta)
     elif permission == Permission.LINK_ACCESS:
         if decrypt(session.get('key')) == page_path:
-            return render_page(file_path, page_path, meta, menu)
+            return render_page(file_path, page_path, meta)
 
     return error_page(page_path)
 

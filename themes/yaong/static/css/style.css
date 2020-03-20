@@ -40,6 +40,12 @@ div.page {
     padding: 0.2em 1em;
 }
 
+iframe {
+    /* javascript 로 resize 후에 보인다 */
+    display: none;
+    border: none;
+}
+
 
 /* Style */
 a,

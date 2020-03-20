@@ -59,6 +59,14 @@
         {% endif %}
     {% endwith %}
 
+    {% if content %}
     {{ content|safe }}
+    {% endif %}
 
+{% endblock %}
+
+{% block html %}
+    {% if html_url %}
+    <iframe src="{{ html_url }}" onload="resizeIFrame()"></iframe>
+    {% endif %}
 {% endblock %}
