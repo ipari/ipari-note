@@ -31,7 +31,7 @@ def set_permission(page_path, permission):
             del permissions[page_path]
     else:
         permissions[page_path] = permission
-    with open(PERMISSION_PATH, 'w') as f:
+    with open(PERMISSION_PATH, 'w', encoding='utf-8') as f:
         yaml.dump(permissions, f, default_flow_style=False, allow_unicode=True)
 
 

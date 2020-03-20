@@ -183,7 +183,7 @@ def encrypt_url(page_path):
 
 def get_raw_page(file_path):
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             return f.read()
     except IOError:
         return ''
