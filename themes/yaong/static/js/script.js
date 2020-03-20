@@ -57,8 +57,10 @@ function previewMarkdown(preview, plainText, url) {
 }
 
 function resizeIFrame() {
-    let iframe = select("iframe");
-    iframe.style.display = "block";
-    iframe.width = iframe.contentWindow.outerWidth;
-    iframe.height = iframe.contentWindow.document.body.scrollHeight;
+    let iframes = selects("iframe");
+    for (let i = 0; i < iframes.length; i++) {
+        iframes[i].style.display = "block";
+        iframes[i].width = iframes[i].contentWindow.outerWidth;
+        iframes[i].height = iframes[i].contentWindow.document.body.scrollHeight;
+    }
 }
