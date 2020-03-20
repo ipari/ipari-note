@@ -87,7 +87,6 @@ def process_page(page_path):
         if is_logged_in() or \
                 (request.referrer and request.url_root in request.referrer):
             file_path = os.path.join('..', file_path)
-            print(file_path)
             return send_file(file_path)
         return error_page(page_path)
     # 노트는 권한에 따라 다르게 처리한다.
