@@ -1,5 +1,5 @@
 import re
-from flask import redirect, url_for
+from flask import jsonify, redirect, url_for
 from app.note import bp
 from app.note.note import *
 from app.crypto import decrypt
@@ -49,3 +49,22 @@ def route_edit(page_path):
         else:
             delete_page(page_path)
         return redirect(url_for('note.route_page', page_path=page_path))
+
+
+@bp.route('/<path:page_path>/upload', methods=['POST'])
+def upload(page_path):
+    if request.method == 'POST':
+        print(request)
+        if 'file' not in request.files:
+            # no file part
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            # no selected file
+            return redirect(request.url)
+        if file:
+            print(request)
+            page_dir = '/'.join(page_path.split('/')[:-1])
+            path = os.path.join(PAGE_ROOT, page_dir, file.filename)
+            file.save(path)
+            return jsonify(success=True, filename=file.filename)

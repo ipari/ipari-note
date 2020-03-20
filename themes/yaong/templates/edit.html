@@ -1,54 +1,78 @@
 {% extends "_base.html" %}
 
 {% block script %}
-  <script src="{{ url_for('static', filename='js/simplemde.min.js') }}"></script>
-  <script src="https://cdn.jsdelivr.net/highlight.js/latest/highlight.min.js"></script>
+    <script src="{{ url_for('static', filename='js/simplemde.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/inline-attachment.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/codemirror-4.inline-attachment.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/highlight.js/latest/highlight.min.js"></script>
 {% endblock %}
 
 {% block css %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/simplemde.min.css') }}" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/highlight.js/latest/styles/github.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/simplemde.min.css') }}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/highlight.js/latest/styles/github.min.css">
 {% endblock %}
 
 {% block pagename %}{{ pagename }}{% endblock %}
 
 {% block content %}
-  <h1>{{ pagename }}</h1>
+    <h1>{{ pagename }}</h1>
 
-  <form method="post" class="editor">
-    <textarea name="md" id="md"></textarea>
-    <div class="buttons">
-      <input type="submit" value="저장"/>
-      <a class="button" href="/{{ base_url }}/{{ pagename }}">취소</a>
-    </div>
-  </form>
+    <form method="post" class="editor">
+        <textarea name="md" id="md"></textarea>
+        <div class="buttons">
+            <input type="submit" value="저장"/>
+            <a class="button" href="/{{ base_url }}/{{ pagename }}">취소</a>
+        </div>
+    </form>
 
-  {# https://github.com/sparksuite/simplemde-markdown-editor #}
-  <script>
-  let postURL = "/{{ base_url }}/preview";
-  let simplemde = new SimpleMDE({
-      autofocus: true,
-      autosave: {
-          enabled: true,
-          uniqueId: "{{ pagename }}",
-          delay: 10000
-      },
-      element: document.getElementById("md"),
-      indentWithTabs: false,
-      previewRender: function(plainText, preview) {
-          setTimeout(function() {
-              previewMarkdown(preview, plainText, postURL);
-          }, 250);
-          return "Loading...";
-      },
-      promptURLs: false,
-      renderingConfig: {
-          codeSyntaxHighlighting: true
-      },
-      spellChecker: false,
-      tabSize: 4
-  });
-  {# ES6 템플릿 문자열 ` 을 사용해야 한다. #}
-  simplemde.value(`{{ raw_md|safe }}`);
-  </script>
+    {# https://github.com/sparksuite/simplemde-markdown-editor #}
+    <script>
+    let postURL = "/{{ base_url }}/preview";
+    let simplemde = new SimpleMDE({
+        autofocus: true,
+        autosave: {
+            enabled: true,
+            uniqueId: "{{ pagename }}",
+            delay: 10000
+        },
+    element: document.getElementById("md"),
+    indentWithTabs: false,
+    previewRender: function(plainText, preview) {
+        setTimeout(function() {
+        previewMarkdown(preview, plainText, postURL);
+    }, 250);
+        return "Loading...";
+    },
+    promptURLs: false,
+    renderingConfig: {
+    codeSyntaxHighlighting: true
+    },
+    spellChecker: false,
+    tabSize: 4
+    });
+    {# ES6 템플릿 문자열 ` 을 사용해야 한다. #}
+    simplemde.value(`{{ raw_md|safe }}`);
+    {# 이미지 붙여넣기 업로드 #}
+    inlineAttachment.editors.codemirror4.attach(simplemde.codemirror, {
+        onFileUploadResponse: function(xhr) {
+            let result = JSON.parse(xhr.responseText);
+            let filename = result[this.settings.jsonFieldName];
+            if (result && filename) {
+                let newValue;
+                if (typeof this.settings.urlText === 'function') {
+                    newValue = this.settings.urlText.call(this, filename, result);
+                } else {
+                    newValue = this.settings.urlText.replace(this.filenameTag, filename);
+                }
+                let text = this.editor.getValue().replace(this.lastValue, newValue);
+                this.editor.setValue(text);
+                this.settings.onFileUploaded.call(this, filename);
+            }
+            return false;
+        },
+        uploadUrl: "/{{ base_url }}/{{ pagename }}/upload",
+        jsonFieldName: "filename",
+        urlText: "![Image]({filename})"
+    });
+    </script>
 {% endblock %}
