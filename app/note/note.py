@@ -10,7 +10,7 @@ from app.user.user import get_user, is_logged_in
 
 
 NOTE_EXT = ('.md', '.html')
-PAGE_DIR = os.path.join('data', 'pages')
+PAGE_ROOT = os.path.join('data', 'pages')
 
 
 def get_note_meta():
@@ -131,10 +131,10 @@ def delete_page(page_path):
     os.remove(file_path)
 
     # 빈 디렉터리 제거 (첫 2개는 data/pages)
-    page_dir_length = len(PAGE_DIR.split(os.path.sep))
+    page_dir_length = len(PAGE_ROOT.split(os.path.sep))
     dirs = os.path.dirname(file_path).split(os.path.sep)[page_dir_length:]
     for x in range(len(dirs), 0, -1):
-        subdir = os.path.join(PAGE_DIR, *dirs[:x])
+        subdir = os.path.join(PAGE_ROOT, *dirs[:x])
         try:
             if len(os.listdir(subdir)) == 0:
                 os.rmdir(subdir)
@@ -158,12 +158,12 @@ def edit_page(page_path):
 
 
 def get_file_path(page_path):
-    path = os.path.join(PAGE_DIR, page_path + '.md')
+    path = os.path.join(PAGE_ROOT, page_path + '.md')
     return os.path.normpath(path)
 
 
 def find_file_path(page_path):
-    base_path = os.path.join(PAGE_DIR, page_path)
+    base_path = os.path.join(PAGE_ROOT, page_path)
     _, ext = os.path.splitext(page_path)
     if ext and is_file_exist(base_path):
         return os.path.normpath(base_path)
