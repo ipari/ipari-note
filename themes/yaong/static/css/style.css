@@ -349,6 +349,11 @@ pre {
     white-space: pre;
 }
 
+pre > code {
+    background: none;
+}
+
+
 a.headerlink {
     font-size: 75%;
 }
