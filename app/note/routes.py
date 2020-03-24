@@ -22,7 +22,7 @@ def route_page(page_path):
 @bp.route('/preview', methods=['POST'])
 def preview():
     if request.method == 'POST':
-        html = render_markdown(request.get_json()['raw_md'])
+        html, _ = render_markdown(request.get_json()['raw_md'])
 
         # ipari-note/guide 는 ipari-note 폴더의 guide.md 파일을 보여준다.
         # 그러므로 각종 경로에 ../ 를 붙여 한 단계 위에서 파일을 찾도록 한다.

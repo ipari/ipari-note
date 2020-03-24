@@ -11,6 +11,7 @@ def md_extensions():
     base_url = get_config('note')['base_url']
     extensions.append(
         WikiLinkExtensionCustom(base_url='/{}/'.format(base_url)))
+    extensions.append('markdown.extensions.meta')
     extensions.append('markdown.extensions.fenced_code')
     extensions.append('markdown.extensions.codehilite')
     extensions.append('markdown.extensions.tables')

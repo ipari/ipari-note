@@ -46,7 +46,7 @@ def render_page(file_path, page_path, meta):
     _, ext = os.path.splitext(file_path)
     if ext == '.md':
         content = get_raw_page(file_path)
-        content = render_markdown(content)
+        content, _ = render_markdown(content)
         menu = get_menu_list(page_path=page_path, page_exist=True)
         return render_template('page.html',
                                meta=meta,
@@ -214,7 +214,19 @@ def get_raw_page(file_path):
 
 def render_markdown(raw_md):
     extensions = md_extensions()
-    return markdown.markdown(raw_md, extensions=extensions)
+    md = markdown.Markdown(extensions=extensions)
+    html = md.convert(raw_md)
+    meta = process_page_meta(md.Meta)
+    return html, meta
+
+
+def process_page_meta(meta):
+    for k, v in meta.items():
+        v = meta[k][0]
+        if k == 'tags':
+            v = [tag.strip() for tag in v.split(',')]
+        meta[k] = v
+    return meta
 
 
 def iterate_pages(extension=False):
