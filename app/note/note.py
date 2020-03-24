@@ -9,7 +9,8 @@ from app.note.permission import *
 from app.user.user import get_user, is_logged_in
 
 
-NOTE_EXT = ('.md', '.html')
+MARKDOWN_EXT = ('.md', '.markdown')
+HTML_EXT = ('.html', '.htm')
 PAGE_ROOT = os.path.join('data', 'pages')
 
 
@@ -42,26 +43,21 @@ def get_menu_list(page_path=None, page_exist=False, editable=True):
     return items
 
 
-def render_page(file_path, page_path, meta):
-    _, ext = os.path.splitext(file_path)
-    if ext == '.md':
-        content = get_raw_page(file_path)
-        content, _ = render_markdown(content)
-        menu = get_menu_list(page_path=page_path, page_exist=True)
-        return render_template('page.html',
-                               meta=meta,
-                               menu=menu,
-                               pagename=page_path,
-                               content=content,
-                               html_url=None)
-    elif ext == '.html':
-        menu = get_menu_list(page_path=page_path, editable=False)
-        return render_template('page.html',
-                               meta=meta,
-                               menu=menu,
-                               pagename=page_path,
-                               content=None,
-                               html_url=page_path + '.html')
+def render_page(page_path, meta):
+    md_path = get_md_path(page_path)
+    if md_path is None:
+        return error_page(page_path)
+
+    raw_md = get_raw_md(md_path)
+    content, _ = render_markdown(raw_md)
+    html_url = get_html_path(page_path)
+    menu = get_menu_list(page_path=page_path, page_exist=True)
+    return render_template('page.html',
+                           meta=meta,
+                           menu=menu,
+                           pagename=page_path,
+                           content=content,
+                           html_url=html_url)
 
 
 def error_page(page_path, message=None):
@@ -76,19 +72,19 @@ def error_page(page_path, message=None):
     return render_template('page.html', meta=meta, menu=menu, pagename=page_path)
 
 
-def process_page(page_path):
-    file_path = find_file_path(page_path)
-    if not file_path:
-        return error_page(page_path)
+def serve_file(file_path):
+    if is_logged_in() or \
+            (request.referrer and request.url_root in request.referrer):
+        path = os.path.join('..', PAGE_ROOT, file_path)
+        path = os.path.normpath(path)
+        try:
+            return send_file(path)
+        except FileNotFoundError:
+            pass
+    return error_page(file_path)
 
-    _, ext = os.path.splitext(page_path)
-    # 파일인 경우 URL 직접 접속과 외부 접속을 차단한다.
-    if ext:
-        if is_logged_in() or \
-                (request.referrer and request.url_root in request.referrer):
-            file_path = os.path.join('..', file_path)
-            return send_file(file_path)
-        return error_page(page_path)
+
+def serve_page(page_path):
     # 노트는 권한에 따라 다르게 처리한다.
     permission = get_permission(page_path)
     meta = get_note_meta()
@@ -96,11 +92,10 @@ def process_page(page_path):
     meta['permission'] = permission
     meta['link'] = encrypt_url(page_path)
     if is_logged_in() or permission == Permission.PUBLIC:
-        return render_page(file_path, page_path, meta)
+        return render_page(page_path, meta)
     elif permission == Permission.LINK_ACCESS:
         if decrypt(session.get('key')) == page_path:
-            return render_page(file_path, page_path, meta)
-
+            return render_page(page_path, meta)
     return error_page(page_path)
 
 
@@ -112,13 +107,15 @@ def config_page(page_path, form):
     if 'permission' in form:
         permission = int(form['permission'])
         set_permission(page_path, permission)
-    return process_page(page_path)
+    return serve_page(page_path)
 
 
 def save_page(page_path, raw_md):
-    file_path = get_file_path(page_path)
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    with open(file_path, 'w', encoding='utf-8') as f:
+    md_path = get_md_path(page_path)
+    if md_path is None:
+        md_path = norm_page_path(page_path) + MARKDOWN_EXT[0]
+    os.makedirs(os.path.dirname(md_path), exist_ok=True)
+    with open(md_path, 'w', encoding='utf-8') as f:
         f.write(raw_md)
 
 
@@ -127,7 +124,7 @@ def delete_page(page_path):
     delete_permission(page_path)
 
     # 파일 제거
-    file_path = get_file_path(page_path)
+    file_path = get_md_path(page_path)
     os.remove(file_path)
 
     # 빈 디렉터리 제거 (첫 2개는 data/pages)
@@ -143,9 +140,9 @@ def delete_page(page_path):
 
 
 def edit_page(page_path):
-    file_path = get_file_path(page_path)
+    md_path = get_md_path(page_path)
     base_url = get_config('note.base_url')
-    raw_md = get_raw_page(file_path)
+    raw_md = get_raw_md(md_path)
     # ` 문자는 ES6에서 템플릿 문자로 사용되므로 escape 해줘야 한다.
     # https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Template_literals
     raw_md = raw_md.replace('`', '\`')
@@ -180,21 +177,23 @@ def save_file(page_path, file):
     return jsonify(success=True, filename=filename)
 
 
-def get_file_path(page_path):
-    path = os.path.join(PAGE_ROOT, page_path + '.md')
+def norm_page_path(page_path):
+    path = os.path.join(PAGE_ROOT, page_path)
     return os.path.normpath(path)
 
 
-def find_file_path(page_path):
-    base_path = os.path.join(PAGE_ROOT, page_path)
-    _, ext = os.path.splitext(page_path)
-    if ext and is_file_exist(base_path):
-        return os.path.normpath(base_path)
-    for ext in NOTE_EXT:
-        file_path = base_path + ext
-        if is_file_exist(file_path):
-            return os.path.normpath(file_path)
-    return None
+def get_md_path(page_path):
+    for ext in MARKDOWN_EXT:
+        path = norm_page_path(page_path) + ext
+        if is_file_exist(path):
+            return path
+
+
+def get_html_path(page_path):
+    for ext in HTML_EXT:
+        path = norm_page_path(page_path) + ext
+        if is_file_exist(path):
+            return page_path + ext
 
 
 def encrypt_url(page_path):
@@ -204,11 +203,11 @@ def encrypt_url(page_path):
     return url
 
 
-def get_raw_page(file_path):
+def get_raw_md(file_path):
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             return f.read()
-    except IOError:
+    except (IOError, TypeError):
         return ''
 
 
@@ -233,7 +232,7 @@ def iterate_pages(extension=False):
     for root, subdirs, files in os.walk(PAGE_ROOT):
         for file in files:
             name, ext = os.path.splitext(file)
-            if ext not in NOTE_EXT:
+            if ext not in MARKDOWN_EXT:
                 continue
             abs_path = os.path.join(root,
                                     file if extension else name)

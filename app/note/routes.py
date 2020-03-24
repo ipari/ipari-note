@@ -14,7 +14,11 @@ def route_page(page_path):
             return redirect(
                 url_for('note.route_page', page_path=decrypted_page_path)
             )
-        return process_page(page_path)
+        name, ext = os.path.splitext(page_path)
+        if ext:
+            return serve_file(page_path)
+        else:
+            return serve_page(page_path)
     if request.method == 'POST':
         return config_page(page_path, request.form)
 
