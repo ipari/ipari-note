@@ -215,3 +215,15 @@ def get_raw_page(file_path):
 def render_markdown(raw_md):
     extensions = md_extensions()
     return markdown.markdown(raw_md, extensions=extensions)
+
+
+def iterate_pages(extension=False):
+    for root, subdirs, files in os.walk(PAGE_ROOT):
+        for file in files:
+            name, ext = os.path.splitext(file)
+            if ext not in NOTE_EXT:
+                continue
+            abs_path = os.path.join(root,
+                                    file if extension else name)
+            page_path = os.path.relpath(abs_path, PAGE_ROOT)
+            yield page_path
