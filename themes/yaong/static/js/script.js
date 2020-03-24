@@ -16,6 +16,21 @@ document.addEventListener("DOMContentLoaded", function() {
             select("div.permission form").submit();
         });
     }
+
+    // 테이블 헤더 정렬 기능
+    // https://stackoverflow.com/questions/14267781/sorting-html-table-with-javascript
+    const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+
+    const comparer = (idx, asc) => (a, b) => ((v1, v2) =>
+        v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+        )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+
+    document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+        const tbody = th.closest('table').querySelector('tbody');
+        Array.from(tbody.querySelectorAll('tr:nth-child(n)'))
+            .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+            .forEach(tr => tbody.appendChild(tr) );
+    })));
 });
 
 window.addEventListener("resize", function() {
