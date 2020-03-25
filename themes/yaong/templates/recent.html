@@ -1,0 +1,30 @@
+{% extends "_base.html" %}
+
+{% block pagename %}최근 글{% endblock %}
+
+{% block content %}
+{% set ns = namespace(last_id=None) %}
+<ul class="recent">
+{% for page in pages %}
+    <li>
+        <h2 id="{{ page.title }}"><a href="{{ base_url }}/{{ page.path }}" class="wikilink">{{ page.title }}</a></h2>
+        <p class="meta">
+            {{ page.updated }}
+            {% if page.tags %} ·
+            {% for tag in page.tags %}
+                <a href="tags/{{ tag }}" class="wikilink">#{{ tag }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+            {% endif %}
+        </p>
+        {% if page.summary %}
+        <p class="summary">{{ page.summary }}</p>
+        {% endif %}
+    </li>
+    {% if loop.last %}{% set ns.last_id = page.title %}{% endif %}
+{% endfor %}
+</ul>
+
+{% if more_pages %}
+    <p><a href="{{ url_for('main.route_recent', _anchor=ns.last_id) }}" class="wikilink">전체 목록 보기</a></p>
+{% endif %}
+{% endblock %}

@@ -44,6 +44,7 @@ def init_config():
             'base_url': 'note',
             'main_page': 'Home',
             'theme': 'yaong',
+            'recent_pages': 10,
         },
         'markdown_extensions': {
             'toc_marker': '[목차]',

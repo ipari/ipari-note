@@ -263,7 +263,7 @@ def get_page_list(sort_key=None):
         page.update(page_meta)
         pages.append(page)
 
-    sorted(pages, key=lambda x: x[sort_key])
+    pages = sorted(pages, key=lambda x: x[sort_key], reverse=True)
     return pages
 
 
@@ -278,14 +278,15 @@ def get_page_meta(page_path=None):
     return data.get(page_path, {})
 
 
-def make_page_meta(page_path):
+def make_page_meta(page_path, meta=None):
     md_path = get_md_path(page_path)
-    raw_md = get_raw_md(md_path)
-    _, meta = render_markdown(raw_md)
-    if 'modified' not in meta:
+    if meta is None:
+        raw_md = get_raw_md(md_path)
+        _, meta = render_markdown(raw_md)
+    if 'updated' not in meta:
         mtime_ts = int(os.path.getmtime(md_path))
         mtime_dt = datetime.fromtimestamp(mtime_ts)
-        meta['modified'] = mtime_dt.strftime('%Y-%m-%d')
+        meta['updated'] = mtime_dt.strftime('%Y-%m-%d')
     meta['cached'] = int(datetime.now().timestamp())
     return meta
 

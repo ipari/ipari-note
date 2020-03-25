@@ -523,6 +523,44 @@ input[type=submit]:hover {
 }
 
 
+/* Recent */
+ul.recent {
+    padding: 0;
+    list-style-type: none;
+}
+
+ul.recent li {
+    margin-bottom: 1.6em;
+}
+
+ul.recent p {
+    margin: 0;
+}
+
+ul.recent h2 {
+    margin: 1em 0 .1em;
+    font-family: 'Noto Sans KR', 'Malgun Gothic','Sego UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 1.5em;
+    font-weight: normal;
+    color: #2a99b6;
+}
+
+ul.recent .summary {
+    margin-top: .4em;
+}
+
+ul.recent .meta {
+    margin: 0;
+    color: #999999;
+    font-size: 90%;
+}
+
+ul.recent a.wikilink {
+    color: inherit;
+}
+
+
+
 /* Footer */
 footer {
     padding: 0.6em 0;
