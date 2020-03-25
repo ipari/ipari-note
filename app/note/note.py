@@ -282,9 +282,13 @@ def get_page_meta(page_path=None):
     return data.get(page_path, {})
 
 
-def process_page_meta(meta):
-    for k, v in meta.items():
-        v = meta[k][0]
+def process_page_meta(prev_meta):
+    meta = {}
+    for k, v in prev_meta.items():
+        v = prev_meta[k][0]
+        if not v:
+            continue
+        # 타입에 따른 처리
         if k == 'tags':
             v = [tag.strip() for tag in v.split(',')]
         elif k in ('created', 'updated'):
