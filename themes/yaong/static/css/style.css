@@ -571,6 +571,16 @@ ul.recent a.wikilink {
 }
 
 
+/* Archive */
+div.archive table {
+    width: 100%;
+}
+
+div.archive img.permission {
+    width: 18px;
+}
+
+
 
 /* Footer */
 footer {

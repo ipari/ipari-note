@@ -6,6 +6,8 @@
 <h1>목록</h1>
 
 {% if pages %}
+{% set permission_icons = {0: 'lock', 1: 'key', 2: 'unlock'} %}
+<div class="archive">
     <table>
     <thead>
     <tr>
@@ -21,15 +23,19 @@
     {% for page in pages %}
     <tr>
         {% if meta.logged_in %}
-        <td>{{ page.permission }}</td>
+        <td class="center">
+            <span style="display: none">{{ page.permission }}</span>
+            <img src="{{ url_for('static', filename='img/' + permission_icons[page.permission] + '.svg') }}" class="permission">
+        </td>
         {% endif %}
-        <td><a href="{{ base_url }}/{{ page.path }}">{{ page.path }}</a></td>
-        <td>{{ page.created }}</td>
-        <td>{{ page.updated }}</td>
+        <td class="left"><a href="{{ base_url }}/{{ page.path }}">{{ page.path }}</a></td>
+        <td class="center">{{ page.created }}</td>
+        <td class="center">{{ page.updated }}</td>
     </tr>
     {% endfor %}
     </tbody>
     </table>
+</div>
 {% else %}
     <p>문서가 없습니다.</p>
 {% endif %}
