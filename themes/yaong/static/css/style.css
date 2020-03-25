@@ -338,9 +338,10 @@ code, pre {
 }
 
 code {
-    padding: .2em .4em;
+    padding: .1em .2em;
     vertical-align: text-bottom;
     color: #666;
+    border-radius: 4px;
 }
 
 pre {
@@ -350,6 +351,7 @@ pre {
 }
 
 pre > code {
+    padding: 0;
     background: none;
 }
 
