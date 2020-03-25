@@ -15,14 +15,16 @@ def check_setup():
 @bp.route('/')
 def route_index():
     recent_count = config.get_config('note.recent_pages')
-    pages = get_page_list(sort_key='updated', reverse=True)
-    pages = pages[:recent_count]
+    all_pages = get_page_list(sort_key='updated', reverse=True)
+    pages = all_pages[:recent_count]
     menu = get_menu_list()
     meta = get_note_meta()
     base_url = config.get_config('note.base_url')
+    more_pages = len(all_pages) > recent_count
     return render_template('recent.html',
                            meta=meta, menu=menu,
-                           base_url=base_url, pages=pages, more_pages=True)
+                           base_url=base_url, pages=pages,
+                           more_pages=more_pages)
 
 
 @bp.route('/recent')
