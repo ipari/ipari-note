@@ -3,6 +3,13 @@ from flask import redirect, url_for
 from app.note import bp
 from app.note.note import *
 from app.crypto import decrypt
+from app.utils import config
+
+
+@bp.route('/')
+def route_note():
+    main_page = config('note.main_page')
+    return redirect(url_for('note.route_page', page_path=main_page))
 
 
 @bp.route('/<path:page_path>', methods=['GET', 'POST'])

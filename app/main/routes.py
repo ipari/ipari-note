@@ -8,8 +8,14 @@ from app.note.note import *
 
 @bp.route('/')
 def route_index():
-    main_page = config.get_config('note')['main_page']
-    return redirect(url_for('note.route_page', page_path=main_page))
+    update_all_page_meta()
+    pages = get_page_list(sort_key='updated')
+    menu = get_menu_list()
+    meta = get_note_meta()
+    base_url = config.get_config('note.base_url')
+    return render_template('recent.html',
+                           meta=meta, menu=menu,
+                           base_url=base_url, pages=pages)
 
 
 @bp.before_request
