@@ -238,3 +238,31 @@ def iterate_pages(extension=False):
                                     file if extension else name)
             page_path = os.path.relpath(abs_path, PAGE_ROOT)
             yield page_path
+
+
+def get_page_list(sort_key=None):
+    sort_key = sort_key or 'modified'
+    permissions = get_permission()
+    pages = []
+    for page_path in iterate_pages():
+        permission = permissions.get(page_path, 0)
+        if not is_logged_in() and permission != Permission.PUBLIC:
+            continue
+        page = {
+            'title': page_path.split('/')[-1],
+            'path': page_path,
+            'permission': permission
+        }
+        file_path = get_md_path(page_path)
+        _, meta = render_markdown(get_raw_md(file_path))
+        page.update(meta)
+
+        if 'modified' not in page:
+            mtime_ts = os.path.getmtime(file_path)
+            mtime_dt = datetime.fromtimestamp(mtime_ts)
+            page['modified'] = mtime_dt.strftime('%Y-%m-%d')
+
+        pages.append(page)
+
+    sorted(pages, key=lambda x: x[sort_key])
+    return pages
