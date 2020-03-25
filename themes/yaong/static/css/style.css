@@ -77,6 +77,10 @@ tr:last-child td {
     border-bottom: 1px solid #cccccc;
 }
 
+th {
+    cursor: pointer;
+}
+
 td {
     border-bottom: 1px dotted #cccccc;
 }
