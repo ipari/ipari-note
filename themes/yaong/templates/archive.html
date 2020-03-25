@@ -4,10 +4,33 @@
 
 {% block content %}
 <h1>목록</h1>
-권한이 있는 노트의 목록입니다.
-<ul>
-  {% for page in pages %}
-  <li><a href="{{ base_url }}/{{ page }}">{{ page }}</a></li>
-  {% endfor %}
-</ul>
+
+{% if pages %}
+    <table>
+    <thead>
+    <tr>
+        {% if meta.logged_in %}
+        <th>권한</th>
+        {% endif %}
+        <th>제목</th>
+        <th>작성일</th>
+        <th>마지막 수정</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for page in pages %}
+    <tr>
+        {% if meta.logged_in %}
+        <td>{{ page.permission }}</td>
+        {% endif %}
+        <td><a href="{{ base_url }}/{{ page.path }}">{{ page.path }}</a></td>
+        <td>{{ page.created }}</td>
+        <td>{{ page.modified }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+{% else %}
+    <p>문서가 없습니다.</p>
+{% endif %}
 {% endblock %}
