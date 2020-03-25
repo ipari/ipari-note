@@ -13,6 +13,11 @@ MARKDOWN_EXT = ('.md', '.markdown')
 HTML_EXT = ('.html', '.htm')
 PAGE_ROOT = os.path.join('data', 'pages')
 
+META_FILENAME = 'data/cache/meta.yml'
+META_PATH = os.path.normpath(os.path.join(os.getcwd(), META_FILENAME))
+CONTENT_FILENAME = 'data/cache/content.yml'
+CONTENT_PATH = os.path.normpath(os.path.join(os.getcwd(), META_FILENAME))
+
 
 def get_note_meta():
     note_config = get_config('note')
@@ -243,6 +248,7 @@ def iterate_pages(extension=False):
 def get_page_list(sort_key=None):
     sort_key = sort_key or 'modified'
     permissions = get_permission()
+    page_metas = get_page_meta()
     pages = []
     for page_path in iterate_pages():
         permission = permissions.get(page_path, 0)
@@ -253,16 +259,62 @@ def get_page_list(sort_key=None):
             'path': page_path,
             'permission': permission
         }
-        file_path = get_md_path(page_path)
-        _, meta = render_markdown(get_raw_md(file_path))
-        page.update(meta)
-
-        if 'modified' not in page:
-            mtime_ts = os.path.getmtime(file_path)
-            mtime_dt = datetime.fromtimestamp(mtime_ts)
-            page['modified'] = mtime_dt.strftime('%Y-%m-%d')
-
+        page_meta = page_metas.get(page_path, {})
+        page.update(page_meta)
         pages.append(page)
 
     sorted(pages, key=lambda x: x[sort_key])
     return pages
+
+
+def get_page_meta(page_path=None):
+    try:
+        with open(META_PATH, 'r', encoding='utf-8') as f:
+            data = yaml.full_load(f)
+    except IOError:
+        data = {}
+    if page_path is None:
+        return data
+    return data.get(page_path, {})
+
+
+def make_page_meta(page_path):
+    md_path = get_md_path(page_path)
+    raw_md = get_raw_md(md_path)
+    _, meta = render_markdown(raw_md)
+    if 'modified' not in meta:
+        mtime_ts = int(os.path.getmtime(md_path))
+        mtime_dt = datetime.fromtimestamp(mtime_ts)
+        meta['modified'] = mtime_dt.strftime('%Y-%m-%d')
+    meta['cached'] = int(datetime.now().timestamp())
+    return meta
+
+
+def save_meta(data):
+    os.makedirs(os.path.dirname(META_PATH), exist_ok=True)
+    with open(META_PATH, 'w', encoding='utf-8') as f:
+        yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
+
+
+def update_page_meta(page_path):
+    page_metas = get_page_meta()
+    md_path = get_md_path(page_path)
+    if md_path is None and page_path in page_metas:
+        del page_metas[md_path]
+    else:
+        page_metas.update(make_page_meta(page_path))
+    save_meta(page_metas)
+
+
+def update_all_page_meta():
+    prev_metas = get_page_meta()
+    new_metas = {}
+    for page_path in iterate_pages():
+        md_path = get_md_path(page_path)
+        cached_ts = prev_metas.get(page_path, {}).get('cached', 0)
+        mtime_ts = int(os.path.getmtime(md_path))
+        if mtime_ts <= cached_ts:
+            new_metas[page_path] = prev_metas[page_path]
+        else:
+            new_metas[page_path] = make_page_meta(page_path)
+    save_meta(new_metas)

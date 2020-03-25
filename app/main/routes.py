@@ -20,6 +20,7 @@ def check_setup():
 
 @bp.route('/archive')
 def view_archive():
+    update_all_page_meta()
     pages = get_page_list(sort_key='title')
     base_url = config.get_config('note.base_url')
     menu = get_menu_list()

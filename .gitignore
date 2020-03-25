@@ -4,6 +4,7 @@ venv-windows
 run.sh
 
 *.pyc
+data/cache/*
 data/configs/*
 data/pages/*
 !data/pages/ipari-note
