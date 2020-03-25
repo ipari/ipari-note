@@ -119,9 +119,12 @@ def save_page(page_path, raw_md):
     md_path = get_md_path(page_path)
     if md_path is None:
         md_path = norm_page_path(page_path) + MARKDOWN_EXT[0]
+    # 문서 기록
     os.makedirs(os.path.dirname(md_path), exist_ok=True)
     with open(md_path, 'w', encoding='utf-8') as f:
         f.write(raw_md)
+    # 메타 업데이트
+    update_page_meta(page_path)
 
 
 def delete_page(page_path):
@@ -131,6 +134,9 @@ def delete_page(page_path):
     # 파일 제거
     file_path = get_md_path(page_path)
     os.remove(file_path)
+
+    # 메타 업데이트
+    update_page_meta(page_path)
 
     # 빈 디렉터리 제거 (첫 2개는 data/pages)
     page_dir_length = len(PAGE_ROOT.split(os.path.sep))
@@ -213,7 +219,13 @@ def get_raw_md(file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
             return f.read()
     except (IOError, TypeError):
-        return ''
+        template = f"""
+        Created: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+        Summary: 
+        Tags: 
+        """
+        template = [line.strip() for line in template.split('\n') if line]
+        return "\n".join(template) + '\n'
 
 
 def render_markdown(raw_md):
@@ -222,15 +234,6 @@ def render_markdown(raw_md):
     html = md.convert(raw_md)
     meta = process_page_meta(md.Meta)
     return html, meta
-
-
-def process_page_meta(meta):
-    for k, v in meta.items():
-        v = meta[k][0]
-        if k == 'tags':
-            v = [tag.strip() for tag in v.split(',')]
-        meta[k] = v
-    return meta
 
 
 def iterate_pages(extension=False):
@@ -246,7 +249,7 @@ def iterate_pages(extension=False):
 
 
 def get_page_list(sort_key=None, reverse=False):
-    sort_key = sort_key or 'modified'
+    sort_key = sort_key or 'updated'
     permissions = get_permission()
     page_metas = get_page_meta()
     pages = []
@@ -270,12 +273,28 @@ def get_page_list(sort_key=None, reverse=False):
 def get_page_meta(page_path=None):
     try:
         with open(META_PATH, 'r', encoding='utf-8') as f:
-            data = yaml.full_load(f)
+            data = yaml.safe_load(f)
     except IOError:
-        data = {}
+        update_all_page_meta()
+        return get_page_meta(page_path=page_path)
     if page_path is None:
         return data
     return data.get(page_path, {})
+
+
+def process_page_meta(meta):
+    for k, v in meta.items():
+        v = meta[k][0]
+        if k == 'tags':
+            v = [tag.strip() for tag in v.split(',')]
+        elif k in ('created', 'updated'):
+            try:
+                v = datetime.strptime(v, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                v = datetime.strptime(v, '%Y-%m-%d')
+        if v:
+            meta[k] = v
+    return meta
 
 
 def make_page_meta(page_path, meta=None):
@@ -286,7 +305,7 @@ def make_page_meta(page_path, meta=None):
     if 'updated' not in meta:
         mtime_ts = int(os.path.getmtime(md_path))
         mtime_dt = datetime.fromtimestamp(mtime_ts)
-        meta['updated'] = mtime_dt.strftime('%Y-%m-%d')
+        meta['updated'] = mtime_dt
     meta['cached'] = int(datetime.now().timestamp())
     return meta
 
@@ -294,28 +313,21 @@ def make_page_meta(page_path, meta=None):
 def save_meta(data):
     os.makedirs(os.path.dirname(META_PATH), exist_ok=True)
     with open(META_PATH, 'w', encoding='utf-8') as f:
-        yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
+        yaml.safe_dump(data, f, default_flow_style=False, allow_unicode=True)
 
 
 def update_page_meta(page_path):
     page_metas = get_page_meta()
     md_path = get_md_path(page_path)
     if md_path is None and page_path in page_metas:
-        del page_metas[md_path]
+        del page_metas[page_path]
     else:
-        page_metas.update(make_page_meta(page_path))
+        page_metas[page_path] = make_page_meta(page_path)
     save_meta(page_metas)
 
 
 def update_all_page_meta():
-    prev_metas = get_page_meta()
-    new_metas = {}
+    page_metas = {}
     for page_path in iterate_pages():
-        md_path = get_md_path(page_path)
-        cached_ts = prev_metas.get(page_path, {}).get('cached', 0)
-        mtime_ts = int(os.path.getmtime(md_path))
-        if mtime_ts <= cached_ts:
-            new_metas[page_path] = prev_metas[page_path]
-        else:
-            new_metas[page_path] = make_page_meta(page_path)
-    save_meta(new_metas)
+        page_metas[page_path] = make_page_meta(page_path)
+    save_meta(page_metas)

@@ -29,7 +29,6 @@ def route_index():
 
 @bp.route('/recent')
 def route_recent():
-    update_all_page_meta()
     pages = get_page_list(sort_key='updated', reverse=True)
     menu = get_menu_list()
     meta = get_note_meta()
@@ -40,8 +39,7 @@ def route_recent():
 
 
 @bp.route('/archive')
-def view_archive():
-    update_all_page_meta()
+def route_archive():
     pages = get_page_list(sort_key='path')
     base_url = config.get_config('note.base_url')
     menu = get_menu_list()
@@ -50,3 +48,11 @@ def view_archive():
     return render_template('archive.html',
                            meta=meta, menu=menu,
                            base_url=base_url, pages=pages)
+
+
+@bp.route('/update')
+def route_update():
+    if is_logged_in():
+        update_all_page_meta()
+        return redirect('/')
+    return error_page(page_path=None, message='로그인이 필요합니다.')

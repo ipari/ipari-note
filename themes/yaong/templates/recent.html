@@ -9,10 +9,10 @@
     <li>
         <h2 id="{{ page.title }}"><a href="{{ base_url }}/{{ page.path }}" class="wikilink">{{ page.title }}</a></h2>
         <p class="meta">
-            {{ page.updated }}
+            {{ page.updated.strftime('%Y-%m-%d') }}
             {% if page.tags %} ·
             {% for tag in page.tags %}
-                <a href="tags/{{ tag }}" class="wikilink">#{{ tag }}</a>{% if not loop.last %}, {% endif %}
+                <a href="tags/{{ tag }}" class="wikilink">{{ tag }}</a>{% if not loop.last %}, {% endif %}
             {% endfor %}
             {% endif %}
         </p>

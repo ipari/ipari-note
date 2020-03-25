@@ -29,8 +29,8 @@
         </td>
         {% endif %}
         <td class="left"><a href="{{ base_url }}/{{ page.path }}">{{ page.path }}</a></td>
-        <td class="center">{{ page.created }}</td>
-        <td class="center">{{ page.updated }}</td>
+        <td class="center">{% if page.created %}{{ page.created.strftime('%Y-%m-%d') }}{% endif %}</td>
+        <td class="center">{% if page.updated %}{{ page.updated.strftime('%Y-%m-%d') }}{% endif %}</td>
     </tr>
     {% endfor %}
     </tbody>
