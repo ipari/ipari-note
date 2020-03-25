@@ -245,7 +245,7 @@ def iterate_pages(extension=False):
             yield page_path
 
 
-def get_page_list(sort_key=None):
+def get_page_list(sort_key=None, reverse=False):
     sort_key = sort_key or 'modified'
     permissions = get_permission()
     page_metas = get_page_meta()
@@ -263,7 +263,7 @@ def get_page_list(sort_key=None):
         page.update(page_meta)
         pages.append(page)
 
-    pages = sorted(pages, key=lambda x: x[sort_key], reverse=True)
+    pages = sorted(pages, key=lambda x: x[sort_key], reverse=reverse)
     return pages
 
 

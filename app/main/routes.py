@@ -15,7 +15,7 @@ def check_setup():
 @bp.route('/')
 def route_index():
     recent_count = config.get_config('note.recent_pages')
-    pages = get_page_list(sort_key='updated')
+    pages = get_page_list(sort_key='updated', reverse=True)
     pages = pages[:recent_count]
     menu = get_menu_list()
     meta = get_note_meta()
@@ -28,7 +28,7 @@ def route_index():
 @bp.route('/recent')
 def route_recent():
     update_all_page_meta()
-    pages = get_page_list(sort_key='updated')
+    pages = get_page_list(sort_key='updated', reverse=True)
     menu = get_menu_list()
     meta = get_note_meta()
     base_url = config.get_config('note.base_url')
@@ -40,7 +40,7 @@ def route_recent():
 @bp.route('/archive')
 def view_archive():
     update_all_page_meta()
-    pages = get_page_list(sort_key='title')
+    pages = get_page_list(sort_key='path')
     base_url = config.get_config('note.base_url')
     menu = get_menu_list()
     meta = get_note_meta()
