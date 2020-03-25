@@ -1,11 +1,28 @@
+Created: 2018-12-26
+Updated: 2020-03-25
+Summary: 이파리노트 기능 및 서식에 대한 가이드 문서
+Tags: ipari-note, guide
+
 노트의 문서는 [Markdown](https://daringfireball.net/projects/markdown/syntax) 문법을 기반으로 합니다.
 기본 문법과 확장 문법을 구분하지 않고 서술합니다.
 
 [목차]
 
+## 메타
+문서의 첫 줄에 문서에 대한 설명을 추가할 수 있습니다.
+
+- Updated 는 지정하지 않으면 파일 수정 시각을 사용합니다.
+
+```text
+Created: 2018-12-26
+Updated: 2020-03-25
+Summary: First page of the note.
+Tags: ipari-note, guide
+```
+
 ## 서식
 
-```markdown
+```text
 **굵은** 글자
 *기울어진* 글자
 [[Home]]으로 가는 노트 내부 링크 걸기
@@ -24,7 +41,7 @@
 최상위 헤더 `<h1>` 에는 표제어가 자동으로 삽입됩니다.
 따라서 본문에는 `<h2>` 이후의 헤더를 사용합니다.
 
-```markdown
+```text
 ## <h2> 태그
 ### <h3> 태그
 #### <h4> 태그
@@ -32,7 +49,7 @@
 
 ## 표
 
-```markdown
+```text
 | 번호 | 제목 | 가수 |
 | :---: | :---: | :---: |
 | 46130 | fantastic baby | 하현우 |
@@ -54,7 +71,7 @@
 ## 주석
 아래와 같은 방식으로 사용합니다.
 
-```markdown
+```text
 주석[^1]은 이렇게[^이렇게] 사용합니다.
 
 [^1]: '주석'에 달린 주석
@@ -71,7 +88,7 @@
 
 ### 코드 블럭
 
-````markdown
+````text
 ```python
 def blah():
     return 'blah'
@@ -88,7 +105,7 @@ def blah():
 
 ### 코드 라인 강조
 
-````markdown
+````text
 ```python hl_lines="1 3"
 def blah():
     print('blah')
@@ -105,7 +122,7 @@ def blah():
 ## 안내
 안내하고 싶은 내용이 있을 때, 상자 모양으로 강조하여 알려줄 수 있습니다.
 
-```markdown
+```text
 !!! tip "차가운 맥주가 없을 땐"
     급한 상황에 차갑게 해 놓은 맥주가 없을 땐 맥주에 얼음을 넣어 마시면 된다.
 ```
