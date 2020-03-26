@@ -4,11 +4,10 @@ from datetime import datetime
 from flask import flash, jsonify, render_template, request, send_file, session
 
 from app.crypto import decrypt, encrypt
-from app.config.config import get_config, is_file_exist
 from app.note.markdown import md_extensions
 from app.note.permission import *
 from app.user.user import get_user, is_logged_in
-from app.utils import dump_yaml
+from app.utils import config, dump_yaml, is_file_exist
 
 
 MARKDOWN_EXT = ('.md', '.markdown')
@@ -24,7 +23,7 @@ CONTENT_PATH = os.path.normpath(os.path.join(os.getcwd(), META_FILENAME))
 
 
 def get_note_meta():
-    note_config = get_config('note')
+    note_config = config('note')
     meta = dict()
     meta['note_title'] = note_config.get('title', '')
     meta['note_subtitle'] = note_config.get('subtitle', '')
@@ -37,7 +36,7 @@ def get_menu_list(page_path=None, page_exist=False, editable=True):
     items = []
     if is_logged_in():
         if page_path is not None and editable:
-            base_url = get_config('note.base_url')
+            base_url = config('note.base_url')
             url = f'/{base_url}/{page_path}/edit'
             if page_exist:
                 items.append({'type': 'edit', 'url': url, 'label': '편집'})
@@ -156,7 +155,7 @@ def delete_page(page_path):
 
 def edit_page(page_path):
     md_path = get_md_path(page_path)
-    base_url = get_config('note.base_url')
+    base_url = config('note.base_url')
     raw_md = get_raw_md(md_path)
     # ` 문자는 ES6에서 템플릿 문자로 사용되므로 escape 해줘야 한다.
     # https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Template_literals
@@ -213,7 +212,7 @@ def get_html_path(page_path):
 
 def encrypt_url(page_path):
     url_root = request.url_root
-    base_url = get_config('note.base_url')
+    base_url = config('note.base_url')
     url = f'{url_root}{base_url}/{encrypt(page_path)}'
     return url
 

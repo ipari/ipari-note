@@ -1,28 +1,28 @@
 from flask import redirect
 
 from app.main import bp
-from app.config import config
 from app.user import user
+from app.utils import config
+from app.config.config import is_require_setup
 from app.note.note import *
 
 
 @bp.before_request
 def check_setup():
-    if config.is_require_setup() or not user.is_user_exists():
+    if is_require_setup() or not user.is_user_exists():
         return redirect('/setup/note')
 
 
 @bp.route('/')
 def route_index():
-    recent_count = config.get_config('note.recent_pages')
+    recent_count = config('note.recent_pages')
     all_pages = get_page_list(sort_key='updated', reverse=True)
     pages = all_pages[:recent_count]
     menu = get_menu_list()
     meta = get_note_meta()
-    base_url = config.get_config('note.base_url')
     more_pages = len(all_pages) > recent_count
     return render_template('recent.html',
-                           meta=meta, menu=menu, base_url=base_url,
+                           meta=meta, menu=menu,
                            pagename='최근 글', hide_header=True,
                            pages=pages, more_pages=more_pages)
 
@@ -32,7 +32,7 @@ def route_recent():
     pages = get_page_list(sort_key='updated', reverse=True)
     menu = get_menu_list()
     meta = get_note_meta()
-    base_url = config.get_config('note.base_url')
+    base_url = config('note.base_url')
     return render_template('recent.html',
                            meta=meta, menu=menu, base_url=base_url,
                            pagename='모든 글', pages=pages)

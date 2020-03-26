@@ -2,13 +2,13 @@ import re
 from markdown.extensions.toc import TocExtension
 from markdown.extensions.wikilinks \
     import WikiLinkExtension, WikiLinksInlineProcessor
-from app.config.config import get_config
+from app.utils import config
 
 
 def md_extensions():
     extensions = []
     # https://python-markdown.github.io/extensions/
-    base_url = get_config('note')['base_url']
+    base_url = config('note.base_url')
     extensions.append(
         WikiLinkExtensionCustom(base_url='/{}/'.format(base_url)))
     extensions.append('markdown.extensions.meta')
@@ -20,7 +20,7 @@ def md_extensions():
     extensions.append('markdown.extensions.footnotes')
     extensions.append('markdown.extensions.md_in_html')
 
-    ext_config = get_config('markdown_extensions')
+    ext_config = config('markdown_extensions')
     toc_marker = ext_config['toc_marker']
     extensions.append(TocExtension(
         marker=toc_marker, permalink=True, slugify=_slugify))

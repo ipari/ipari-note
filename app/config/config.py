@@ -1,6 +1,6 @@
 import os
 import yaml
-from app.utils import dump_yaml, get_value_by_path
+from app.utils import dump_yaml, get_value_by_path, is_file_exist
 
 
 CONFIG_FILENAME = 'data/configs/note.yml'
@@ -22,10 +22,6 @@ def get_config(path=None, default=None):
 
 def set_config(data):
     dump_yaml(data, CONFIG_PATH)
-
-
-def is_file_exist(path):
-    return os.path.isfile(path)
 
 
 def is_config_exist():
