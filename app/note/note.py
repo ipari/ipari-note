@@ -277,15 +277,17 @@ def get_tag_list():
     tag_metas = get_tag_meta()
     permissions = get_permission()
     result = []
-    for tag, page_paths in tag_metas.items():
-        tag_pages = {'tag': tag, 'pages': []}
-        for page_path in page_paths:
-            permission = permissions.get(page_path, 0)
-            if not is_logged_in() and permission != Permission.PUBLIC:
-                continue
-            tag_pages['pages'].append(page_path)
-        result.append(tag_pages)
-    result = sorted(result, key=lambda x: len(x['pages']), reverse=True)
+    for tag, tag_info in tag_metas.items():
+        tag_info['tag'] = tag
+        tag_info['pages'] = [
+            page for page in tag_info['pages']
+            if is_logged_in() or permissions.get(page, 0) == Permission.PUBLIC
+        ]
+        if len(tag_info['pages']) > 0:
+            result.append(tag_info)
+    result.sort(key=lambda x: x['created'])
+    result.sort(key=lambda x: x['updated'], reverse=True)
+    result.sort(key=lambda x: len(x['pages']), reverse=True)
     return result
 
 
@@ -355,15 +357,21 @@ def save_tag(data):
     data = dict(data)
     os.makedirs(os.path.dirname(TAG_PATH), exist_ok=True)
     with open(TAG_PATH, 'w', encoding='utf-8') as f:
-        yaml.safe_dump(data, f, default_flow_style=False, allow_unicode=True)
+        yaml.Dumper.ignore_aliases = lambda *args: True
+        yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
 
 
 def update_all_tag_meta(page_metas):
-    tag_metas = defaultdict(list)
+    tag_metas = defaultdict(lambda: {
+        'pages': [], 'created': datetime.max, 'updated': datetime.min})
     for page_path, page_meta in page_metas.items():
         tags = page_meta.get('tags', [])
+        updated = page_meta.get('updated')
+        created = page_meta.get('created', updated)
         for tag in tags:
-            tag_metas[tag].append(page_path)
+            tag_metas[tag]['pages'].append(page_path)
+            tag_metas[tag]['created'] = min(created, tag_metas[tag]['created'])
+            tag_metas[tag]['updated'] = max(updated, tag_metas[tag]['updated'])
     save_tag(tag_metas)
 
 

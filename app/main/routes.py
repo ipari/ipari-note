@@ -52,8 +52,11 @@ def route_archive():
 
 @bp.route('/tags')
 def route_tags():
-    tag_list = get_tag_list()
-    return tag_list
+    tag_infos = get_tag_list()
+    menu = get_menu_list()
+    meta = get_note_meta()
+    return render_template('tags.html',
+                           meta=meta, menu=menu, tag_infos=tag_infos)
 
 
 @bp.route('/tags/<tag>')
