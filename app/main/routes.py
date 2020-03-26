@@ -61,7 +61,12 @@ def route_tags():
 
 @bp.route('/tags/<tag>')
 def route_tag(tag):
-    return tag
+    pages = get_page_list_in_tag(tag)
+    menu = get_menu_list()
+    meta = get_note_meta()
+    return render_template('recent.html',
+                           meta=meta, menu=menu,
+                           pagename=f'#{tag}', pages=pages)
 
 
 @bp.route('/update')

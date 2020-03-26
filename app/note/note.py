@@ -251,12 +251,13 @@ def iterate_pages(extension=False):
             yield page_path
 
 
-def get_page_list(sort_key=None, reverse=False):
+def get_page_list(page_paths=None, sort_key=None, reverse=False):
+    page_paths = page_paths or iterate_pages()
     sort_key = sort_key or 'updated'
     permissions = get_permission()
     page_metas = get_page_meta()
     pages = []
-    for page_path in iterate_pages():
+    for page_path in page_paths:
         permission = permissions.get(page_path, 0)
         if not is_logged_in() and permission != Permission.PUBLIC:
             continue
@@ -291,6 +292,12 @@ def get_tag_list():
     return result
 
 
+def get_page_list_in_tag(tag):
+    tag_meta = get_tag_meta(tag)
+    page_paths = tag_meta.get('pages', [])
+    return get_page_list(page_paths=page_paths, reverse=True)
+
+
 def get_page_meta(page_path=None):
     try:
         with open(META_PATH, 'r', encoding='utf-8') as f:
@@ -312,7 +319,7 @@ def get_tag_meta(tag=None):
         return get_tag_meta(tag=tag)
     if tag is None:
         return data
-    return data.get(tag, [])
+    return data.get(tag, {})
 
 
 def process_page_meta(prev_meta):
