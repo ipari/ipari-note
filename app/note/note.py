@@ -1,4 +1,5 @@
 import markdown
+from collections import defaultdict
 from datetime import datetime
 from flask import flash, jsonify, render_template, request, send_file, session
 
@@ -15,6 +16,8 @@ PAGE_ROOT = os.path.join('data', 'pages')
 
 META_FILENAME = 'data/cache/meta.yml'
 META_PATH = os.path.normpath(os.path.join(os.getcwd(), META_FILENAME))
+TAG_FILENAME = 'data/cache/tag.yml'
+TAG_PATH = os.path.normpath(os.path.join(os.getcwd(), TAG_FILENAME))
 CONTENT_FILENAME = 'data/cache/content.yml'
 CONTENT_PATH = os.path.normpath(os.path.join(os.getcwd(), META_FILENAME))
 
@@ -270,6 +273,22 @@ def get_page_list(sort_key=None, reverse=False):
     return pages
 
 
+def get_tag_list():
+    tag_metas = get_tag_meta()
+    permissions = get_permission()
+    result = []
+    for tag, page_paths in tag_metas.items():
+        tag_pages = {'tag': tag, 'pages': []}
+        for page_path in page_paths:
+            permission = permissions.get(page_path, 0)
+            if not is_logged_in() and permission != Permission.PUBLIC:
+                continue
+            tag_pages['pages'].append(page_path)
+        result.append(tag_pages)
+    result = sorted(result, key=lambda x: len(x['pages']), reverse=True)
+    return result
+
+
 def get_page_meta(page_path=None):
     try:
         with open(META_PATH, 'r', encoding='utf-8') as f:
@@ -280,6 +299,18 @@ def get_page_meta(page_path=None):
     if page_path is None:
         return data
     return data.get(page_path, {})
+
+
+def get_tag_meta(tag=None):
+    try:
+        with open(TAG_PATH, 'r', encoding='utf-8') as f:
+            data = yaml.safe_load(f)
+    except IOError:
+        update_all_page_meta()
+        return get_tag_meta(tag=tag)
+    if tag is None:
+        return data
+    return data.get(tag, [])
 
 
 def process_page_meta(prev_meta):
@@ -320,14 +351,32 @@ def save_meta(data):
         yaml.safe_dump(data, f, default_flow_style=False, allow_unicode=True)
 
 
+def save_tag(data):
+    data = dict(data)
+    os.makedirs(os.path.dirname(TAG_PATH), exist_ok=True)
+    with open(TAG_PATH, 'w', encoding='utf-8') as f:
+        yaml.safe_dump(data, f, default_flow_style=False, allow_unicode=True)
+
+
+def update_all_tag_meta(page_metas):
+    tag_metas = defaultdict(list)
+    for page_path, page_meta in page_metas.items():
+        tags = page_meta.get('tags', [])
+        for tag in tags:
+            tag_metas[tag].append(page_path)
+    save_tag(tag_metas)
+
+
 def update_page_meta(page_path):
     page_metas = get_page_meta()
     md_path = get_md_path(page_path)
+    page_meta = make_page_meta(page_path)
     if md_path is None and page_path in page_metas:
         del page_metas[page_path]
     else:
-        page_metas[page_path] = make_page_meta(page_path)
+        page_metas[page_path] = page_meta
     save_meta(page_metas)
+    update_all_tag_meta(page_metas)
 
 
 def update_all_page_meta():
@@ -335,3 +384,4 @@ def update_all_page_meta():
     for page_path in iterate_pages():
         page_metas[page_path] = make_page_meta(page_path)
     save_meta(page_metas)
+    update_all_tag_meta(page_metas)
