@@ -1,6 +1,7 @@
 import os
 import yaml
 from enum import IntEnum
+from app.utils import dump_yaml
 
 
 PERMISSION_FILENAME = 'data/configs/permission.yml'
@@ -31,8 +32,7 @@ def set_permission(page_path, permission):
             del permissions[page_path]
     else:
         permissions[page_path] = permission
-    with open(PERMISSION_PATH, 'w', encoding='utf-8') as f:
-        yaml.dump(permissions, f, default_flow_style=False, allow_unicode=True)
+    dump_yaml(permissions, PERMISSION_PATH)
 
 
 def delete_permission(page_path):

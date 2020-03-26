@@ -2,7 +2,7 @@ import os
 import yaml
 from flask import session
 from werkzeug.security import check_password_hash
-from app.utils import get_value_by_path
+from app.utils import dump_yaml, get_value_by_path
 
 
 USER_FILENAME = 'data/configs/user.yml'
@@ -21,9 +21,8 @@ def get_user(path=None):
         return get_value_by_path(data, path)
 
 
-def set_user(d):
-    with open(USER_PATH, 'w', encoding='utf-8') as f:
-        yaml.dump(d, f, default_flow_style=False, allow_unicode=True)
+def set_user(data):
+    dump_yaml(data, USER_PATH)
 
 
 def is_user_exists():

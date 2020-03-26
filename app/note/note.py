@@ -8,6 +8,7 @@ from app.config.config import get_config, is_file_exist
 from app.note.markdown import md_extensions
 from app.note.permission import *
 from app.user.user import get_user, is_logged_in
+from app.utils import dump_yaml
 
 
 MARKDOWN_EXT = ('.md', '.markdown')
@@ -355,17 +356,12 @@ def make_page_meta(page_path, meta=None):
 
 
 def save_meta(data):
-    os.makedirs(os.path.dirname(META_PATH), exist_ok=True)
-    with open(META_PATH, 'w', encoding='utf-8') as f:
-        yaml.safe_dump(data, f, default_flow_style=False, allow_unicode=True)
+    dump_yaml(data, META_PATH)
 
 
 def save_tag(data):
     data = dict(data)
-    os.makedirs(os.path.dirname(TAG_PATH), exist_ok=True)
-    with open(TAG_PATH, 'w', encoding='utf-8') as f:
-        yaml.Dumper.ignore_aliases = lambda *args: True
-        yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
+    dump_yaml(data, TAG_PATH)
 
 
 def update_all_tag_meta(page_metas):

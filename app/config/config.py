@@ -1,6 +1,6 @@
 import os
 import yaml
-from app.utils import get_value_by_path, set_value_by_path
+from app.utils import dump_yaml, get_value_by_path
 
 
 CONFIG_FILENAME = 'data/configs/note.yml'
@@ -20,9 +20,8 @@ def get_config(path=None, default=None):
         return get_value_by_path(data, path, default=default)
 
 
-def set_config(d):
-    with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
-        yaml.dump(d, f, default_flow_style=False, allow_unicode=True)
+def set_config(data):
+    dump_yaml(data, CONFIG_PATH)
 
 
 def is_file_exist(path):
@@ -54,6 +53,4 @@ def init_config():
         },
         'require_setup': True
     }
-    os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-    with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
-        yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
+    set_config(config)
