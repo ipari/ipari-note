@@ -28,7 +28,7 @@
             <img src="{{ url_for('static', filename='img/' + permission_icons[page.permission] + '.svg') }}" class="permission">
         </td>
         {% endif %}
-        <td class="left"><a href="{{ base_url }}/{{ page.path }}">{{ page.path }}</a></td>
+        <td class="left"><a href="{{ url_for('note.route_page', page_path=page.path) }}">{{ page.path }}</a></td>
         <td class="center">{% if page.created %}{{ page.created.strftime('%Y-%m-%d') }}{% endif %}</td>
         <td class="center">{% if page.updated %}{{ page.updated.strftime('%Y-%m-%d') }}{% endif %}</td>
     </tr>

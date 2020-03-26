@@ -22,9 +22,9 @@ def route_index():
     base_url = config.get_config('note.base_url')
     more_pages = len(all_pages) > recent_count
     return render_template('recent.html',
-                           meta=meta, menu=menu,
-                           base_url=base_url, pages=pages,
-                           more_pages=more_pages)
+                           meta=meta, menu=menu, base_url=base_url,
+                           pagename='최근 글', hide_header=True,
+                           pages=pages, more_pages=more_pages)
 
 
 @bp.route('/recent')
@@ -34,20 +34,18 @@ def route_recent():
     meta = get_note_meta()
     base_url = config.get_config('note.base_url')
     return render_template('recent.html',
-                           meta=meta, menu=menu,
-                           base_url=base_url, pages=pages)
+                           meta=meta, menu=menu, base_url=base_url,
+                           pagename='모든 글', pages=pages)
 
 
 @bp.route('/archive')
 def route_archive():
     pages = get_page_list(sort_key='path')
-    base_url = config.get_config('note.base_url')
     menu = get_menu_list()
     meta = get_note_meta()
     meta['logged_in'] = is_logged_in()
     return render_template('archive.html',
-                           meta=meta, menu=menu,
-                           base_url=base_url, pages=pages)
+                           meta=meta, menu=menu, pages=pages)
 
 
 @bp.route('/tags')
