@@ -306,7 +306,7 @@ def make_page_meta(page_path, meta=None):
     if meta is None:
         raw_md = get_raw_md(md_path)
         _, meta = render_markdown(raw_md)
-    if 'updated' not in meta:
+    if md_path and 'updated' not in meta:
         mtime_ts = int(os.path.getmtime(md_path))
         mtime_dt = datetime.fromtimestamp(mtime_ts)
         meta['updated'] = mtime_dt
