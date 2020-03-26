@@ -50,6 +50,17 @@ def route_archive():
                            base_url=base_url, pages=pages)
 
 
+@bp.route('/tags')
+def route_tags():
+    tag_list = get_tag_list()
+    return tag_list
+
+
+@bp.route('/tags/<tag>')
+def route_tag(tag):
+    return tag
+
+
 @bp.route('/update')
 def route_update():
     if is_logged_in():
