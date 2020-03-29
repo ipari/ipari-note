@@ -270,7 +270,13 @@ def get_page_list(page_paths=None, sort_key=None, reverse=False):
         page.update(page_meta)
         pages.append(page)
 
-    pages = sorted(pages, key=lambda x: x[sort_key], reverse=reverse)
+    try:
+        pages.sort(key=lambda x: x[sort_key], reverse=reverse)
+    except KeyError:
+        update_all_page_meta()
+        return get_page_list(page_paths=page_paths,
+                             sort_key=sort_key,
+                             reverse=reverse)
     return pages
 
 
@@ -286,9 +292,14 @@ def get_tag_list():
         ]
         if len(tag_info['pages']) > 0:
             result.append(tag_info)
-    result.sort(key=lambda x: x['created'])
-    result.sort(key=lambda x: x['updated'], reverse=True)
-    result.sort(key=lambda x: len(x['pages']), reverse=True)
+
+    try:
+        result.sort(key=lambda x: x['created'])
+        result.sort(key=lambda x: x['updated'], reverse=True)
+        result.sort(key=lambda x: len(x['pages']), reverse=True)
+    except KeyError:
+        update_all_page_meta()
+        return get_tag_list()
     return result
 
 
