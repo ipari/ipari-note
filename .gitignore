@@ -1,7 +1,7 @@
 .idea
 venv
 venv-windows
-run.sh
+*.sh
 
 *.pyc
 data/cache/*
