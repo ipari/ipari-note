@@ -5,7 +5,7 @@ from markdown.extensions import Extension
 from markdown.extensions.toc import TocExtension
 from markdown.extensions.wikilinks \
     import WikiLinkExtension, WikiLinksInlineProcessor
-from markdown.inlinepatterns import InlineProcessor
+from markdown.inlinepatterns import InlineProcessor, LinkInlineProcessor
 
 from app.utils import config
 
@@ -31,6 +31,7 @@ def md_extensions():
         marker=toc_marker, permalink=True, slugify=_slugify))
 
     extensions.append(AutolinkExtensionCustom())
+    extensions.append(LinkInlineExtension())
 
     return extensions
 
@@ -71,8 +72,45 @@ class AutolinkExtensionCustom(Extension):
 
     def extendMarkdown(self, md):
         html_re = r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)'
+        md.inlinePatterns.deregister('autolink')
         md.inlinePatterns.register(
             AutolinkInlineProcessor(html_re, md), 'autolink', 120)
+
+
+class LinkInlineProcessorCustom(LinkInlineProcessor):
+
+    def __init__(self, pattern, md):
+        super(LinkInlineProcessorCustom, self).__init__(pattern, md)
+
+    def handleMatch(self, m, data):
+        text, index, handled = self.getText(data, m.end(0))
+
+        if not handled:
+            return None, None, None
+
+        href, title, index, handled = self.getLink(data, index)
+        if not handled:
+            return None, None, None
+
+        el = etree.Element('a')
+        el.text = text
+
+        el.set('href', href)
+        el.set('target', '_blank')
+
+        if title is not None:
+            el.set("title", title)
+
+        return el, m.start(0), index
+
+
+class LinkInlineExtension(Extension):
+
+    def extendMarkdown(self, md):
+        link_re = r'(?<!\!)\['
+        md.inlinePatterns.deregister('link')
+        md.inlinePatterns.register(
+            LinkInlineProcessorCustom(link_re, md), 'link', 160)
 
 
 def _slugify(value, _):
