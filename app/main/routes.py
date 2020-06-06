@@ -1,8 +1,7 @@
-from flask import redirect
+from flask import redirect, url_for
 
 from app.main import bp
 from app.user import user
-from app.utils import config
 from app.config.config import is_require_setup
 from app.note.note import *
 
@@ -73,3 +72,8 @@ def route_update():
         update_all_page_meta()
         return redirect('/')
     return error_page(page_path=None, message='로그인이 필요합니다.')
+
+
+@bp.route('/<path:page_path>')
+def route_etc(page_path):
+    return redirect(url_for('note.route_page', page_path=page_path))
