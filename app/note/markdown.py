@@ -1,16 +1,18 @@
 import re
+import xml.etree.ElementTree as etree
+from markdown import util
+from markdown.extensions import Extension
 from markdown.extensions.toc import TocExtension
 from markdown.extensions.wikilinks \
     import WikiLinkExtension, WikiLinksInlineProcessor
+from markdown.inlinepatterns import InlineProcessor
+
 from app.utils import config
 
 
 def md_extensions():
     extensions = []
     # https://python-markdown.github.io/extensions/
-    base_url = config('note.base_url')
-    extensions.append(
-        WikiLinkExtensionCustom(base_url='/{}/'.format(base_url)))
     extensions.append('markdown.extensions.meta')
     extensions.append('markdown.extensions.fenced_code')
     extensions.append('markdown.extensions.codehilite')
@@ -20,10 +22,15 @@ def md_extensions():
     extensions.append('markdown.extensions.footnotes')
     extensions.append('markdown.extensions.md_in_html')
 
-    ext_config = config('markdown_extensions')
-    toc_marker = ext_config['toc_marker']
+    base_url = config('note.base_url')
+    extensions.append(
+        WikiLinkExtensionCustom(base_url='/{}/'.format(base_url)))
+
+    toc_marker = config('markdown_extensions.toc_marker')
     extensions.append(TocExtension(
         marker=toc_marker, permalink=True, slugify=_slugify))
+
+    extensions.append(AutolinkExtensionCustom())
 
     return extensions
 
@@ -48,6 +55,24 @@ class WikiLinkExtensionCustom(WikiLinkExtension):
             WikiLinksInlineProcessor(wikilink_re, self.getConfigs())
         wikilink_pattern.md = md
         md.inlinePatterns.register(wikilink_pattern, 'wikilink', 75)
+
+
+class AutolinkInlineProcessor(InlineProcessor):
+    """ Return a link Element given an autolink (`http://example/com`). """
+    def handleMatch(self, m, data):
+        el = etree.Element('a')
+        el.set('href', self.unescape(m.group(0)))
+        el.set('target', '_blank')
+        el.text = util.AtomicString(m.group(0))
+        return el, m.start(0), m.end(0)
+
+
+class AutolinkExtensionCustom(Extension):
+
+    def extendMarkdown(self, md):
+        html_re = r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)'
+        md.inlinePatterns.register(
+            AutolinkInlineProcessor(html_re, md), 'autolink', 120)
 
 
 def _slugify(value, _):
