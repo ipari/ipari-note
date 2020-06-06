@@ -39,7 +39,7 @@ def route_recent():
 
 @bp.route('/archive')
 def route_archive():
-    pages = get_page_list(sort_key='path')
+    pages = get_page_list(sort_key='updated', reverse=True)
     menu = get_menu_list()
     meta = get_note_meta()
     meta['logged_in'] = is_logged_in()
