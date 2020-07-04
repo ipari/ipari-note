@@ -19,7 +19,9 @@
     <div class="page">
       <div class="left">
         <h1><a href="/">{{ meta.note_title }}</a></h1>
+        {% if meta.note_subtitle is not none %}
         <p>{{ meta.note_subtitle }}</p>
+        {% endif %}
       </div>
       <div class="right">
         <button>Menu</button>

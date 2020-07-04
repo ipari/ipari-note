@@ -20,13 +20,12 @@ body {
 body {
     display: flex;
     flex-direction: column;
-
     font: normal 18px/1.5 'Apple SD Gothic Neo', 'Malgun Gothic', Helvetica, Arial, Sans-serif;
     letter-spacing: -0.5px;
     -webkit-text-size-adjust: 100%;
     -moz-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
-    color: #333333;
+    color: #444444;
 }
 
 article {
@@ -35,7 +34,7 @@ article {
 }
 
 div.page {
-    max-width: 35em;
+    max-width: 630px;  /* 35em for 18px */
     margin: 0 auto;
     padding: 0.2em 1em;
 }
@@ -65,22 +64,18 @@ img {
 table {
     border-collapse: collapse;
 }
-
 th, td {
     min-width: 4em;
     padding: 0.2em 0.4em;
     font-size: 85%;
 }
-
 th,
 tr:last-child td {
     border-bottom: 1px solid #cccccc;
 }
-
 th {
     cursor: pointer;
 }
-
 td {
     border-bottom: 1px dotted #cccccc;
 }
@@ -97,11 +92,9 @@ del {
 .center {
     text-align: center;
 }
-
 .left {
     text-align: left;
 }
-
 .right {
     text-align: right;
 }
@@ -109,6 +102,7 @@ del {
 
 /* Header */
 header {
+    padding: .2em 0;
     background-color: #4bbec3;
 }
 
@@ -135,12 +129,12 @@ header div.right {
 }
 
 header button {
-    width: 40px;
-    height: 40px;
+    width: 28px;
+    height: 28px;
     border: none;
     outline: none;
     background: url('../img/menu.svg') no-repeat right center;
-    background-size: 40px;
+    background-size: 28px;
     text-indent: -9999px;
     cursor: pointer;
 }
@@ -148,6 +142,7 @@ header button {
 header h1 {
     margin: 0;
     padding: 0;
+    font-size: 1.6em;
     font-family: 'Raleway', 'Khula', sans-serif;
     font-weight: 300;
 }
@@ -169,7 +164,8 @@ header h1 a:hover {
 }
 
 header p {
-    margin: -0.1em 0 0;
+    margin: 0;
+    font-size: 0.85em;
     color: rgba(255,255,255,0.6);
 }
 
@@ -177,6 +173,7 @@ header p {
 /* Nav */
 nav {
     display: none;
+    font-size: 16px;
     background-color: #fbfbfb;
 }
 
@@ -313,17 +310,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    font-size: 2.2em; /* 2.2em for 20px */
+    font-size: 1.8em;
     margin: 0.6em 0 0.4em;
 }
 
 h2 {
-    font-size: 1.8em;
+    font-size: 1.5em;
     margin: 1.6em 0 0.4em;
 }
 
 h3 {
-    font-size: 1.4em;
+    font-size: 1.35em;
     margin: 1.6em 0 0.4em;
 }
 
@@ -332,11 +329,53 @@ h4 {
     margin: 1.6em 0 0.4em;
 }
 
+div.article h2 {
+    padding-bottom: .3em;
+    border-bottom: 1px solid #cccccc;
+}
+
+div.article ul ul,
+div.article ul ol,
+div.article ol ol,
+div.article ol ul {
+    padding-left: 1.6em;
+}
+div.article li p {
+    display: inline-block;
+    margin: 0;
+}
+div.article ul {
+    list-style: none;
+}
+div.article ul > li::before {
+    display: inline-block;
+    vertical-align: top;
+    width: 1em;
+    margin-left: -2em;
+    content: "\2022";
+    color: #2a99b6;
+}
+
+div.article ol {
+    list-style: none;
+    counter-reset: li;
+}
+div.article ol > li {
+    counter-increment: li;
+}
+div.article ol > li::before {
+    display: inline-block;
+    vertical-align: top;
+    width: auto;
+    margin: 0 .5em 0 -2em;
+    content: counter(li) ".";
+    color: #2a99b6;
+}
+
 blockquote {
     margin: 0;
     padding-left: 0.6em;
-    border-left: 3px solid #cccccc;
-    color: #999999;
+    border-left: 3px solid #2a99b6;
 }
 
 code, pre {
@@ -466,11 +505,8 @@ form a.button {
 
 
 /* Footnotes */
-div.footnote ol {
-    padding: 0 1em;
-}
-
 div.footnote p {
+    display: inline-block;
     margin: 0;
     word-break: break-all;
 }
@@ -584,7 +620,9 @@ div.archive img.permission {
 
 /* Footer */
 footer {
-    padding: 0.6em 0;
+    margin-top: 1.6em;
+    padding: 0.3em 0;
+    font-size: 0.85em;
     background-color: #7baabe;
     color: rgba(255,255,255,0.6);
 }
@@ -596,16 +634,21 @@ footer {
         font-size: 16px;
     }
 
+    header {
+        padding: .2em 0;
+    }
+    header h1 {
+        font-size: 1.5em;
+    }
     header button {
-        width: 32px;
-        height: 32px;
-        background-size: 32px;
+        width: 24px;
+        height: 24px;
+        background-size: 24px;
     }
 
     nav li {
         float: none;
     }
-
     nav li a {
         margin: 0;
         border-bottom: 1px solid #eeeeee;
