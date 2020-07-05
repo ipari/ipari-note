@@ -23,7 +23,9 @@
             <a href="{{ url_for('note.route_page', page_path=page.path) }}" class="wikilink">{{ page.title }}</a>
         </h2>
         <p class="meta">
+            {% if page.updated %}
             {{ page.updated.strftime('%Y-%m-%d') }}
+            {% endif %}
             {% if page.tags %} ·
             {% for tag in page.tags %}
                 <a href="tags/{{ tag }}" class="wikilink">#{{ tag }}</a>{% if not loop.last %}, {% endif %}
