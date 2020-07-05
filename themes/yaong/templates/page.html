@@ -48,7 +48,17 @@
     {% endif %}
 
     <div class="article">
-    <h1>{{ pagename }}</h1>
+    {% set path_elems = pagename.split('/') %}
+    <h1>
+        <p>
+            {% for name in path_elems[:-1] %}
+                {% set path = path_elems[:loop.index]|join('/') %}
+                <a href="{{ url_for('note.route_page', page_path=path) }}" class="wikilink">{{ name }}</a>
+                {% if not loop.last %} ≫ {% endif %}
+            {% endfor %}
+        </p>
+        {{ path_elems[-1] }}
+    </h1>
 
     {% with messages = get_flashed_messages() %}
         {% if messages %}
