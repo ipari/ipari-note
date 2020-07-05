@@ -225,6 +225,11 @@ nav li a.menu-archive {
     background-size: 24px;
 }
 
+nav li a.menu-tag {
+    background: url('../img/menu-tag.svg') no-repeat left center;
+    background-size: 24px;
+}
+
 nav li a.menu-config {
     background: url('../img/menu-config.svg') no-repeat left center;
     background-size: 24px;
