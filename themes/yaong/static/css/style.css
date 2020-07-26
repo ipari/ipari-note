@@ -347,7 +347,7 @@ div.article h1 p {
 
 div.article h2 {
     padding-bottom: .3em;
-    border-bottom: 1px solid #cccccc;
+    border-bottom: 1px solid #f0f0f0;
 }
 
 div.article ul ul,
@@ -677,7 +677,7 @@ div.archive img.permission {
 
 /* Footer */
 footer {
-    margin-top: 1.6em;
+    margin-top: 3em;
     padding: 0.3em 0;
     font-size: 0.85em;
     background-color: #7baabe;
