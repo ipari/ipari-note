@@ -61,6 +61,7 @@ def render_page(page_path, meta):
     raw_md = get_raw_md(md_path)
     content, _ = render_markdown(raw_md)
     html_url = get_html_path(page_path)
+    meta.update(get_page_meta(page_path))
     menu = get_menu_list(page_path=page_path, page_exist=True)
     return render_template('page.html',
                            meta=meta,

@@ -89,6 +89,11 @@ del {
     color: #aaaaaa;
 }
 
+dl, dt, dd {
+    margin: 0;
+    padding: 0;
+}
+
 .center {
     text-align: center;
 }
@@ -381,6 +386,36 @@ div.article ol > li::before {
     margin: 0 .5em 0 -2em;
     content: counter(li) ".";
     color: #2a99b6;
+}
+
+div.meta {
+    display: flex;
+    margin: 1.6em 0 2em;
+    padding: .4em 0;
+    font-size: 16px;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+}
+div.meta dt:after {
+    content: ':';
+    padding: 0 .2em;
+}
+div.meta .date {
+    flex: 0 0 auto;
+    margin-left: 1em;
+    text-align: right;
+    font-size: 16px;
+    color: #999;
+}
+div.meta .tags {
+    flex: 1 1 auto;
+}
+div.meta dt {
+    float: left;
+    clear: both;
+}
+div.meta dd {
+    float: left;
 }
 
 blockquote {
