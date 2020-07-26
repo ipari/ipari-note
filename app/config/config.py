@@ -37,7 +37,6 @@ def init_config():
     config = {
         'note': {
             'base_url': 'note',
-            'main_page': 'Home',
             'theme': 'yaong',
             'recent_pages': 10,
         },
