@@ -17,11 +17,17 @@
             {% for name in path_elems[:-1] %}
                 {% set path = path_elems[:loop.index]|join('/') %}
                 <a href="{{ url_for('note.route_page', page_path=path) }}" class="wikilink">{{ name }}</a>
-                {% if not loop.last %} ≫ {% endif %}
+                {% if not loop.last %} / {% endif %}
             {% endfor %}
             </p>
             <a href="{{ url_for('note.route_page', page_path=page.path) }}" class="wikilink">{{ page.title }}</a>
+            {% if page.is_pinned %}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 24">
+                <path d="M21.797 4.097a1.041 1.891 45 0 0-2.409 2.874l.727.727-5.283 5.283-1.454-1.454c-.8-.8-2.643-.266-4.096 1.187l4.363 4.363L5.722 25l-2 3.28 3.456-1.827L15.1 18.53l4.363 4.363c1.453-1.453 1.987-3.296 1.187-4.096l-1.454-1.454 5.283-5.283.727.727a1.028 1.868 45 1 0 2.641-2.641L22.03 4.33a1.028 1.868 45 0 0-.131-.131 1.028 1.868 45 0 0-.087-.087z" />
+            </svg>
+            {% endif %}
         </h2>
+        {% if not page.is_pinned %}
         <p class="meta">
             {% if page.updated %}
             {{ page.updated.strftime('%Y-%m-%d') }}
@@ -32,6 +38,7 @@
             {% endfor %}
             {% endif %}
         </p>
+        {% endif %}
         {% if page.summary %}
         <p class="summary">{{ page.summary }}</p>
         {% endif %}

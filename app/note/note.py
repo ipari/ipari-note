@@ -255,14 +255,15 @@ def iterate_pages(extension=False):
 
 def get_page_list(page_paths=None, sort_key=None, reverse=False):
 
-    def make_page_info(page_path):
+    def make_page_info(page_path, is_pinned=False):
         permission = permissions.get(page_path, 0)
         if not is_logged_in() and permission != Permission.PUBLIC:
             return
         page = {
             'title': page_path.split('/')[-1],
             'path': page_path,
-            'permission': permission
+            'permission': permission,
+            'is_pinned': is_pinned
         }
         page_meta = page_metas.get(page_path, {})
         page.update(page_meta)
@@ -272,11 +273,11 @@ def get_page_list(page_paths=None, sort_key=None, reverse=False):
     sort_key = sort_key or 'updated'
     permissions = get_permission()
     page_metas = get_page_meta()
-    main_page_path = config('note.main_page')
+    pinned_page_paths = config('note.pinned_pages') or []
 
     pages = []
     for page_path in page_paths:
-        if page_path == main_page_path:
+        if page_path in pinned_page_paths:
             continue
         page = make_page_info(page_path)
         if page:
@@ -289,10 +290,12 @@ def get_page_list(page_paths=None, sort_key=None, reverse=False):
         return get_page_list(page_paths=page_paths,
                              sort_key=sort_key,
                              reverse=reverse)
-    if main_page_path:
-        main_page = make_page_info(main_page_path)
-        if main_page:
-            pages.insert(0, main_page)
+    if pinned_page_paths:
+        pinned_pages = []
+        for page_path in pinned_page_paths:
+            page = make_page_info(page_path, is_pinned=True)
+            pinned_pages.append(page)
+        pages = pinned_pages + pages
 
     return pages
 

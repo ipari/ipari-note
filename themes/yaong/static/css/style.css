@@ -623,6 +623,11 @@ ul.recent a.wikilink {
     color: inherit;
 }
 
+ul.recent svg {
+    width: 16px;
+    height: 16px;
+    fill: #999999;
+}
 
 /* Archive */
 div.archive table {
