@@ -305,6 +305,7 @@ def get_page_list(page_paths=None, sort_key=None, reverse=False, pinned=False):
         pinned_pages = []
         for page_path in pinned_page_paths:
             page = make_page_info(page_path, is_pinned=True)
+        if page:
             pinned_pages.append(page)
         pages = pinned_pages + pages
 
