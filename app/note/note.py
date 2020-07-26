@@ -99,6 +99,7 @@ def serve_page(page_path):
     # 노트는 권한에 따라 다르게 처리한다.
     permission = get_permission(page_path)
     meta = get_note_meta()
+    meta['is_page'] = True
     meta['logged_in'] = is_logged_in()
     meta['permission'] = permission
     meta['link'] = encrypt_url(page_path)
