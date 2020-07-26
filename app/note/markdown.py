@@ -52,8 +52,10 @@ class WikiLinkExtensionCustom(WikiLinkExtension):
 
         # append to end of inline patterns
         wikilink_re = r'\[\[([\w0-9_ -/]+)\]\]'
+        config = self.getConfigs()
+        config['build_url'] = lambda label, base, end:  '{}{}{}'.format(base, label, end)
         wikilink_pattern = \
-            WikiLinksInlineProcessor(wikilink_re, self.getConfigs())
+            WikiLinksInlineProcessor(wikilink_re, config)
         wikilink_pattern.md = md
         md.inlinePatterns.register(wikilink_pattern, 'wikilink', 75)
 
