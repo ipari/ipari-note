@@ -254,7 +254,17 @@ def iterate_pages(extension=False):
             yield page_path
 
 
-def get_page_list(page_paths=None, sort_key=None, reverse=False):
+def get_page_list(page_paths=None, sort_key=None, reverse=False, pinned=False):
+    """ 페이지 목록
+
+    Args:
+        page_paths: page_path 목록
+        sort_key: 정렬 키
+        reverse: 정렬 역순 여부
+        pinned: 고정된 페이지 포함 여부
+
+    Returns: list of dict
+    """
 
     def make_page_info(page_path, is_pinned=False):
         permission = permissions.get(page_path, 0)
@@ -278,7 +288,7 @@ def get_page_list(page_paths=None, sort_key=None, reverse=False):
 
     pages = []
     for page_path in page_paths:
-        if page_path in pinned_page_paths:
+        if pinned and page_path in pinned_page_paths:
             continue
         page = make_page_info(page_path)
         if page:
@@ -291,7 +301,7 @@ def get_page_list(page_paths=None, sort_key=None, reverse=False):
         return get_page_list(page_paths=page_paths,
                              sort_key=sort_key,
                              reverse=reverse)
-    if pinned_page_paths:
+    if pinned and pinned_page_paths:
         pinned_pages = []
         for page_path in pinned_page_paths:
             page = make_page_info(page_path, is_pinned=True)
