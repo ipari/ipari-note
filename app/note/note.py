@@ -27,6 +27,7 @@ def get_note_meta():
     meta = dict()
     meta['note_title'] = note_config.get('title', '')
     meta['note_subtitle'] = note_config.get('subtitle', '')
+    meta['note_description'] = note_config.get('description', '')
     meta['user_name'] = get_user('name')
     meta['year'] = datetime.now().year
     meta['ga_tracking_id'] = config('ga_tracking_id')
