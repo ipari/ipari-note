@@ -29,6 +29,7 @@ def get_note_meta():
     meta['note_subtitle'] = note_config.get('subtitle', '')
     meta['user_name'] = get_user('name')
     meta['year'] = datetime.now().year
+    meta['ga_tracking_id'] = config('ga_tracking_id')
     return meta
 
 
