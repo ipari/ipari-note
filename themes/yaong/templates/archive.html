@@ -1,9 +1,9 @@
 {% extends "_base.html" %}
 
-{% block pagename %}목록{% endblock %}
+{% block pagename %}{{ pagename }}{% endblock %}
 
 {% block content %}
-<h1>목록</h1>
+<h1>{{ pagename }}</h1>
 
 {% if pages %}
 {% set permission_icons = {0: 'lock', 1: 'key', 2: 'unlock'} %}

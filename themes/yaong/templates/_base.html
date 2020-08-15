@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:title" content="{{ pagename + " - " + meta.note_title|default(meta.note_title) }}">
+  <meta property="og:description" content="{{ meta.summary|default(meta.note_description) }}">
+  <meta property="og:image" content="{{ meta.thumbnail|default(request.url_root + 'static/img/favicons/apple-touch-icon-152x152.png') }}">
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   {% block script %}{% endblock %}
   <title>{% block pagename %}{% endblock %} - {{ meta.note_title }}</title>

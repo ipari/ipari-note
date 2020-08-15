@@ -44,7 +44,8 @@ def route_archive():
     meta = get_note_meta()
     meta['logged_in'] = is_logged_in()
     return render_template('archive.html',
-                           meta=meta, menu=menu, pages=pages)
+                           meta=meta, menu=menu, 
+                           pagename='목록', pages=pages)
 
 
 @bp.route('/tags')
@@ -53,7 +54,8 @@ def route_tags():
     menu = get_menu_list()
     meta = get_note_meta()
     return render_template('tags.html',
-                           meta=meta, menu=menu, tag_infos=tag_infos)
+                           meta=meta, menu=menu, 
+                           pagename='태그', tag_infos=tag_infos)
 
 
 @bp.route('/tags/<tag>')
