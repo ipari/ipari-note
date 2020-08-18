@@ -20,7 +20,8 @@ def route_login():
         form.referrer.data = request.referrer
         meta = get_note_meta()
         menu = get_menu_list()
-        return render_template('login.html', form=form, meta=meta, menu=menu)
+        return render_template('login.html', form=form, meta=meta, menu=menu,
+                               pagename='로그인')
 
     if log_in(form):
         if form.referrer:
