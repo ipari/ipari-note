@@ -1,7 +1,7 @@
 Created: 2018-12-26
-Updated: 2020-03-25
+Updated: 2020-11-22
 Summary: 이파리노트 기능 및 서식에 대한 가이드 문서
-Tags: ipari-note, guide
+Tags: #ipari-note, #guide
 
 노트의 문서는 [Markdown](https://daringfireball.net/projects/markdown/syntax) 문법을 기반으로 합니다.
 기본 문법과 확장 문법을 구분하지 않고 서술합니다.

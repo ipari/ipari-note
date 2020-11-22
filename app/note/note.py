@@ -376,7 +376,14 @@ def process_page_meta(prev_meta):
             continue
         # 타입에 따른 처리
         if k == 'tags':
-            v = [tag.strip() for tag in v.split(',')]
+            tags = []
+            for tag in v.split(','):
+                tag = tag.strip()
+                if tag.startswith('#'):
+                    tag = tag[1:]
+                tags.append(tag)
+            v = tags
+
         elif k in ('created', 'updated'):
             try:
                 v = datetime.strptime(v, '%Y-%m-%d %H:%M:%S')
