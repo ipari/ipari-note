@@ -712,3 +712,10 @@ footer {
         padding-left: 2em;
     }
 }
+
+
+/* Prism.js */
+code[class*="language-"],
+pre[class*="language-"] {
+    font-family: var(--monospace) !important;
+}
