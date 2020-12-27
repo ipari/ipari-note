@@ -5,6 +5,7 @@ venv-windows
 *.sh
 
 *.pyc
+*.sqlite
 data/cache/*
 data/configs/*
 data/pages/*

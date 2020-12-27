@@ -1,9 +1,10 @@
 import threading
 from app import create_app
 from app.watcher import PageWatcher
+import config
 
 
-app = create_app()
+app = create_app(config)
 watcher = PageWatcher()
 
 
