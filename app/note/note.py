@@ -8,6 +8,7 @@ from .markdown import md_extensions
 MARKDOWN_EXT = ('.md', '.markdown')
 HTML_EXT = ('.html', '.htm')
 PAGE_ROOT = os.path.join('data', 'pages')
+ROOT_PATH = os.path.realpath(PAGE_ROOT)
 
 
 class NoteMeta(object):
@@ -30,13 +31,13 @@ class NoteMeta(object):
         self._meta = _meta
         path, ext = os.path.splitext(filepath)
         self.title = path.split('/')[-1]
-        self.path = path
+        self.path = os.path.relpath(filepath, ROOT_PATH)
         self.filepath = filepath
         self.permission = self._meta.get('permission', 0)
         self.created = self.parse_datetime('created')
         self.updated = self.parse_datetime('updated')
         self.tags = self.parse_tags('tags')
-        self.summary = self._meta.get('summary', None)
+        self.summary = self._meta.get('summary', None)[0]
 
         if self.updated is None:
             mtime_ts = int(os.path.getmtime(filepath))
@@ -57,17 +58,14 @@ class NoteMeta(object):
         }
 
     def parse_tags(self, key):
-        tags_str = self._meta.get(key, None)
-        if not tags_str:
-            return None
-        tags = []
-        tags_str = tags_str.split(',')
-        for tag in tags_str:
+        tags = self._meta.get(key, [])
+        new_tags = []
+        for tag in tags:
             tag = tag.strip()
             if tag.startswith('#'):
                 tag = tag[1:]
-            tags.append(tag)
-        return tags
+            new_tags.append(tag)
+        return new_tags
 
     def parse_datetime(self, key):
         dt_str = self._meta.get(key, None)
@@ -77,7 +75,7 @@ class NoteMeta(object):
         if len(dt_str) > 10:
             dt_format = '%Y-%m-%d %H:%M:%S'
         try:
-            return datetime.strptime(dt_str, dt_format)
+            return datetime.strptime(dt_str[0], dt_format)
         except ValueError:
             return None
 
@@ -94,19 +92,19 @@ def get_md_path(rel_path):
             return path
 
 
-def update_db(rel_path):
-    path = get_md_path(rel_path)
-    with open(path, 'r', encoding='utf-8') as f:
-        raw_md = f.read()
-
-    html, meta = render_markdown(raw_md, path)
-
-
-def render_markdown(raw_md):
+def render_markdown(raw_md, abs_path):
     extensions = md_extensions()
     md = markdown.Markdown(extensions=extensions)
     html = md.convert(raw_md)
-    return html, md.Meta
+    meta = NoteMeta(md.Meta, abs_path)
+    return html, meta
+
+
+def update_db(abs_path):
+    with open(abs_path, 'r', encoding='utf-8') as f:
+        raw_md = f.read()
+
+    html, meta = render_markdown(raw_md, abs_path)
 
 
 def process_meta(source):

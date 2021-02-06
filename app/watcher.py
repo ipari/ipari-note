@@ -39,7 +39,9 @@ class PageWatcher(object):
         # 파일 이동 시 새 경로에 생성을 먼저 하고 삭제 처리 하도록 한다.
         buffer = sorted(buffer, key=lambda x: self.event_order.index(x.key[0]))
         for event in buffer:
-            print(event)
+            if event.event_type == 'modified':
+                from app.note.note import update_db
+                update_db(event.src_path)
 
         self.event_handler.clear_buffer()
         print('-'*30)
