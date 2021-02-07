@@ -9,9 +9,10 @@ def create_app(config):
     app = Flask(__name__)
     app.config.from_object(config)
 
-    from app import main, user
+    from app import main, user, note
     app.register_blueprint(main.bp)
     app.register_blueprint(user.bp)
+    app.register_blueprint(note.bp)
 
     db.init_app(app)
     with app.app_context():

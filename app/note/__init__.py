@@ -1,4 +1,5 @@
 from flask import Blueprint
+from app.note import model
 from app.utils import config
 
 url_prefix = config('note')['base_url']

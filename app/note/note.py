@@ -2,7 +2,9 @@ import markdown
 import os
 from datetime import datetime
 
+from app import db
 from .markdown import md_extensions
+from .model import Note
 
 
 MARKDOWN_EXT = ('.md', '.markdown')
@@ -31,7 +33,7 @@ class NoteMeta(object):
         self._meta = _meta
         path, ext = os.path.splitext(filepath)
         self.title = path.split('/')[-1]
-        self.path = os.path.relpath(filepath, ROOT_PATH)
+        self.path, _ = os.path.splitext(os.path.relpath(filepath, ROOT_PATH))
         self.filepath = filepath
         self.permission = self._meta.get('permission', 0)
         self.created = self.parse_datetime('created')
@@ -68,9 +70,10 @@ class NoteMeta(object):
         return new_tags
 
     def parse_datetime(self, key):
-        dt_str = self._meta.get(key, None)
-        if not dt_str:
+        value = self._meta.get(key, None)
+        if not value:
             return None
+        dt_str = value[0]
         dt_format = '%Y-%m-%d'
         if len(dt_str) > 10:
             dt_format = '%Y-%m-%d %H:%M:%S'
@@ -105,6 +108,15 @@ def update_db(abs_path):
         raw_md = f.read()
 
     html, meta = render_markdown(raw_md, abs_path)
+    path = meta.meta['path']
+
+    prev_note = Note.query.filter_by(path=path).first()
+    if prev_note:
+        prev_note.update(meta, raw_md, html)
+    else:
+        note = Note(meta, raw_md, html)
+        db.session.add(note)
+    db.session.commit()
 
 
 def process_meta(source):
