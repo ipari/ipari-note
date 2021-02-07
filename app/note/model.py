@@ -5,6 +5,8 @@ from .permission import Permission
 
 
 class Note(db.Model):
+    __tablename__ = 'note'
+
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     path = db.Column(db.String(256), unique=True, nullable=False)
     filepath = db.Column(db.String(256), nullable=False)
@@ -13,13 +15,13 @@ class Note(db.Model):
     created = db.Column(db.DateTime(timezone=True), nullable=False)
     updated = db.Column(db.DateTime(timezone=True), nullable=False)
     summary = db.Column(db.Text())
-    # tags = db.Column(db.ARRAY(db.String(256)))
+    child = db.relationship('Tag')
     markdown = db.Column(db.Text)
     html = db.Column(db.Text)
     text = db.Column(db.Text)
 
     def __init__(self, meta, raw_md, html):
-        self.update(html, meta)
+        self.update(meta, raw_md, html)
 
     def __repr__(self):
         return f'<Note> path: {self.path}, text: {self.text[:20]}'
@@ -32,7 +34,21 @@ class Note(db.Model):
         self.created = meta.created or meta.updated
         self.updated = meta.updated
         self.summary = meta.summary
-        # self.tags = meta.tags
         self.html = html
         self.text = html2text.HTML2Text().handle(html)
         self.markdown = raw_md
+
+
+class Tag(db.Model):
+    __tablename__ = 'tag'
+
+    id = db.Column(db.Integer, primary_key=True)
+    note_path = db.Column(db.String(256), db.ForeignKey('note.path'))
+    tag = db.Column(db.String(256))
+
+    def __init__(self, note, tag):
+        self.note_path = note.path
+        self.tag = tag
+
+    def __repr__(self):
+        return f'<Tag> note_path: {self.note_path}, text: {self.tag}'

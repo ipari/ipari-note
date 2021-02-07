@@ -4,7 +4,7 @@ from datetime import datetime
 
 from app import db
 from .markdown import md_extensions
-from .model import Note
+from .model import Note, Tag
 
 
 MARKDOWN_EXT = ('.md', '.markdown')
@@ -61,6 +61,10 @@ class NoteMeta(object):
 
     def parse_tags(self, key):
         tags = self._meta.get(key, [])
+        if not tags:
+            return tags
+
+        tags = tags[0].split(',')
         new_tags = []
         for tag in tags:
             tag = tag.strip()
@@ -110,12 +114,19 @@ def update_db(abs_path):
     html, meta = render_markdown(raw_md, abs_path)
     path = meta.meta['path']
 
-    prev_note = Note.query.filter_by(path=path).first()
-    if prev_note:
-        prev_note.update(meta, raw_md, html)
+    note = Note.query.filter_by(path=path).first()
+    if note:
+        note.update(meta, raw_md, html)
     else:
         note = Note(meta, raw_md, html)
         db.session.add(note)
+
+    tag_names = meta.meta.get('tags', [])
+    Tag.query.filter_by(note_path=path).delete()
+    for tag_name in tag_names:
+        tag = Tag(note, tag_name)
+        db.session.add(tag)
+
     db.session.commit()
 
 
