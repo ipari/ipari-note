@@ -40,8 +40,11 @@ class PageWatcher(object):
         buffer = sorted(buffer, key=lambda x: self.event_order.index(x.key[0]))
         for event in buffer:
             if event.event_type == 'modified':
+                from main import app
                 from app.note.note import update_db
-                update_db(event.src_path)
+
+                with app.app_context():
+                    update_db(event.src_path)
 
         self.event_handler.clear_buffer()
         print('-'*30)
