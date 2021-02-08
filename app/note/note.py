@@ -130,10 +130,6 @@ def update_db(abs_path):
     db.session.commit()
 
 
-def process_meta(source):
-    meta = {}
-
-
 # import markdown
 # from collections import defaultdict
 # from datetime import datetime
