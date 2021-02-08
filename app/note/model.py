@@ -1,6 +1,7 @@
 import html2text
 
 from app import db
+from app.crypto import encrypt
 from .permission import Permission
 
 
@@ -9,6 +10,7 @@ class Note(db.Model):
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     path = db.Column(db.String(256), unique=True, nullable=False)
+    encrypted_path = db.Column(db.String(256), nullable=False)
     filepath = db.Column(db.String(256), nullable=False)
     title = db.Column(db.String(256), nullable=False)
     permission = db.Column(db.Enum(Permission), nullable=False)
@@ -29,6 +31,7 @@ class Note(db.Model):
     def update(self, meta, raw_md, html):
         self.title = meta.title
         self.path = meta.path
+        self.encrypted_path = encrypt(meta.path)
         self.filepath = meta.filepath
         self.permission = meta.permission
         self.created = meta.created or meta.updated
