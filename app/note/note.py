@@ -1,10 +1,12 @@
 import markdown
 import os
 from datetime import datetime
+from flask import render_template, send_file, session
 
 from app import db
 from .markdown import md_extensions
 from .model import Note, Tag
+from .permission import Permission
 
 
 MARKDOWN_EXT = ('.md', '.markdown')
@@ -13,6 +15,9 @@ PAGE_ROOT = os.path.join('data', 'pages')
 ROOT_PATH = os.path.realpath(PAGE_ROOT)
 
 
+###############################################################################
+# Class NoteMeta
+###############################################################################
 class NoteMeta(object):
 
     title = None
@@ -35,7 +40,7 @@ class NoteMeta(object):
         self.title = path.split('/')[-1]
         self.path, _ = os.path.splitext(os.path.relpath(filepath, ROOT_PATH))
         self.filepath = filepath
-        self.permission = self._meta.get('permission', 0)
+        self.permission = self.parse_permission()
         self.created = self.parse_datetime('created')
         self.updated = self.parse_datetime('updated')
         self.tags = self.parse_tags('tags')
@@ -86,6 +91,14 @@ class NoteMeta(object):
         except ValueError:
             return None
 
+    def parse_permission(self):
+        try:
+            v = self._meta.get('permission')
+        except KeyError:
+            return Permission(0)
+        else:
+            return Permission(int(v[0]))
+
 
 def get_abs_path(rel_path):
     path = os.path.join(PAGE_ROOT, rel_path)
@@ -128,6 +141,44 @@ def update_db(abs_path):
         db.session.add(tag)
 
     db.session.commit()
+
+
+def serve_page(note):
+    if check_permission(note.permission):
+        return render_template('page.html', content=note.html)
+    return '404 Not Found'
+
+
+def serve_file(page_path):
+    path = os.path.join(ROOT_PATH, page_path)
+    return send_file(path)
+
+
+def check_permission(permission=Permission.PRIVATE):
+    print(permission == Permission.PRIVATE)
+    if permission > Permission.PRIVATE:
+        return True
+    if permission == Permission.PRIVATE and 'user' in session:
+        return True
+    return False
+
+
+# def render_page(page_path, meta):
+#     md_path = get_md_path(page_path)
+#     if md_path is None:
+#         return error_page(page_path)
+#
+#     raw_md = get_raw_md(md_path)
+#     content, _ = render_markdown(raw_md)
+#     html_url = get_html_path(page_path)
+#     meta.update(get_page_meta(page_path))
+#     menu = get_menu_list(page_path=page_path, page_exist=True)
+#     return render_template('page.html',
+#                            meta=meta,
+#                            menu=menu,
+#                            pagename=page_path,
+#                            content=content,
+#                            html_url=html_url)
 
 
 # import markdown

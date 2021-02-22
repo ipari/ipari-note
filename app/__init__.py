@@ -9,6 +9,11 @@ def create_app(config):
     app = Flask(__name__)
     app.config.from_object(config)
 
+    # theme = config.get_config('note')['theme']
+    theme = 'yaong'
+    app.static_folder = '../themes/{}/static'.format(theme)
+    app.template_folder = '../themes/{}/templates'.format(theme)
+
     from app import main, user, note
     app.register_blueprint(main.bp)
     app.register_blueprint(user.bp)

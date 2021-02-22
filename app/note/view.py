@@ -2,6 +2,7 @@ import os
 from flask import Blueprint, request, send_file
 
 from .model import Note
+from app.note.note import check_permission, serve_file, serve_page
 from app.utils import config
 
 
@@ -19,18 +20,9 @@ def route_page(page_path):
     if request.method == 'GET':
         path, ext = os.path.splitext(page_path)
         if ext:
-            return send_file(path)
+            return serve_file(page_path)
 
         note = Note.query.filter_by(path=path).first()
-        # TODO: Check permission and login status
-        if note:
-            # return render_template()
-            return f'serve page: {path}'
-
-        note = Note.query.filter_by(encrypted_path=path).first()
-        # TODO: Check permission and login status
-        if note:
-            # return render_template()
-            return f'serve page: {note.encrypted_path}'
-
-        return '404 Not Found'
+        if note is None:
+            note = Note.query.filter_by(encrypted_path=path).first()
+        return serve_page(note)

@@ -33,7 +33,7 @@ class Note(db.Model):
         self.path = meta.path
         self.encrypted_path = encrypt(meta.path)
         self.filepath = meta.filepath
-        self.permission = meta.permission
+        self.permission = Permission(meta.permission)
         self.created = meta.created or meta.updated
         self.updated = meta.updated
         self.summary = meta.summary
