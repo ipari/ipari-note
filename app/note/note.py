@@ -141,6 +141,16 @@ def update_db(abs_path):
     db.session.commit()
 
 
+def update_all():
+    for subdir, dirs, files in os.walk(ROOT_PATH):
+        for file in files:
+            _, ext = os.path.splitext(file)
+            if ext not in MARKDOWN_EXT:
+                continue
+            path = os.path.join(subdir, file)
+            update_db(path)
+
+
 def serve_page(note):
     if check_permission(note.permission):
         return render_template('page.html', content=note.html)
