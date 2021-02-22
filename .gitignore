@@ -10,5 +10,5 @@ data/cache/*
 data/configs/*
 data/pages/*
 !data/pages/ipari-note
-data/pages_old/*
-!data/pages_old/ipari-note
+data/pages/*
+!data/pages/ipari-note
