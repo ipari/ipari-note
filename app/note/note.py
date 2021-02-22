@@ -92,12 +92,10 @@ class NoteMeta(object):
             return None
 
     def parse_permission(self):
-        try:
-            v = self._meta.get('permission')
-        except KeyError:
+        v = self._meta.get('permission', None)
+        if v is None:
             return Permission(0)
-        else:
-            return Permission(int(v[0]))
+        return Permission(int(v[0]))
 
 
 def get_abs_path(rel_path):
@@ -155,10 +153,9 @@ def serve_file(page_path):
 
 
 def check_permission(permission=Permission.PRIVATE):
-    print(permission == Permission.PRIVATE)
     if permission > Permission.PRIVATE:
         return True
-    if permission == Permission.PRIVATE and 'user' in session:
+    if permission == Permission.PRIVATE and 'email' in session:
         return True
     return False
 
