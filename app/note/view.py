@@ -2,7 +2,8 @@ import os
 from flask import Blueprint, request, send_file
 
 from .model import Note
-from app.note.note import check_permission, serve_file, serve_page
+from app.user.user import is_logged_in
+from app.note.note import *
 from app.utils import config
 
 
@@ -26,3 +27,15 @@ def route_page(page_path):
         if note is None:
             note = Note.query.filter_by(encrypted_path=path).first()
         return serve_page(note)
+
+
+@bp.route('/<path:page_path>/edit', methods=['GET', 'POST'])
+def route_edit(page_path):
+    if not is_logged_in():
+        message = "로그인 후에 편집할 수 있습니다."
+        return message
+
+    if request.method == 'GET':
+        return "edit"
+    elif request.method == 'POST':
+        return "edited"
