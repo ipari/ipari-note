@@ -30,7 +30,7 @@ def is_user_exists():
 
 
 def is_logged_in():
-    return 'user' in session
+    return 'email' in session
 
 
 def log_in(form):
@@ -38,5 +38,5 @@ def log_in(form):
     is_valid_email = user['email'] == form.email.data
     is_valid_password = check_password_hash(user['password'], form.password.data)
     if is_valid_email and is_valid_password:
-        session['user'] = user['email']
+        session['email'] = user['email']
         return True
