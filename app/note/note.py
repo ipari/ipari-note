@@ -4,6 +4,8 @@ from datetime import datetime
 from flask import render_template, send_file, session
 
 from app import db
+from app.user.user import get_user
+from app.utils import config
 from .markdown import md_extensions
 from .model import Note, Tag
 from .permission import Permission
@@ -153,7 +155,12 @@ def update_all():
 
 def serve_page(note):
     if check_permission(note.permission):
-        return render_template('page.html', content=note.html)
+        meta = get_base_meta()
+        meta = get_note_meta(note, meta=meta)
+        return render_template('page.html',
+                               meta=meta,
+                               pagename=note.path,
+                               content=note.html)
     return '404 Not Found'
 
 
@@ -168,6 +175,26 @@ def check_permission(permission=Permission.PRIVATE):
     if permission == Permission.PRIVATE and 'email' in session:
         return True
     return False
+
+
+def get_base_meta():
+    note_config = config('note')
+    meta = dict()
+    meta['note_title'] = note_config.get('title', '')
+    meta['note_subtitle'] = note_config.get('subtitle', '')
+    meta['note_description'] = note_config.get('description', '')
+    meta['user_name'] = get_user('name')
+    meta['year'] = datetime.now().year
+    meta['ga_tracking_id'] = config('ga_tracking_id')
+    return meta
+
+
+def get_note_meta(note, meta=None):
+    meta = meta or dict()
+    meta['created'] = note.created
+    meta['updated'] = note.updated
+    meta['tags'] = [tag.tag for tag in note.tags]
+    return meta
 
 
 # def render_page(page_path, meta):

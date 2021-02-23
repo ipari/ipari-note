@@ -1,52 +1,52 @@
-{#{% extends "_base.html" %}#}
+{% extends "_base.html" %}
 
 {% block pagename %}{{ pagename }}{% endblock %}
 
 {% block content %}
     <div class="article">
-{#    {% set path_elems = pagename.split('/') %}#}
-{#    <h1>#}
-{#        <p>#}
-{#            {% for name in path_elems[:-1] %}#}
-{#                {% set path = path_elems[:loop.index]|join('/') %}#}
-{#                <a href="{{ url_for('note.route_page', page_path=path) }}" class="wikilink">{{ name }}</a>#}
-{#                {% if not loop.last %} / {% endif %}#}
-{#            {% endfor %}#}
-{#        </p>#}
-{#        {{ path_elems[-1] }}#}
-{#    </h1>#}
-{##}
-{#    {% with messages = get_flashed_messages() %}#}
-{#        {% if messages %}#}
-{#            <div class="error">#}
-{#            {% for message in messages %}#}
-{#                <p>{{ message }}</p>#}
-{#            {% endfor %}#}
-{#            </div>#}
-{#        {% endif %}#}
-{#    {% endwith %}#}
-{##}
-{#    <div class="meta">#}
-{#        <div class="tags">#}
-{#            {% if meta.tags %}#}
-{#            {% for tag in meta.tags %}#}
-{#                <a href="/tags/{{ tag }}" class="wikilink">#{{ tag }}</a>{% if not loop.last %}, {% endif %}#}
-{#            {% endfor %}#}
-{#            {% endif %}#}
-{#        </div>#}
-{#        <div class="date">#}
-{#            <dl>#}
-{#            {% if meta.created %}#}
-{#                <dt>작성</dt>#}
-{#                <dd>{{ meta.created.strftime('%Y-%m-%d') }}</dd>#}
-{#            {% endif %}#}
-{#            {% if meta.updated %}#}
-{#                <dt>수정</dt>#}
-{#                <dd>{{ meta.updated.strftime('%Y-%m-%d') }}</dd>#}
-{#            {% endif %}#}
-{#            </dl>#}
-{#        </div>#}
-{#    </div>#}
+    {% set path_elems = pagename.split('/') %}
+    <h1>
+        <p>
+            {% for name in path_elems[:-1] %}
+                {% set path = path_elems[:loop.index]|join('/') %}
+                <a href="{{ url_for('note.route_page', page_path=path) }}" class="wikilink">{{ name }}</a>
+                {% if not loop.last %} / {% endif %}
+            {% endfor %}
+        </p>
+        {{ path_elems[-1] }}
+    </h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="error">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="meta">
+        <div class="tags">
+            {% if meta.tags %}
+            {% for tag in meta.tags %}
+                <a href="/tags/{{ tag }}" class="wikilink">#{{ tag }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="date">
+            <dl>
+            {% if meta.created %}
+                <dt>작성</dt>
+                <dd>{{ meta.created.strftime('%Y-%m-%d') }}</dd>
+            {% endif %}
+            {% if meta.updated %}
+                <dt>수정</dt>
+                <dd>{{ meta.updated.strftime('%Y-%m-%d') }}</dd>
+            {% endif %}
+            </dl>
+        </div>
+    </div>
 
     {% if content %}
     {{ content|safe }}
@@ -55,8 +55,8 @@
 
 {% endblock %}
 
-{#{% block html %}#}
-{#    {% if html_url %}#}
-{#    <iframe src="{{ html_url }}" onload="resizeIFrame()"></iframe>#}
-{#    {% endif %}#}
-{#{% endblock %}#}
+{% block html %}
+    {% if html_url %}
+    <iframe src="{{ html_url }}" onload="resizeIFrame()"></iframe>
+    {% endif %}
+{% endblock %}

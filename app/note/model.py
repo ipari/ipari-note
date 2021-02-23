@@ -17,7 +17,7 @@ class Note(db.Model):
     created = db.Column(db.DateTime(timezone=True), nullable=False)
     updated = db.Column(db.DateTime(timezone=True), nullable=False)
     summary = db.Column(db.Text())
-    child = db.relationship('Tag')
+    tags = db.relationship('Tag')
     markdown = db.Column(db.Text)
     html = db.Column(db.Text)
     text = db.Column(db.Text)
