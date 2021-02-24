@@ -4,6 +4,8 @@ import traceback
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
+from app.note.note import MARKDOWN_EXT
+
 
 class PageWatcher(object):
 
@@ -40,6 +42,10 @@ class PageWatcher(object):
         # 파일 이동 시 새 경로에 생성을 먼저 하고 삭제 처리 하도록 한다.
         buffer = sorted(buffer, key=lambda x: self.event_order.index(x.key[0]))
         for event in buffer:
+            _, ext = os.path.splitext(event.src_path)
+            if ext not in MARKDOWN_EXT:
+                continue
+
             if event.event_type == 'modified':
                 from main import app
                 from app.note.note import update_db
@@ -48,7 +54,6 @@ class PageWatcher(object):
                     update_db(event.src_path)
 
         self.event_handler.clear_buffer()
-        print('-'*30)
 
 
 class PageHandler(FileSystemEventHandler):
