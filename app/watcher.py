@@ -1,5 +1,6 @@
 import os
 import time
+import traceback
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -26,9 +27,9 @@ class PageWatcher(object):
                 time.sleep(1)
                 self.handle_events()
 
-        except Exception as e:
+        except Exception:
             self.observer.stop()
-            print(e)
+            traceback.print_exc()
             self.observer.join()
 
     def handle_events(self):
