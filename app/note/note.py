@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import render_template, send_file, session
 
 from app import db
-from app.user.user import get_user
+from app.user.user import get_user, is_logged_in
 from app.utils import config
 from .markdown import md_extensions
 from .model import Note, Tag
@@ -154,8 +154,8 @@ def update_all():
             update_db(path)
 
 
-def serve_page(note):
-    if check_permission(note.permission):
+def serve_page(note, from_encrypted_path=False):
+    if check_permission(note.permission, from_encrypted_path):
         meta = get_base_meta()
         meta = get_note_meta(note, meta=meta)
         return render_template('page.html',
@@ -170,10 +170,10 @@ def serve_file(page_path):
     return send_file(path)
 
 
-def check_permission(permission=Permission.PRIVATE):
-    if permission > Permission.PRIVATE:
+def check_permission(permission=Permission.PRIVATE, from_encrypted_path=False):
+    if permission == Permission.PUBLIC or is_logged_in():
         return True
-    if permission == Permission.PRIVATE and 'email' in session:
+    if permission == Permission.LINK_ACCESS and from_encrypted_path:
         return True
     return False
 

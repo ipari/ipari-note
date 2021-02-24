@@ -24,9 +24,12 @@ def route_page(page_path):
             return serve_file(page_path)
 
         note = Note.query.filter_by(path=path).first()
-        if note is None:
-            note = Note.query.filter_by(encrypted_path=path).first()
-        return serve_page(note)
+        if note:
+            return serve_page(note)
+        note = Note.query.filter_by(encrypted_path=path).first()
+        if note:
+            return serve_page(note, from_encrypted_path=True)
+        return "404 Not Found"
 
 
 @bp.route('/<path:page_path>/edit', methods=['GET', 'POST'])
