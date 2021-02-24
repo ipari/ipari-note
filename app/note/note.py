@@ -37,7 +37,8 @@ class NoteMeta(object):
         Args:
             source: markdown.Markdown.Meta
         """
-        self._meta = _meta
+        self._meta = {k.lower(): v for k, v in _meta.items()}
+
         path, ext = os.path.splitext(filepath)
         self.title = path.split('/')[-1]
         self.path, _ = os.path.splitext(os.path.relpath(filepath, ROOT_PATH))
@@ -89,7 +90,7 @@ class NoteMeta(object):
         if len(dt_str) > 10:
             dt_format = '%Y-%m-%d %H:%M:%S'
         try:
-            return datetime.strptime(dt_str[0], dt_format)
+            return datetime.strptime(dt_str, dt_format)
         except ValueError:
             return None
 
