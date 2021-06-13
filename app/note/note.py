@@ -49,7 +49,7 @@ class NoteMeta(object):
         self.created = self.parse_datetime('created')
         self.updated = self.parse_datetime('updated')
         self.tags = self.parse_tags('tags')
-        self.summary = self._meta.get('summary', None)[0]
+        self.summary = self._meta.get('summary', [''])[0]
 
         if self.updated is None:
             mtime_ts = int(os.path.getmtime(filepath))
@@ -125,8 +125,12 @@ def render_markdown(raw_md, abs_path):
 
 
 def update_db(abs_path):
-    with open(abs_path, 'r', encoding='utf-8') as f:
-        raw_md = f.read()
+    try:
+        with open(abs_path, 'r', encoding='utf-8') as f:
+            raw_md = f.read()
+    except FileNotFoundError:
+        delete_db(abs_path)
+        return
 
     html, meta = render_markdown(raw_md, abs_path)
     path = meta.meta['path']
@@ -144,6 +148,13 @@ def update_db(abs_path):
         tag = Tag(note, tag_name)
         db.session.add(tag)
 
+    db.session.commit()
+
+
+def delete_db(abs_path):
+    note = Note.query.filter_by(filepath=abs_path)
+    Tag.query.filter_by(note_path=note.value('path')).delete()
+    note.delete()
     db.session.commit()
 
 

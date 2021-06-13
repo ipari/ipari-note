@@ -46,7 +46,7 @@ class PageWatcher(object):
             if ext not in MARKDOWN_EXT:
                 continue
 
-            if event.event_type == 'modified':
+            if event.event_type in ('modified', 'deleted'):
                 from main import app
                 from app.note.note import update_db
 
