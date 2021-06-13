@@ -26,6 +26,7 @@ class NoteMeta(object):
     path = None
     filepath = None
     permission = None
+    pinned = None
     created = None
     updated = None
     tags = None
@@ -44,6 +45,7 @@ class NoteMeta(object):
         self.path, _ = os.path.splitext(os.path.relpath(filepath, ROOT_PATH))
         self.filepath = filepath
         self.permission = self.parse_permission()
+        self.pinned = self._meta.get('pinned', 0)
         self.created = self.parse_datetime('created')
         self.updated = self.parse_datetime('updated')
         self.tags = self.parse_tags('tags')
@@ -61,6 +63,7 @@ class NoteMeta(object):
             'path': self.path,
             'filepath': self.filepath,
             'permission': self.permission,
+            'pinned': self.pinned,
             'created': self.created,
             'updated': self.updated,
             'tags': self.tags,
