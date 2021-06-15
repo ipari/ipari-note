@@ -20,7 +20,7 @@ def route_index():
     menu = get_menu_list()
     meta = get_note_meta()
     more_pages = len(all_pages) > recent_count
-    return render_template('recent.html',
+    return render_template('posts.html',
                            meta=meta, menu=menu,
                            pagename='최근 글', hide_header=True,
                            pages=pages, more_pages=more_pages)
@@ -32,7 +32,7 @@ def route_recent():
     menu = get_menu_list()
     meta = get_note_meta()
     base_url = config('note.base_url')
-    return render_template('recent.html',
+    return render_template('posts.html',
                            meta=meta, menu=menu, base_url=base_url,
                            pagename='모든 글', pages=pages)
 
@@ -63,7 +63,7 @@ def route_tag(tag):
     pages = get_page_list_in_tag(tag)
     menu = get_menu_list()
     meta = get_note_meta()
-    return render_template('recent.html',
+    return render_template('posts.html',
                            meta=meta, menu=menu,
                            pagename=f'#{tag}', pages=pages)
 
