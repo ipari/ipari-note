@@ -72,6 +72,7 @@ class NoteMeta(object):
 
     def parse_tags(self, key):
         tags = self._meta.get(key, [])
+        tags = [tag.strip() for tag in tags if tag.strip()]
         if not tags:
             return tags
 

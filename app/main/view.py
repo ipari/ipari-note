@@ -14,14 +14,35 @@ POST_PER_PAGE = 5
 
 @bp.route('/')
 def view_index():
-    base_query = Note.query.filter_by(permission=Permission.PUBLIC).order_by(Note.updated.desc())
-    pages = base_query.paginate(1, POST_PER_PAGE, False).items
-    return pages
+    posts, next_url, prev_url = get_page(page=1)
+    return render_template('posts.html',
+                           meta=get_base_meta(),
+                           pagename='',
+                           posts=posts,
+                           next_url=next_url,
+                           prev_url=prev_url)
 
 
 @bp.route('/posts/<int:page>')
 def view_posts(page):
-    base_query = Note.query.filter_by(permission=Permission.PUBLIC).order_by(Note.pinned.desc(), Note.updated.desc())
+    posts, next_url, prev_url = get_page(page=page)
+    return render_template('posts.html',
+                           meta=get_base_meta(),
+                           pagename='',
+                           posts=posts,
+                           next_url=next_url,
+                           prev_url=prev_url)
+
+
+@bp.route('/update')
+def view_update():
+    update_all()
+    return 'update'
+
+
+def get_page(page=0):
+    base_query = Note.query.filter_by(permission=Permission.PUBLIC).\
+        order_by(Note.pinned.desc(), Note.updated.desc())
     page = base_query.paginate(page, POST_PER_PAGE, False)
 
     next_url = None
@@ -45,10 +66,4 @@ def view_posts(page):
         }
         posts.append(post)
 
-    return render_template('posts.html', meta=get_base_meta(), posts=posts, next_url=next_url, prev_url=prev_url, pagename='')
-
-
-@bp.route('/update')
-def view_update():
-    update_all()
-    return 'update'
+    return posts, next_url, prev_url
