@@ -150,7 +150,7 @@ def update_db(abs_path):
         db.session.add(note)
 
     tag_names = meta.meta.get('tags', [])
-    Tag.query.filter_by(note_path=path).delete()
+    Tag.query.filter_by(note_id=note.id).delete()
     for tag_name in tag_names:
         tag = Tag(note, tag_name)
         db.session.add(tag)
@@ -159,8 +159,8 @@ def update_db(abs_path):
 
 
 def delete_db(abs_path):
-    note = Note.query.filter_by(filepath=abs_path)
-    Tag.query.filter_by(note_path=note.value('path')).delete()
+    note = Note.query.filter_by(filepath=abs_path).first()
+    Tag.query.filter_by(note_id=note.id).delete()
     note.delete()
     db.session.commit()
 

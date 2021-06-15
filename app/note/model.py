@@ -48,12 +48,12 @@ class Tag(db.Model):
     __tablename__ = 'tag'
 
     id = db.Column(db.Integer, primary_key=True)
-    note_path = db.Column(db.String(256), db.ForeignKey('note.path'))
+    note_id = db.Column(db.String(256), db.ForeignKey('note.id'))
     tag = db.Column(db.String(256))
 
     def __init__(self, note, tag):
-        self.note_path = note.path
+        self.note_id = note.id
         self.tag = tag
 
     def __repr__(self):
-        return f'<Tag> note_path: {self.note_path}, text: {self.tag}'
+        return f'<Tag> note_id: {self.note_id}, text: {self.tag}'
