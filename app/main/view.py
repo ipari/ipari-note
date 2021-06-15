@@ -21,7 +21,7 @@ def view_index():
 
 @bp.route('/posts/<int:page>')
 def view_posts(page):
-    base_query = Note.query.filter_by(permission=Permission.PUBLIC).order_by(Note.updated.desc())
+    base_query = Note.query.filter_by(permission=Permission.PUBLIC).order_by(Note.pinned.desc(), Note.updated.desc())
     page = base_query.paginate(page, POST_PER_PAGE, False)
 
     next_url = None
