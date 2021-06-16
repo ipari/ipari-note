@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, url_for
 
 from app import db
 from app.note.model import Note, Tag
-from app.note.note import update_all, get_base_meta
+from app.note.note import update_all, get_base_meta, get_menu_list
 from app.note.permission import Permission
 
 
@@ -17,6 +17,7 @@ def view_index():
     posts, next_url, prev_url = get_page()
     return render_template('posts.html',
                            meta=get_base_meta(),
+                           menu=get_menu_list(),
                            pagename='',
                            posts=posts,
                            next_url=next_url,

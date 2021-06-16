@@ -179,8 +179,10 @@ def serve_page(note, from_encrypted_path=False):
     if check_permission(note.permission, from_encrypted_path):
         meta = get_base_meta()
         meta = get_note_meta(note, meta=meta)
+        menu = get_menu_list(page_path=note.path, page_exist=True)
         return render_template('page.html',
                                meta=meta,
+                               menu=menu,
                                pagename=note.path,
                                content=note.html)
     return '404 Not Found'
@@ -217,6 +219,27 @@ def get_note_meta(note, meta=None):
     meta['updated'] = note.updated
     meta['tags'] = [tag.tag for tag in note.tags]
     return meta
+
+
+def get_menu_list(page_path=None, page_exist=False, editable=True):
+    items = []
+    if is_logged_in():
+        if page_path is not None and editable:
+            base_url = config('note.base_url')
+            url = f'/{base_url}/{page_path}/edit'
+            if page_exist:
+                items.append({'type': 'edit', 'url': url, 'label': '편집'})
+            else:
+                items.append({'type': 'write', 'url': url, 'label': '작성'})
+        items.append({'type': 'archive', 'url': '/archive', 'label': '목록'})
+        items.append({'type': 'tag', 'url': '/tags', 'label': '태그'})
+        items.append({'type': 'config', 'url': '/config', 'label': '설정'})
+        items.append({'type': 'logout', 'url': '/logout', 'label': '로그아웃'})
+    else:
+        items.append({'type': 'archive', 'url': '/archive', 'label': '목록'})
+        items.append({'type': 'tag', 'url': '/tags', 'label': '태그'})
+        items.append({'type': 'login', 'url': '/login', 'label': '로그인'})
+    return items
 
 
 # def render_page(page_path, meta):

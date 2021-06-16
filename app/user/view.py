@@ -1,9 +1,11 @@
-from flask import Blueprint, request, session
+from flask import Blueprint, flash, redirect, request, render_template, session
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, PasswordField, StringField, SubmitField
 
 from app import db
+from app.note.note import get_base_meta, get_menu_list
 from app.user.model import User
+from app.user.user import is_logged_in, log_in
 
 
 bp = Blueprint('user', __name__)
@@ -36,15 +38,26 @@ def user_view():
     return repr(user)
 
 
-@bp.route('/login', methods=['GET'])
-def user_login():
-    email = request.args.get('email', '')
-    user = User.query.filter_by(email=email).first()
-    if user is None:
-        return 'Invalid User'
+@bp.route('/login', methods=['GET', 'POST'])
+def route_login():
+    if is_logged_in():
+        return redirect('/')
 
-    session['email'] = email
-    return 'Login success'
+    form = LoginForm()
+    if request.method == 'GET':
+        form.referrer.data = request.referrer
+        meta = get_base_meta()
+        menu = get_menu_list()
+        return render_template('login.html', form=form, meta=meta, menu=menu,
+                               pagename='로그인')
+
+    if log_in(form):
+        if form.referrer:
+            return redirect(form.referrer.data)
+        return redirect('/')
+
+    flash('입력한 값이 맞는지 확인해주세요.')
+    return redirect('/login')
 
 
 @bp.route('/logout')
