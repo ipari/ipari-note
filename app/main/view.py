@@ -49,7 +49,7 @@ def view_tag(tag):
     posts, next_url, prev_url = get_tag_page(tag)
     return render_template('posts.html',
                            meta=get_base_meta(),
-                           pagename='',
+                           pagename=f'#{tag}',
                            posts=posts,
                            next_url=next_url,
                            prev_url=prev_url)
@@ -60,7 +60,7 @@ def view_tag_posts(tag, page):
     posts, next_url, prev_url = get_tag_page(tag, page=page)
     return render_template('posts.html',
                            meta=get_base_meta(),
-                           pagename='',
+                           pagename=f'#{tag}',
                            posts=posts,
                            next_url=next_url,
                            prev_url=prev_url)
@@ -108,7 +108,7 @@ def get_page(page=1):
 def get_tag_page(tag, page=1):
     base_query = Note.query.join(Tag, Note.id == Tag.note_id)\
         .filter(Tag.tag == tag, Note.permission == Permission.PUBLIC)\
-        .order_by(Note.pinned.desc(), Note.updated.desc())
+        .order_by(Note.updated.desc())
     page = base_query.paginate(page, POST_PER_PAGE, False)
 
     next_url = None
