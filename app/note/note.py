@@ -231,12 +231,12 @@ def get_menu_list(page_path=None, page_exist=False, editable=True):
                 items.append({'type': 'edit', 'url': url, 'label': '편집'})
             else:
                 items.append({'type': 'write', 'url': url, 'label': '작성'})
-        items.append({'type': 'archive', 'url': '/archive', 'label': '목록'})
+        items.append({'type': 'list', 'url': '/note', 'label': '목록'})
         items.append({'type': 'tag', 'url': '/tags', 'label': '태그'})
         items.append({'type': 'config', 'url': '/config', 'label': '설정'})
         items.append({'type': 'logout', 'url': '/logout', 'label': '로그아웃'})
     else:
-        items.append({'type': 'archive', 'url': '/archive', 'label': '목록'})
+        items.append({'type': 'list', 'url': '/note', 'label': '목록'})
         items.append({'type': 'tag', 'url': '/tags', 'label': '태그'})
         items.append({'type': 'login', 'url': '/login', 'label': '로그인'})
     return items

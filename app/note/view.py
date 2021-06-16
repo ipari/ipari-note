@@ -4,6 +4,7 @@ from flask import Blueprint, request, send_file
 from .model import Note
 from app.user.user import is_logged_in
 from app.note.note import *
+from app.main.view import get_post_info_from_notes
 from app.utils import config
 
 
@@ -13,7 +14,20 @@ bp = Blueprint('note', __name__, url_prefix=f'/{url_prefix}')
 
 @bp.route('/')
 def route_note():
-    return 'redirect to main page'
+    if is_logged_in():
+        notes = Note.query.order_by(Note.updated.desc()).all()
+    else:
+        notes = Note.query.filter_by(permission=Permission.PUBLIC)\
+            .order_by(Note.updated.desc())\
+            .all()
+
+    pages = get_post_info_from_notes(notes)
+    menu = get_menu_list()
+    meta = get_base_meta()
+    meta['logged_in'] = is_logged_in()
+    return render_template('pages.html',
+                           meta=meta, menu=menu,
+                           pagename='목록', pages=pages)
 
 
 @bp.route('/<path:page_path>', methods=['GET', 'POST'])

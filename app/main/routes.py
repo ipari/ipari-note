@@ -43,8 +43,8 @@ def route_archive():
     menu = get_menu_list()
     meta = get_note_meta()
     meta['logged_in'] = is_logged_in()
-    return render_template('archive.html',
-                           meta=meta, menu=menu, 
+    return render_template('pages.html',
+                           meta=meta, menu=menu,
                            pagename='목록', pages=pages)
 
 

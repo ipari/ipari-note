@@ -225,8 +225,8 @@ nav li a.menu-write {
     background-size: 24px;
 }
 
-nav li a.menu-archive {
-    background: url('../img/menu-archive.svg') no-repeat left center;
+nav li a.menu-list {
+    background: url('../img/menu-list.svg') no-repeat left center;
     background-size: 24px;
 }
 
