@@ -29,7 +29,7 @@ def route_page(page_path):
         note = Note.query.filter_by(encrypted_path=path).first()
         if note:
             return serve_page(note, from_encrypted_path=True)
-        return "404 Not Found"
+        return error_page(page_path)
 
 
 @bp.route('/<path:page_path>/edit', methods=['GET', 'POST'])

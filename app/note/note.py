@@ -1,7 +1,7 @@
 import markdown
 import os
 from datetime import datetime
-from flask import render_template, send_file, session
+from flask import flash, render_template, send_file, session
 
 from app import db
 from app.user.user import get_user, is_logged_in
@@ -185,7 +185,7 @@ def serve_page(note, from_encrypted_path=False):
                                menu=menu,
                                pagename=note.path,
                                content=note.html)
-    return '404 Not Found'
+    return error_page(page_path=note.path)
 
 
 def serve_file(page_path):
@@ -240,6 +240,18 @@ def get_menu_list(page_path=None, page_exist=False, editable=True):
         items.append({'type': 'tag', 'url': '/tags', 'label': '태그'})
         items.append({'type': 'login', 'url': '/login', 'label': '로그인'})
     return items
+
+
+def error_page(page_path, message=None):
+    meta = get_base_meta()
+    menu = get_menu_list(page_path=page_path)
+    if message is None:
+        if is_logged_in():
+            message = '문서가 없습니다.'
+        else:
+            message = '문서가 없거나 권한이 없는 문서입니다.'
+    flash(message)
+    return render_template('page.html', meta=meta, menu=menu, pagename=page_path)
 
 
 # def render_page(page_path, meta):
