@@ -49,43 +49,26 @@
     </ul>
 
     {% set class_names = {0: 'closed', 1: 'allow-link', 2: 'opened'} %}
+    {% set encrypted_url = url_for('note.route_page', page_path=meta.encrypted_path, _external=True) %}
     {% if meta.is_page and meta.logged_in %}
       <div class="permission {{ class_names[meta.permission] }}">
         <div>
           {% if meta.permission == 0 %}
             <strong>비공개 문서</strong> 로그인한 사용자에게만 보여집니다.
           {% elif meta.permission == 1 %}
-            <strong>링크 허용 문서</strong> 아래 링크로 접속할 때 보여집니다.<br />
-            <a href="{{ meta.link }}">{{ meta.link }}</a>
+            <strong>링크 허용 문서</strong> 아래 링크를 가진 사람에게 공유됩니다.<br />
+            <a href="{{ encrypted_url }}">{{ encrypted_url }}</a>
           {% else %}
             <strong>공개 문서</strong> 모두에게 보여집니다.
           {% endif %}
-        </div>
-
-        <div class="set-permission">
-          공개 설정 변경
-          <form method="post">
-            <label>
-              <input type="radio" name="permission" value="2" {% if meta.permission == 2 %}checked {% endif %}/>
-              <img src="{{ url_for('static', filename='img/unlock.svg') }}" /><span>공개</span>
-            </label>
-            <label>
-              <input type="radio" name="permission" value="1" {% if meta.permission == 1 %}checked {% endif %}/>
-              <img src="{{ url_for('static', filename='img/key.svg') }}" /><span>링크공개</span>
-            </label>
-            <label>
-              <input type="radio" name="permission" value="0" {% if meta.permission == 0 %}checked {% endif %}/>
-              <img src="{{ url_for('static', filename='img/lock.svg') }}" /><span>비공개</span>
-            </label>
-          </form>
         </div>
       </div>
     {% else %}
       {% if meta.permission == 1 %}
         <div class="permission {{ class_names[meta.permission] }}">
           <div>
-            <strong>링크 허용 문서</strong> 아래 링크로 접속할 때 보여집니다.<br />
-            <a href="{{ meta.link }}">{{ meta.link }}</a>
+            <strong>링크 허용 문서</strong> 아래 링크를 가진 사람에게 공유됩니다.<br />
+            <a href="{{ encrypted_url }}">{{ encrypted_url }}</a>
           </div>
         </div>
       {% endif %}

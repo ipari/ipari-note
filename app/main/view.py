@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, url_for
+from sqlalchemy import func
 
 from app import db
 from app.note.model import Note, Tag
-from app.note.note import update_all, get_base_meta, get_menu_list
+from app.note.note import error_page, update_all, get_base_meta, get_menu_list
 from app.note.permission import Permission
+from app.user.user import is_logged_in
 
 
 bp = Blueprint('main', __name__)
@@ -29,6 +31,7 @@ def view_posts(page):
     posts, next_url, prev_url = get_page(page=page)
     return render_template('posts.html',
                            meta=get_base_meta(),
+                           menu=get_menu_list(),
                            pagename='',
                            posts=posts,
                            next_url=next_url,
@@ -37,12 +40,17 @@ def view_posts(page):
 
 @bp.route('/tags')
 def view_tags():
-    from sqlalchemy import func
-    tag_info = Tag.query.with_entities(Tag.tag, func.count(Tag.note_id))\
+    tag_info = Tag.query.join(Note, Tag.note_id == Note.id)\
+        .filter(Note.permission == Permission.PUBLIC)\
         .group_by(Tag.tag)\
-        .order_by(func.count(Tag.note_id).desc(), Tag.tag)\
+        .with_entities(Tag.tag, func.count())\
+        .order_by(func.count().desc(), Tag.tag)\
         .all()
-    return tag_info
+    return render_template('tags.html',
+                           meta=get_base_meta(),
+                           menu=get_menu_list(),
+                           pagename='태그',
+                           tag_info=tag_info)
 
 
 @bp.route('/tags/<tag>')
@@ -50,6 +58,7 @@ def view_tag(tag):
     posts, next_url, prev_url = get_tag_page(tag)
     return render_template('posts.html',
                            meta=get_base_meta(),
+                           menu=get_menu_list(),
                            pagename=f'#{tag}',
                            posts=posts,
                            next_url=next_url,
@@ -61,6 +70,7 @@ def view_tag_posts(tag, page):
     posts, next_url, prev_url = get_tag_page(tag, page=page)
     return render_template('posts.html',
                            meta=get_base_meta(),
+                           menu=get_menu_list(),
                            pagename=f'#{tag}',
                            posts=posts,
                            next_url=next_url,
@@ -69,8 +79,10 @@ def view_tag_posts(tag, page):
 
 @bp.route('/update')
 def view_update():
-    update_all()
-    return 'update'
+    if is_logged_in():
+        update_all()
+        return redirect('/')
+    return error_page(page_path=None, message='로그인이 필요합니다.')
 
 
 def get_post_info_from_notes(list_of_note):

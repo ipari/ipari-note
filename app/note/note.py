@@ -211,6 +211,7 @@ def get_base_meta():
     meta['user_name'] = get_user('name')
     meta['year'] = datetime.now().year
     meta['ga_tracking_id'] = config('ga_tracking_id')
+    meta['logged_in'] = is_logged_in()
     return meta
 
 
@@ -218,6 +219,9 @@ def get_note_meta(note, meta=None):
     meta = meta or dict()
     meta['created'] = note.created
     meta['updated'] = note.updated
+    meta['permission'] = note.permission
+    meta['is_page'] = True
+    meta['encrypted_path'] = note.encrypted_path
     meta['tags'] = [tag.tag for tag in note.tags]
     return meta
 
