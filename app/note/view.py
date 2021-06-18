@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, request, send_file
+from flask import Blueprint, url_for, redirect, request, send_file
 
 from .model import Note
 from app.user.user import is_logged_in
@@ -50,9 +50,10 @@ def route_page(page_path):
 def route_edit(page_path):
     if not is_logged_in():
         message = "로그인 후에 편집할 수 있습니다."
-        return message
+        return error_page(page_path=page_path, message=message)
 
     if request.method == 'GET':
-        return "edit"
+        return edit_page(page_path)
     elif request.method == 'POST':
-        return "edited"
+        update_page(page_path, request.form['md'])
+        return redirect(url_for('note.route_page', page_path=page_path))

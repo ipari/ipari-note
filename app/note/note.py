@@ -159,9 +159,10 @@ def update_db(abs_path):
 
 
 def delete_db(abs_path):
-    note = Note.query.filter_by(filepath=abs_path).first()
+    note_query = Note.query.filter_by(filepath=abs_path)
+    note = note_query.first()
     Tag.query.filter_by(note_id=note.id).delete()
-    note.delete()
+    note_query.delete()
     db.session.commit()
 
 
@@ -252,6 +253,104 @@ def error_page(page_path, message=None):
             message = '문서가 없거나 권한이 없는 문서입니다.'
     flash(message)
     return render_template('page.html', meta=meta, menu=menu, pagename=page_path)
+
+
+def edit_page(page_path):
+    note = Note.query.filter_by(path=page_path).first()
+
+    if note is None:
+        # 새로운 노트를 생성할 때
+        raw_md = get_template()
+    else:
+        filepath = note.filepath
+        raw_md = read_md(filepath)
+        if raw_md is None:
+            # DB에 있는데 파일이 없으면 DB에서 해당 레코드 삭제
+            Note.query.filter_by(path=page_path).delete()
+            db.session.commit()
+            raw_md = get_template()
+
+    # ` 문자는 ES6에서 템플릿 문자로 사용되므로 escape 해줘야 한다.
+    # https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Template_literals
+    raw_md = raw_md.replace('`', '\`')
+
+    base_url = config('note.base_url')
+    return render_template('edit.html',
+                           pagename=page_path,
+                           meta=get_base_meta(),
+                           menu=get_menu_list(),
+                           base_url=base_url,
+                           raw_md=raw_md)
+
+
+def read_md(filepath):
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            return f.read()
+    except (IOError, TypeError):
+        return None
+
+
+def update_page(page_path, raw_md):
+    filepath = get_filepath(page_path, '.md')
+    if raw_md:
+        return save_page(filepath, raw_md)
+    return delete_page(filepath)
+
+
+def save_page(filepath, raw_md):
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(raw_md)
+
+
+def delete_page(filepath):
+    try:
+        os.remove(filepath)
+    except FileNotFoundError:
+        pass
+    # 빈 디렉터리 제거 (첫 2개는 data/pages)
+    page_dir_length = len(PAGE_ROOT.split(os.path.sep))
+    dirs = os.path.dirname(filepath).split(os.path.sep)[page_dir_length:]
+    for x in range(len(dirs), 0, -1):
+        subdir = os.path.join(PAGE_ROOT, *dirs[:x])
+        try:
+            if len(os.listdir(subdir)) == 0:
+                os.rmdir(subdir)
+        except OSError:
+            continue
+
+
+def get_filepath(page_path, ext):
+    path = os.path.join(PAGE_ROOT, page_path)
+    return os.path.normpath(path) + ext
+
+
+def get_template():
+    template = f"""
+    Created: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+    Summary:
+    Tags:
+    """
+    template = [line.strip() for line in template.split('\n') if line]
+    return "\n".join(template) + '\n'
+
+
+
+
+# def get_raw_md(file_path):
+#     try:
+#         with open(file_path, 'r', encoding='utf-8') as f:
+#             return f.read()
+#     except (IOError, TypeError):
+#         template = f"""
+#         Created: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+#         Summary:
+#         Tags:
+#         """
+#         template = [line.strip() for line in template.split('\n') if line]
+#         return "\n".join(template) + '\n'
+
 
 
 # def render_page(page_path, meta):
