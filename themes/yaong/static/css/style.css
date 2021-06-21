@@ -176,68 +176,80 @@ header p {
 
 
 /* Nav */
-nav {
+nav.menubar {
     display: none;
     font-size: 16px;
     background-color: #fbfbfb;
 }
 
-nav ul {
+nav.menubar ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
 }
 
-nav li {
+nav.menubar li {
     float: left;
 }
 
-nav li a {
+nav.menubar li a {
     display: block;
     margin-right: .4em;
     padding: .4em .8em .4em 1.6em;
 }
 
-nav li a,
-nav li a:link,
-nav li a:visited {
+nav.menubar li a,
+nav.menubar li a:link,
+nav.menubar li a:visited {
     color: #333333;
 }
 
-nav li a:hover {
+nav.menubar li a:hover {
     color: #33bbdf;
 }
 
-nav li a.menu-login {
+nav.menubar li a.menu-login {
     background: url('../img/menu-login.svg') no-repeat left center;
     background-size: 24px;
 }
 
-nav li a.menu-logout {
+nav.menubar li a.menu-logout {
     background: url('../img/menu-logout.svg') no-repeat left center;
     background-size: 24px;
 }
 
-nav li a.menu-edit,
-nav li a.menu-write {
+nav.menubar li a.menu-edit,
+nav.menubar li a.menu-write {
     background: url('../img/menu-edit.svg') no-repeat left center;
     background-size: 24px;
 }
 
-nav li a.menu-list {
+nav.menubar li a.menu-list {
     background: url('../img/menu-list.svg') no-repeat left center;
     background-size: 24px;
 }
 
-nav li a.menu-tag {
+nav.menubar li a.menu-tag {
     background: url('../img/menu-tag.svg') no-repeat left center;
     background-size: 24px;
 }
 
-nav li a.menu-config {
+nav.menubar li a.menu-config {
     background: url('../img/menu-config.svg') no-repeat left center;
     background-size: 24px;
+}
+
+nav.pagination .left {
+    float: left;
+}
+
+nav.pagination .right {
+    float: right;
+}
+
+nav.pagination:after {
+    clear: both;
 }
 
 

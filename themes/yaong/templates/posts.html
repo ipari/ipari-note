@@ -47,11 +47,16 @@
 {% endfor %}
 </ul>
 
-{% if prev_url %}
-    <p><a href="{{ prev_url }}" class="wikilink">이전</a></p>
-{% endif %}
-{% if next_url %}
-    <p><a href="{{ next_url }}" class="wikilink">다음</a></p>
-{% endif %}
-
+<nav class="pagination">
+  {% if prev_url %}
+  <div class="left">
+      <p><a href="{{ prev_url }}" class="wikilink">이전</a></p>
+  </div>
+  {% endif %}
+  {% if next_url %}
+  <div class="right">
+      <p><a href="{{ next_url }}" class="wikilink">다음</a></p>
+  </div>
+  {% endif %}
+</nav>
 {% endblock %}
