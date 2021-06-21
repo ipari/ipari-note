@@ -65,7 +65,6 @@ table {
     border-collapse: collapse;
 }
 th, td {
-    min-width: 4em;
     padding: 0.2em 0.4em;
     font-size: 85%;
 }
@@ -685,7 +684,10 @@ div.archive img.permission {
     width: 18px;
 }
 
-
+/* Pages */
+th.date {
+    min-width: 5em;
+}
 
 /* Footer */
 footer {
@@ -715,10 +717,10 @@ footer {
         background-size: 24px;
     }
 
-    nav li {
+    nav.menubar li {
         float: none;
     }
-    nav li a {
+    nav.menubar li a {
         margin: 0;
         border-bottom: 1px solid #eeeeee;
         padding-left: 2em;

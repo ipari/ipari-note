@@ -1,5 +1,6 @@
 import os
 import re
+import time
 from flask import Blueprint, url_for, redirect, request, send_file
 
 from .model import Note
@@ -57,6 +58,7 @@ def route_edit(page_path):
         return edit_page(page_path)
     elif request.method == 'POST':
         update_page(page_path, request.form['md'])
+        time.sleep(0.5)
         return redirect(url_for('note.route_page', page_path=page_path))
 
 
