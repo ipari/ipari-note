@@ -1,4 +1,5 @@
 import os
+import re
 from flask import Blueprint, url_for, redirect, request, send_file
 
 from .model import Note
@@ -57,3 +58,18 @@ def route_edit(page_path):
     elif request.method == 'POST':
         update_page(page_path, request.form['md'])
         return redirect(url_for('note.route_page', page_path=page_path))
+
+
+@bp.route('/preview', methods=['POST'])
+def preview():
+    if request.method == 'POST':
+        html, _ = render_markdown(request.get_json()['raw_md'])
+
+        # ipari-note/guide 는 ipari-note 폴더의 guide.md 파일을 보여준다.
+        # 그러므로 각종 경로에 ../ 를 붙여 한 단계 위에서 파일을 찾도록 한다.
+        def replace_path(matchobj):
+            return '{}{}/{}{}'.format(matchobj.group(1), '..',
+                                      matchobj.group(2), matchobj.group(3))
+        pattern = r'(src=\")([^\"]*)(\")'
+        html = re.sub(pattern, replace_path, html)
+        return html

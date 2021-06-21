@@ -123,12 +123,11 @@ def get_md_path(rel_path):
             return path
 
 
-def render_markdown(raw_md, abs_path):
+def render_markdown(raw_md):
     extensions = md_extensions()
     md = markdown.Markdown(extensions=extensions)
     html = md.convert(raw_md)
-    meta = NoteMeta(md.Meta, abs_path)
-    return html, meta
+    return html, md.Meta
 
 
 def update_db(abs_path):
@@ -139,7 +138,8 @@ def update_db(abs_path):
         delete_db(abs_path)
         return
 
-    html, meta = render_markdown(raw_md, abs_path)
+    html, meta = render_markdown(raw_md)
+    meta = NoteMeta(meta, abs_path)
     path = meta.meta['path']
 
     note = Note.query.filter_by(path=path).first()
