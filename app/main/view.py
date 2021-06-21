@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for
+from flask import Blueprint, redirect, render_template, url_for
 from sqlalchemy import func
 
 from app import db
@@ -83,6 +83,11 @@ def view_update():
         update_all()
         return redirect('/')
     return error_page(page_path=None, message='로그인이 필요합니다.')
+
+
+@bp.route('/<path:page_path>')
+def route_to_note(page_path):
+    return redirect(url_for('note.route_page', page_path=page_path))
 
 
 def get_post_info_from_notes(list_of_note):
