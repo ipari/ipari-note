@@ -58,6 +58,20 @@ def route_edit(page_path):
         return redirect(url_for('note.route_page', page_path=page_path))
 
 
+@bp.route('/<path:page_path>/upload', methods=['POST'])
+def route_upload(page_path):
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            # no file part
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            # no selected file
+            return redirect(request.url)
+        if file:
+            return save_file(page_path, file)
+
+
 @bp.route('/preview', methods=['POST'])
 def preview():
     if request.method == 'POST':

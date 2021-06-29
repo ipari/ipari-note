@@ -1,7 +1,7 @@
 import markdown
 import os
 from datetime import datetime
-from flask import flash, render_template, send_file, url_for
+from flask import flash, jsonify, request, render_template, send_file, url_for
 
 from app import db
 from app.config.model import Config
@@ -313,6 +313,29 @@ def delete_page(filepath):
                 os.rmdir(subdir)
         except OSError:
             continue
+
+
+def save_file(page_path, file):
+    filename = request.form.get('filename')
+    if filename is None:
+        now = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f'image-{now}.png'
+    name, ext = os.path.splitext(filename)
+    if not ext:
+        ext = '.png'
+        filename += ext
+    page_dir = '/'.join(page_path.split('/')[:-1])
+    i = 0
+    while True:
+        if i > 0:
+            filename = f'{name}-{i}{ext}'
+        file_path = os.path.join(PAGE_ROOT, page_dir, filename)
+        if not os.path.isfile(file_path):
+            break
+        i += 1
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    file.save(file_path)
+    return jsonify(success=True, filename=filename)
 
 
 def get_filepath(page_path, ext):
