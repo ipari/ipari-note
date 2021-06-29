@@ -7,10 +7,9 @@ from app.watcher import PageWatcher
 app = create_app()
 watcher = PageWatcher()
 
+thread = threading.Thread(target=watcher.watch, args=())
+thread.daemon = True
+thread.start()
 
 if __name__ == '__main__':
-    thread = threading.Thread(target=watcher.watch, args=())
-    thread.daemon = True
-    thread.start()
-
     app.run(threaded=True)
