@@ -8,7 +8,6 @@ itsdangerous==2.0.1
 Jinja2==3.0.1
 Markdown==3.3.4
 MarkupSafe==2.0.1
-pkg-resources==0.0.0
 pycryptodome==3.10.1
 Pygments==2.9.0
 PyYAML==5.4.1
