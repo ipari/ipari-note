@@ -176,7 +176,10 @@ def serve_page(note, from_encrypted_path=False):
 
 def serve_file(page_path):
     path = os.path.join(ROOT_PATH, page_path)
-    return send_file(path)
+    try:
+        return send_file(path)
+    except FileNotFoundError:
+        pass
 
 
 def check_permission(permission=Permission.PRIVATE, from_encrypted_path=False):
