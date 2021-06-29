@@ -6,9 +6,8 @@ venv-windows
 
 *.pyc
 *.sqlite
-data/cache/*
-data/configs/*
-data/pages/*
-!data/pages/ipari-note
+config.py
+config.yml
+user.yml
 data/pages/*
 !data/pages/ipari-note

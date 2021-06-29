@@ -1,22 +1,18 @@
-import os
 import re
 import time
-from flask import Blueprint, url_for, redirect, request, send_file
+from flask import Blueprint, redirect, request
 
-from .model import Note
-from app.user.user import is_logged_in
 from app.note.note import *
-from app.main.view import get_post_info_from_notes
-from app.utils import config
 
 
-url_prefix = config('note')['base_url']
+# FIXME: 수정해야함
+url_prefix = 'note'
 bp = Blueprint('note', __name__, url_prefix=f'/{url_prefix}')
 
 
 @bp.route('/')
 def route_note():
-    if is_logged_in():
+    if User.is_logged_in():
         notes = Note.query.order_by(Note.updated.desc()).all()
     else:
         notes = Note.query.filter_by(permission=Permission.PUBLIC)\
@@ -26,7 +22,7 @@ def route_note():
     pages = get_post_info_from_notes(notes)
     menu = get_menu_list()
     meta = get_base_meta()
-    meta['logged_in'] = is_logged_in()
+    meta['logged_in'] = User.is_logged_in()
     return render_template('pages.html',
                            meta=meta, menu=menu,
                            pagename='목록', pages=pages)
@@ -50,7 +46,7 @@ def route_page(page_path):
 
 @bp.route('/<path:page_path>/edit', methods=['GET', 'POST'])
 def route_edit(page_path):
-    if not is_logged_in():
+    if not User.is_logged_in():
         message = "로그인 후에 편집할 수 있습니다."
         return error_page(page_path=page_path, message=message)
 

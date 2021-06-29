@@ -2,7 +2,7 @@ import html2text
 
 from app import db
 from app.crypto import encrypt
-from .permission import Permission
+from app.note.permission import Permission
 
 
 class Note(db.Model):

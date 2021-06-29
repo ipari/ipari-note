@@ -1,14 +1,15 @@
 import base64
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-from app.utils import config
+from app.config.model import Config
 
 PADDING = '$'
 AES_KEY_LENGTH = 32
 
 
 def get_aes_key():
-    key = config('secret.key')
+    # FIXME: 설정에서 가져오도록
+    key = Config.get('aes_key')
     if len(key) > AES_KEY_LENGTH:
         key = key[:AES_KEY_LENGTH]
     if len(key) < AES_KEY_LENGTH:

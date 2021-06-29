@@ -1,6 +1,12 @@
+import os
 from flask import session
+from werkzeug.security import check_password_hash
 
 from app import db
+from app.utils import load_yaml
+
+
+USER_PATH = os.path.join(os.getcwd(), 'user.yml')
 
 
 class User(db.Model):
@@ -20,6 +26,21 @@ class User(db.Model):
         return f'<User> name: {self.name}, email: {self.email}'
 
     @classmethod
+    def update_user(cls):
+        info = load_yaml(USER_PATH)
+        if info is None:
+            cls.query.first().delete()
+        else:
+            user = cls.query.first()
+            if user is None:
+                user = User(info['email'], info['password'], info['name'])
+                db.session.add(user)
+            else:
+                for k, v in info.items():
+                    setattr(user, k, v)
+        db.session.commit()
+
+    @classmethod
     def get_by_session(cls):
         email = session.get('email', None)
         if email is not None:
@@ -27,6 +48,26 @@ class User(db.Model):
         else:
             return None
 
+    @classmethod
+    def get_user_info(cls, column=None):
+        user = cls.query.first()
+        row2dict = lambda r: {c.name: str(getattr(r, c.name)) for c in r.__table__.columns}
+        if column:
+            return row2dict(user)[column]
+        return row2dict(user)
+
+    @classmethod
+    def login(cls, form):
+        user = cls.query.filter_by(email=form.email.data).first()
+        if form.email.data == user.email \
+                and check_password_hash(user.password, form.password.data):
+            session['email'] = form.email.data
+            return True
+
     @staticmethod
     def logout():
         session.pop('email', None)
+
+    @staticmethod
+    def is_logged_in():
+        return 'email' in session

@@ -6,8 +6,7 @@ from markdown.extensions.toc import TocExtension
 from markdown.extensions.wikilinks \
     import WikiLinkExtension, WikiLinksInlineProcessor
 from markdown.inlinepatterns import InlineProcessor, LinkInlineProcessor
-
-from app.utils import config
+from app.config.model import Config
 
 
 def md_extensions():
@@ -22,11 +21,12 @@ def md_extensions():
     extensions.append('markdown.extensions.footnotes')
     extensions.append('markdown.extensions.md_in_html')
 
-    base_url = config('note.base_url')
+    # FIXME: 수정해야함
+    base_url = 'note'
     extensions.append(
         WikiLinkExtensionCustom(base_url='/{}/'.format(base_url)))
 
-    toc_marker = config('markdown_extensions.toc_marker')
+    toc_marker = Config.get('md_toc_marker')
     extensions.append(TocExtension(
         marker=toc_marker, permalink=True, slugify=_slugify))
 

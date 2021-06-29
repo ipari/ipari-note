@@ -4,7 +4,12 @@ import traceback
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-from app.note.note import MARKDOWN_EXT
+from app.config.model import CONFIG_PATH
+from app.user.model import USER_PATH
+
+
+MARKDOWN_EXT = '.md'
+PAGE_PATH = os.path.join('data', 'pages')
 
 
 class PageWatcher(object):
@@ -13,37 +18,41 @@ class PageWatcher(object):
 
     def __init__(self):
         self.observer = Observer()
-        self.event_handler = PageHandler()
-        self.page_path = os.path.join('data', 'pages')
+        self.page_handler = EventHandler()
+        self.user_handler = EventHandler()
+        self.config_handler = EventHandler()
 
     def watch(self):
         self.observer.schedule(
-            self.event_handler,
-            os.path.realpath(self.page_path),
+            self.page_handler,
+            os.path.realpath(PAGE_PATH),
             recursive=True,
         )
+        self.observer.schedule(self.user_handler, os.path.realpath(USER_PATH))
+        self.observer.schedule(self.config_handler, os.path.realpath(CONFIG_PATH))
         self.observer.start()
 
         try:
             while True:
                 time.sleep(1)
-                self.handle_events()
-
+                self.handle_page_events()
+                self.handle_user_events()
+                self.handle_config_events()
         except Exception:
             self.observer.stop()
             traceback.print_exc()
             self.observer.join()
 
-    def handle_events(self):
-        if not self.event_handler.buffer:
+    def handle_page_events(self):
+        if not self.page_handler.buffer:
             return
-        buffer = self.event_handler.buffer
+        buffer = self.page_handler.buffer
         buffer = list(set(buffer))
         # 파일 이동 시 새 경로에 생성을 먼저 하고 삭제 처리 하도록 한다.
         buffer = sorted(buffer, key=lambda x: self.event_order.index(x.key[0]))
         for event in buffer:
             _, ext = os.path.splitext(event.src_path)
-            if ext not in MARKDOWN_EXT:
+            if ext != MARKDOWN_EXT:
                 continue
 
             if event.event_type in ('modified', 'deleted'):
@@ -53,10 +62,29 @@ class PageWatcher(object):
                 with app.app_context():
                     update_db(event.src_path)
 
-        self.event_handler.clear_buffer()
+        self.page_handler.clear_buffer()
+
+    def handle_user_events(self):
+        if not self.user_handler.buffer:
+            return
+        from main import app
+        from app.user.model import User
+        with app.app_context():
+            User.update_user()
+        self.user_handler.clear_buffer()
+
+    def handle_config_events(self):
+        buffer = self.config_handler.buffer
+        if not buffer:
+            return
+        from main import app
+        from app.config.model import Config
+        with app.app_context():
+            Config.update_config()
+        self.config_handler.clear_buffer()
 
 
-class PageHandler(FileSystemEventHandler):
+class EventHandler(FileSystemEventHandler):
 
     buffer = []
 
