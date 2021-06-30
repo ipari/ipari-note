@@ -6,8 +6,10 @@
 <h1>{{ pagename }}</h1>
 <div class="archive">
 {% for (tag, count) in tag_info %}
-  <a href="{{ url_for('main.view_tag', tag=tag) }}">#{{ tag }}</a>({{ count }})
-  {%- if not loop.last %}, {% endif %}
+  <span class="tag-wrapper">
+    <a href="{{ url_for('main.view_tag', tag=tag) }}">#{{ tag }}</a>
+    <span class="tag-count">{{ count }}</span>
+  </span>
 {% endfor %}
 </div>
 {% endblock %}

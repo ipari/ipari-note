@@ -34,7 +34,7 @@ article {
 }
 
 div.page {
-    max-width: 630px;  /* 35em for 18px */
+    max-width: 800px;  /* 630px = 35em for 18px */
     margin: 0 auto;
     padding: 0.2em 1em;
 }
@@ -374,6 +374,9 @@ div.article li p {
 div.article ul {
     list-style: none;
 }
+div.article > ul {
+    margin-left: -1em;
+}
 div.article ul > li::before {
     display: inline-block;
     vertical-align: top;
@@ -382,10 +385,12 @@ div.article ul > li::before {
     content: "\2022";
     color: #2a99b6;
 }
-
 div.article ol {
     list-style: none;
     counter-reset: li;
+}
+div.article > ol {
+    margin-left: -1em;
 }
 div.article ol > li {
     counter-increment: li;
@@ -432,7 +437,7 @@ div.meta dd {
 blockquote {
     margin: 0;
     padding-left: 0.6em;
-    border-left: 3px solid #2a99b6;
+    border-left: 3px solid #7baabe;
 }
 
 code, pre {
@@ -689,10 +694,26 @@ th.date {
     min-width: 5em;
 }
 
+/* Tags */
+span.tag-wrapper {
+    display: inline-block;
+}
+
+span.tag-count {
+    display: inline-block;
+    margin-right: .6em;
+    padding: 0 .6em 0;
+    border-radius: 10px;
+    font-size: 85%;
+    background: #7baabe;
+    color: #fff;
+    vertical-align: text-bottom;
+}
+
 /* Footer */
 footer {
     margin-top: 3em;
-    padding: 0.3em 0;
+    padding: 0.5em 0;
     font-size: 0.85em;
     background-color: #7baabe;
     color: rgba(255,255,255,0.6);
@@ -702,7 +723,7 @@ footer {
 /* Mobile */
 @media only screen and (max-width: 600px) {
     body {
-        font-size: 16px;
+        font-size: 18px;
     }
 
     header {
