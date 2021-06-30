@@ -378,7 +378,7 @@ div.article ul > li::before {
     display: inline-block;
     vertical-align: top;
     width: 1em;
-    margin-left: -2em;
+    margin-left: -1em;
     content: "\2022";
     color: #2a99b6;
 }
@@ -394,7 +394,7 @@ div.article ol > li::before {
     display: inline-block;
     vertical-align: top;
     width: auto;
-    margin: 0 .5em 0 -2em;
+    margin: 0 .5em 0 -1em;
     content: counter(li) ".";
     color: #2a99b6;
 }
