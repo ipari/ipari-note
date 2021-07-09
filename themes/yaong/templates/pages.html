@@ -12,11 +12,10 @@
     <thead>
     <tr>
         {% if meta.logged_in %}
-        <th>권한</th>
+        <th></th>
         {% endif %}
         <th>제목</th>
-        <th>작성일</th>
-        <th>마지막 수정</th>
+        <th class="date">수정</th>
     </tr>
     </thead>
     <tbody>
@@ -29,7 +28,6 @@
         </td>
         {% endif %}
         <td class="left"><a href="{{ url_for('note.route_page', page_path=page.path) }}">{{ page.path }}</a></td>
-        <td class="center">{% if page.created %}{{ page.created.strftime('%Y-%m-%d') }}{% endif %}</td>
         <td class="center">{% if page.updated %}{{ page.updated.strftime('%Y-%m-%d') }}{% endif %}</td>
     </tr>
     {% endfor %}

@@ -1,5 +1,2 @@
-from flask import Blueprint
-
-bp = Blueprint('user', __name__)
-
-from app.user import routes
+from app.user import model
+from app.user.view import bp

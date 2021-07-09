@@ -1,0 +1,11 @@
+markdown:
+  toc_marker: "[목차]"
+
+note:
+  title: "ipari-note"
+  subtitle: "this is subtitle"
+  theme: "yaong"
+  post_per_page: 5
+  ga_tracking_id: ""
+
+aes_key: ""

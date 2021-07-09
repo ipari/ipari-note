@@ -5,25 +5,11 @@
 {% block content %}
 <h1>{{ pagename }}</h1>
 <div class="archive">
-<table>
-    <thead>
-        <tr>
-            <th>태그</th>
-            <th>글 개수</th>
-            <th>첫 작성</th>
-            <th>마지막 작성</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for tag_info in tag_infos %}
-        <tr>
-            <td class="center"><a href="{{ url_for('main.route_tag', tag=tag_info.tag) }}">#{{ tag_info.tag }}</a></td>
-            <td class="center">{{ tag_info.pages|length }}</td>
-            <td class="center">{% if tag_info.created %}{{ tag_info.created.strftime('%Y-%m-%d') }}{% endif %}</td>
-            <td class="center">{% if tag_info.updated %}{{ tag_info.updated.strftime('%Y-%m-%d') }}{% endif %}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% for (tag, count) in tag_info %}
+  <span class="tag-wrapper">
+    <a href="{{ url_for('main.view_tag', tag=tag) }}">#{{ tag }}</a>
+    <span class="tag-count">{{ count }}</span>
+  </span>
+{% endfor %}
 </div>
 {% endblock %}

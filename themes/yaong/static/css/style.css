@@ -34,7 +34,7 @@ article {
 }
 
 div.page {
-    max-width: 630px;  /* 35em for 18px */
+    max-width: 800px;  /* 630px = 35em for 18px */
     margin: 0 auto;
     padding: 0.2em 1em;
 }
@@ -65,7 +65,6 @@ table {
     border-collapse: collapse;
 }
 th, td {
-    min-width: 4em;
     padding: 0.2em 0.4em;
     font-size: 85%;
 }
@@ -176,68 +175,80 @@ header p {
 
 
 /* Nav */
-nav {
+nav.menubar {
     display: none;
     font-size: 16px;
     background-color: #fbfbfb;
 }
 
-nav ul {
+nav.menubar ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
 }
 
-nav li {
+nav.menubar li {
     float: left;
 }
 
-nav li a {
+nav.menubar li a {
     display: block;
     margin-right: .4em;
     padding: .4em .8em .4em 1.6em;
 }
 
-nav li a,
-nav li a:link,
-nav li a:visited {
+nav.menubar li a,
+nav.menubar li a:link,
+nav.menubar li a:visited {
     color: #333333;
 }
 
-nav li a:hover {
+nav.menubar li a:hover {
     color: #33bbdf;
 }
 
-nav li a.menu-login {
+nav.menubar li a.menu-login {
     background: url('../img/menu-login.svg') no-repeat left center;
     background-size: 24px;
 }
 
-nav li a.menu-logout {
+nav.menubar li a.menu-logout {
     background: url('../img/menu-logout.svg') no-repeat left center;
     background-size: 24px;
 }
 
-nav li a.menu-edit,
-nav li a.menu-write {
+nav.menubar li a.menu-edit,
+nav.menubar li a.menu-write {
     background: url('../img/menu-edit.svg') no-repeat left center;
     background-size: 24px;
 }
 
-nav li a.menu-archive {
-    background: url('../img/menu-archive.svg') no-repeat left center;
+nav.menubar li a.menu-list {
+    background: url('../img/menu-list.svg') no-repeat left center;
     background-size: 24px;
 }
 
-nav li a.menu-tag {
+nav.menubar li a.menu-tag {
     background: url('../img/menu-tag.svg') no-repeat left center;
     background-size: 24px;
 }
 
-nav li a.menu-config {
+nav.menubar li a.menu-config {
     background: url('../img/menu-config.svg') no-repeat left center;
     background-size: 24px;
+}
+
+nav.pagination .left {
+    float: left;
+}
+
+nav.pagination .right {
+    float: right;
+}
+
+nav.pagination:after {
+    clear: both;
 }
 
 
@@ -350,42 +361,18 @@ div.article h2 {
     border-bottom: 1px solid #f0f0f0;
 }
 
-div.article ul ul,
-div.article ul ol,
-div.article ol ol,
-div.article ol ul {
-    padding-left: 1.6em;
-}
-div.article li p {
-    display: inline-block;
-    margin: 0;
-}
-div.article ul {
-    list-style: none;
-}
-div.article ul > li::before {
-    display: inline-block;
-    vertical-align: top;
-    width: 1em;
-    margin-left: -2em;
-    content: "\2022";
+div.article li::marker {
     color: #2a99b6;
 }
 
-div.article ol {
-    list-style: none;
-    counter-reset: li;
-}
-div.article ol > li {
-    counter-increment: li;
-}
-div.article ol > li::before {
-    display: inline-block;
+div.article li p {
     vertical-align: top;
-    width: auto;
-    margin: 0 .5em 0 -2em;
-    content: counter(li) ".";
-    color: #2a99b6;
+}
+
+div.article > ul,
+div.article > ol,
+div.footnote > ol {
+    padding-left: 1.5em;
 }
 
 div.meta {
@@ -421,7 +408,7 @@ div.meta dd {
 blockquote {
     margin: 0;
     padding-left: 0.6em;
-    border-left: 3px solid #2a99b6;
+    border-left: 3px solid #7baabe;
 }
 
 code, pre {
@@ -673,12 +660,31 @@ div.archive img.permission {
     width: 18px;
 }
 
+/* Pages */
+th.date {
+    min-width: 5em;
+}
 
+/* Tags */
+span.tag-wrapper {
+    display: inline-block;
+}
+
+span.tag-count {
+    display: inline-block;
+    margin-right: .6em;
+    padding: 0 .6em 0;
+    border-radius: 10px;
+    font-size: 85%;
+    background: #7baabe;
+    color: #fff;
+    vertical-align: text-bottom;
+}
 
 /* Footer */
 footer {
     margin-top: 3em;
-    padding: 0.3em 0;
+    padding: 0.5em 0;
     font-size: 0.85em;
     background-color: #7baabe;
     color: rgba(255,255,255,0.6);
@@ -688,7 +694,7 @@ footer {
 /* Mobile */
 @media only screen and (max-width: 600px) {
     body {
-        font-size: 16px;
+        font-size: 18px;
     }
 
     header {
@@ -703,10 +709,10 @@ footer {
         background-size: 24px;
     }
 
-    nav li {
+    nav.menubar li {
         float: none;
     }
-    nav li a {
+    nav.menubar li a {
         margin: 0;
         border-bottom: 1px solid #eeeeee;
         padding-left: 2em;
