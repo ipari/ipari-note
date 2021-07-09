@@ -74,6 +74,7 @@ tr:last-child td {
 }
 th {
     cursor: pointer;
+    min-width: 2em;
 }
 td {
     border-bottom: 1px dotted #cccccc;
