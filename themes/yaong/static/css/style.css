@@ -361,47 +361,18 @@ div.article h2 {
     border-bottom: 1px solid #f0f0f0;
 }
 
-div.article ul ul,
-div.article ul ol,
-div.article ol ol,
-div.article ol ul {
-    padding-left: 1.6em;
+div.article li::marker {
+    color: #2a99b6;
 }
+
 div.article li p {
-    display: inline-block;
-    margin: 0;
-}
-div.article ul {
-    list-style: none;
-}
-div.article > ul {
-    margin-left: -1em;
-}
-div.article ul > li::before {
-    display: inline-block;
     vertical-align: top;
-    width: 1em;
-    margin-left: -1em;
-    content: "\2022";
-    color: #2a99b6;
 }
-div.article ol {
-    list-style: none;
-    counter-reset: li;
-}
-div.article > ol {
-    margin-left: -1em;
-}
-div.article ol > li {
-    counter-increment: li;
-}
-div.article ol > li::before {
-    display: inline-block;
-    vertical-align: top;
-    width: auto;
-    margin: 0 .5em 0 -1em;
-    content: counter(li) ".";
-    color: #2a99b6;
+
+div.article > ul,
+div.article > ol,
+div.footnote > ol {
+    padding-left: 1.5em;
 }
 
 div.meta {
