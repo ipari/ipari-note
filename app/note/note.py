@@ -344,10 +344,14 @@ def get_filepath(page_path, ext):
 
 
 def get_template():
+    # TODO: ---, ... 를 설정으로 옮겨야함
     template = f"""
+    ---
     Created: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-    Summary:
-    Tags:
+    Permission: 0
+    Tags: 
+    Summary: 
+    ---
     """
     template = [line.strip() for line in template.split('\n') if line]
     return "\n".join(template) + '\n'
