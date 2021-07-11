@@ -13,17 +13,19 @@ class Config(db.Model):
     md_toc_marker = db.Column(db.String(64), nullable=False)
     note_title = db.Column(db.String(256))
     note_subtitle = db.Column(db.String(256))
+    note_description = db.Column(db.String(1024))
     theme = db.Column(db.String(64), nullable=False)
     post_per_page = db.Column(db.Integer, nullable=False)
     ga_tracking_id = db.Column(db.String(64))
     aes_key = db.Column(db.String(32), nullable=False)
 
     def __init__(self, md_toc_marker=None, note_title=None, note_subtitle=None,
-                 theme=None, post_per_page=None, ga_tracking_id=None,
-                 aes_key=None):
+                 note_description=None, theme=None, post_per_page=None,
+                 ga_tracking_id=None, aes_key=None):
         self.md_toc_marker = md_toc_marker
         self.note_title = note_title
         self.note_subtitle = note_subtitle
+        self.note_description = note_description
         self.theme = theme
         self.post_per_page = post_per_page
         self.ga_tracking_id = ga_tracking_id
@@ -42,6 +44,7 @@ class Config(db.Model):
                 'md_toc_marker': info['markdown']['toc_marker'],
                 'note_title': info['note']['title'],
                 'note_subtitle': info['note']['subtitle'],
+                'note_description': info['note']['description'],
                 'theme': info['note']['theme'],
                 'post_per_page': info['note']['post_per_page'],
                 'ga_tracking_id': info['note']['ga_tracking_id'],

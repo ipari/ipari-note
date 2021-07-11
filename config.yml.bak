@@ -4,6 +4,7 @@ markdown:
 note:
   title: "ipari-note"
   subtitle: "this is subtitle"
+  description: "meta description for search engine"
   theme: "yaong"
   post_per_page: 5
   ga_tracking_id: ""
