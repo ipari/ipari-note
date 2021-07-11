@@ -5,5 +5,5 @@ NOTE_URL_PREFIX = ""
 SECRET_KEY = ""
 
 # SQLALCHEMY
-SQLALCHEMY_DATABASE_URI = 'sqlite:///../data/db.sqlite'
+SQLALCHEMY_DATABASE_URI = "sqlite:///../data/db.sqlite"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
