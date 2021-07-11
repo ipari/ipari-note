@@ -2,7 +2,12 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  {% if pagename %}
   <title>{% block pagename %}{% endblock %} - {{ meta.note_title }}</title>
+  {% else %}
+  <title>{{ meta.note_title }}</title>
+  {% endif %}
+
   <meta name="description" content="{{ meta.summary|default(meta.note_description) }}">
   {% if meta.tags %}
   <meta name="keywords" content="{{ meta.tags|join(',') }}">
