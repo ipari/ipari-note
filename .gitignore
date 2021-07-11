@@ -11,3 +11,5 @@ config.yml
 user.yml
 data/pages/*
 !data/pages/ipari-note
+robots.txt
+*.xml
