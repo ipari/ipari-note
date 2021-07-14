@@ -20,6 +20,12 @@ document.addEventListener("DOMContentLoaded", function() {
     // 비디오 폭 설정
     resizeVideos();
 
+    let toTop = select("div.to-top a");
+    toTop.addEventListener("click", function(e) {
+       window.scrollTo(0, 0);
+       e.preventDefault();
+    });
+
     // 테이블 헤더 정렬 기능
     // https://stackoverflow.com/questions/14267781/sorting-html-table-with-javascript
     const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
