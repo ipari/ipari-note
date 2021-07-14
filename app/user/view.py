@@ -41,4 +41,4 @@ def route_login():
 @bp.route('/logout')
 def user_logout():
     User.logout()
-    return 'Logout success'
+    return redirect(request.referrer)

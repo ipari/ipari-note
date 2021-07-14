@@ -59,6 +59,8 @@ class User(db.Model):
     @classmethod
     def login(cls, form):
         user = cls.query.filter_by(email=form.email.data).first()
+        if user is None:
+            return
         if form.email.data == user.email \
                 and check_password_hash(user.password, form.password.data):
             session['email'] = form.email.data
