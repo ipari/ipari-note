@@ -241,13 +241,18 @@ nav.menubar li a.menu-config {
 nav.pagination .left {
     float: left;
 }
-
 nav.pagination .right {
     float: right;
 }
-
 nav.pagination:after {
     clear: both;
+}
+
+nav.pagination .left a {
+    padding: .5em 2em .5em 0;
+}
+nav.pagination .right a {
+    padding: .5em 0 .5em 2em;
 }
 
 
