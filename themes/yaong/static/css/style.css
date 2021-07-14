@@ -40,8 +40,6 @@ div.page {
 }
 
 iframe {
-    /* javascript 로 resize 후에 보인다 */
-    display: none;
     border: none;
 }
 
@@ -450,6 +448,15 @@ article p > a:not(.wikilink):not(.footnote-ref):not(.footnote-backref) {
     padding-right: 16px;
     background: url('../img/external_link.png') no-repeat right center;
     background-size: 16px;
+}
+
+figure {
+    margin: 0;
+    padding: 0;
+}
+figure.video iframe {
+    /* javascript 로 resize 후에 보인다 */
+    display: none;
 }
 
 

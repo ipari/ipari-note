@@ -17,6 +17,9 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // 비디오 폭 설정
+    resizeVideos();
+
     // 테이블 헤더 정렬 기능
     // https://stackoverflow.com/questions/14267781/sorting-html-table-with-javascript
     const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
@@ -34,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 window.addEventListener("resize", function() {
-    resizeIFrame();
+    resizeVideos();
 });
 
 function toggleNav() {
@@ -73,9 +76,20 @@ function previewMarkdown(preview, plainText, url) {
 
 function resizeIFrame() {
     let iframes = selects("iframe");
-    for (let i = 0; i < iframes.length; i++) {
-        iframes[i].style.display = "block";
-        iframes[i].width = iframes[i].contentWindow.outerWidth;
-        iframes[i].height = iframes[i].contentWindow.document.body.scrollHeight;
-    }
+    iframes.forEach(iframe => {
+        iframe.style.display = "block";
+        iframe.width = iframe.contentWindow.outerWidth;
+        iframe.height = iframe.contentWindow.document.body.scrollHeight;
+    });
+}
+
+function resizeVideos() {
+    let iframes = selects("figure.video iframe");
+    iframes.forEach(iframe => {
+        iframe.style.display = "block";
+        let parentWidth = iframe.parentElement.clientWidth;
+        let ratio = parentWidth / iframe.width;
+        iframe.width = parentWidth;
+        iframe.height = iframe.height * ratio;
+    });
 }
