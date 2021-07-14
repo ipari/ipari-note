@@ -322,8 +322,19 @@ div.set-permission input:checked ~ img {
 
 
 /* TOC */
+div.toc {
+    border: 1px solid #cccccc;
+    border-radius: 10px;
+}
 div.toc ul ul {
     padding-left: 1.6em;
+}
+div.toc a,
+div.toc a:link {
+    color: inherit;
+}
+div.toc a:hover {
+    color: #33bbdf;
 }
 
 
