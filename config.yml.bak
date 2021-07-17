@@ -5,8 +5,12 @@ note:
   title: "ipari-note"
   subtitle: "this is subtitle"
   description: "meta description for search engine"
+
+app:
   theme: "yaong"
   post_per_page: 5
   ga_tracking_id: ""
+  url: "base url of note"
+  timezone: "+09:00"
 
 aes_key: ""

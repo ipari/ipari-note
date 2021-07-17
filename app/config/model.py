@@ -17,11 +17,13 @@ class Config(db.Model):
     theme = db.Column(db.String(64), nullable=False)
     post_per_page = db.Column(db.Integer, nullable=False)
     ga_tracking_id = db.Column(db.String(64))
+    url = db.Column(db.String(128))
+    timezone = db.Column(db.String(6))
     aes_key = db.Column(db.String(32), nullable=False)
 
     def __init__(self, md_toc_marker=None, note_title=None, note_subtitle=None,
                  note_description=None, theme=None, post_per_page=None,
-                 ga_tracking_id=None, aes_key=None):
+                 ga_tracking_id=None, url=None, timezone=None, aes_key=None):
         self.md_toc_marker = md_toc_marker
         self.note_title = note_title
         self.note_subtitle = note_subtitle
@@ -29,6 +31,8 @@ class Config(db.Model):
         self.theme = theme
         self.post_per_page = post_per_page
         self.ga_tracking_id = ga_tracking_id
+        self.url = url
+        self.timezone = timezone
         self.aes_key = aes_key
 
     def __repr__(self):
@@ -45,9 +49,11 @@ class Config(db.Model):
                 'note_title': info['note']['title'],
                 'note_subtitle': info['note']['subtitle'],
                 'note_description': info['note']['description'],
-                'theme': info['note']['theme'],
-                'post_per_page': info['note']['post_per_page'],
-                'ga_tracking_id': info['note']['ga_tracking_id'],
+                'theme': info['app']['theme'],
+                'post_per_page': info['app']['post_per_page'],
+                'ga_tracking_id': info['app']['ga_tracking_id'],
+                'url': info['app']['url'],
+                'timezone': info['app']['timezone'],
                 'aes_key': info['aes_key'],
             }
             config = cls.query.first()

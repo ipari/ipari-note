@@ -1,7 +1,9 @@
 import markdown
 import os
 from datetime import datetime
-from flask import flash, jsonify, request, render_template, send_file, url_for
+from flask import current_app, flash, jsonify, request, render_template, \
+    send_file, url_for
+from urllib.parse import quote
 
 from app import db
 from app.config.model import Config
@@ -115,12 +117,12 @@ def render_markdown(raw_md):
     return html, md.Meta
 
 
-def update_db(abs_path):
+def update_db(abs_path, feed_update=True):
     try:
         with open(abs_path, 'r', encoding='utf-8') as f:
             raw_md = f.read()
     except FileNotFoundError:
-        delete_db(abs_path)
+        delete_db(abs_path, feed_update=feed_update)
         return
 
     html, meta = render_markdown(raw_md)
@@ -141,14 +143,18 @@ def update_db(abs_path):
         db.session.add(tag)
 
     db.session.commit()
+    if feed_update:
+        update_feed()
 
 
-def delete_db(abs_path):
+def delete_db(abs_path, feed_update=True):
     note_query = Note.query.filter_by(filepath=abs_path)
     note = note_query.first()
     Tag.query.filter_by(note_id=note.id).delete()
     note_query.delete()
     db.session.commit()
+    if feed_update:
+        update_feed()
 
 
 def update_all():
@@ -158,7 +164,47 @@ def update_all():
             if ext not in MARKDOWN_EXT:
                 continue
             path = os.path.join(subdir, file)
-            update_db(path)
+            update_db(path, feed_update=False)
+    update_feed()
+
+
+def update_feed():
+    update_sitemap()
+    # update_atom()
+    # update_rss()
+
+
+def update_sitemap():
+    root_url = Config.get('url')
+    timezone = Config.get('timezone')
+
+    sitemap = ''
+    sitemap += '<?xml version="1.0" encoding="UTF-8"?>\n'
+    sitemap += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+
+    base_locs = [
+        f'{root_url}/',
+        f'{root_url}/note',
+        f'{root_url}/tags',
+    ]
+    for loc in base_locs:
+        sitemap += f'    <url>\n        <loc>{loc}</loc>\n    </url>\n'
+
+    notes = Note.query.filter_by(permission=Permission.PUBLIC).all()
+    for note in notes:
+        updated = note.updated.strftime('%Y-%m-%dT%H:%M:%S')
+        path = quote(note.path)
+
+        sitemap += '    <url>\n'
+        # TODO: note_url_prefix 설정 적용
+        sitemap += f'        <loc>{root_url}/note/{path}</loc>\n'
+        sitemap += f'        <lastmod>{updated}{timezone}</lastmod>\n'
+        sitemap += '    </url>\n'
+    sitemap += '</urlset>'
+
+    sitemap_path = os.path.join(current_app.instance_path, 'sitemap.xml')
+    with open(sitemap_path, 'w', encoding='utf-8') as f:
+        f.write(sitemap)
 
 
 def serve_page(note, from_encrypted_path=False):
