@@ -1,4 +1,6 @@
-from flask import Blueprint, redirect, render_template, url_for
+import os
+from flask import Blueprint, current_app, redirect, render_template, send_file, \
+    url_for
 from sqlalchemy import func
 
 from app.note.model import Note, Tag
@@ -85,3 +87,22 @@ def view_update():
 @bp.route('/<path:page_path>')
 def route_to_note(page_path):
     return redirect(url_for('note.route_page', page_path=page_path))
+
+
+@bp.route('/rss')
+def route_rss():
+    rss_path = os.path.join(current_app.instance_path, 'rss.xml')
+    return send_file(rss_path)
+
+
+@bp.route('/atom')
+def route_atom():
+    atom_path = os.path.join(current_app.instance_path, 'atom.xml')
+    return send_file(atom_path)
+
+
+@bp.route('/sitemap')
+@bp.route('/sitemap.xml')
+def route_sitemap():
+    sitemap_path = os.path.join(current_app.instance_path, 'sitemap.xml')
+    return send_file(sitemap_path)
