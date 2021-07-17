@@ -6,6 +6,7 @@ from flask import current_app, flash, jsonify, request, render_template, \
 from urllib.parse import quote
 
 from app import db
+from app.utils import format_datetime
 from app.config.model import Config
 from app.user.model import User
 from app.note.markdown import md_extensions
@@ -166,45 +167,6 @@ def update_all():
             path = os.path.join(subdir, file)
             update_db(path, feed_update=False)
     update_feed()
-
-
-def update_feed():
-    update_sitemap()
-    # update_atom()
-    # update_rss()
-
-
-def update_sitemap():
-    root_url = Config.get('url')
-    timezone = Config.get('timezone')
-
-    sitemap = ''
-    sitemap += '<?xml version="1.0" encoding="UTF-8"?>\n'
-    sitemap += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-
-    base_locs = [
-        f'{root_url}/',
-        f'{root_url}/note',
-        f'{root_url}/tags',
-    ]
-    for loc in base_locs:
-        sitemap += f'    <url>\n        <loc>{loc}</loc>\n    </url>\n'
-
-    notes = Note.query.filter_by(permission=Permission.PUBLIC).all()
-    for note in notes:
-        updated = note.updated.strftime('%Y-%m-%dT%H:%M:%S')
-        path = quote(note.path)
-
-        sitemap += '    <url>\n'
-        # TODO: note_url_prefix 설정 적용
-        sitemap += f'        <loc>{root_url}/note/{path}</loc>\n'
-        sitemap += f'        <lastmod>{updated}{timezone}</lastmod>\n'
-        sitemap += '    </url>\n'
-    sitemap += '</urlset>'
-
-    sitemap_path = os.path.join(current_app.instance_path, 'sitemap.xml')
-    with open(sitemap_path, 'w', encoding='utf-8') as f:
-        f.write(sitemap)
 
 
 def serve_page(note, from_encrypted_path=False):
@@ -451,3 +413,151 @@ def get_tag_page(tag, page=1):
 
     posts = get_post_info_from_notes(page.items)
     return posts, next_url, prev_url
+
+
+###############################################################################
+# Feed
+###############################################################################
+
+
+XML_Declaration = '<?xml version="1.0" encoding="UTF-8"?>\n'
+
+
+def update_feed():
+    """
+    https://validator.w3.org/feed/docs/rss2.html
+    https://validator.w3.org/feed/docs/atom.html
+
+    Returns:
+    """
+
+    notes = Note.query.filter_by(permission=Permission.PUBLIC)\
+        .order_by(Note.updated.desc()).all()
+    sitemap_items, rss_items, atom_items = get_feed_from_notes(notes)
+
+    now = datetime.now()
+    timezone = Config.get('timezone')
+    build_date_iso = format_datetime(now, style='iso-8601', timezone=timezone)
+    build_date_rfc = format_datetime(now, style='rfc-822', timezone=timezone)
+
+    update_sitemap(sitemap_items)
+    update_rss(rss_items, build_date_rfc)
+    update_atom(atom_items, build_date_iso)
+
+
+def update_sitemap(sitemap_items):
+    root_url = Config.get('url')
+    sitemap = ''
+    sitemap += XML_Declaration
+    sitemap += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    base_locs = [
+        f'{root_url}/',
+        f'{root_url}/note',
+        f'{root_url}/tags',
+    ]
+    for loc in base_locs:
+        sitemap += f'    <url>\n        <loc>{loc}</loc>\n    </url>\n'
+    sitemap += sitemap_items
+    sitemap += '</urlset>'
+
+    path = os.path.join(current_app.instance_path, 'sitemap.xml')
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(sitemap)
+
+
+def update_rss(rss_items, build_date):
+    config = Config.get()
+
+    rss2 = ''
+    rss2 += XML_Declaration
+    rss2 += f'<rss version="2.0">\n'
+    rss2 += f'    <channel>\n'
+    rss2 += f'        <title>{config["note_title"]}</title>\n'
+    rss2 += f'        <link>{config["url"]}</link>\n'
+    rss2 += f'        <description>{config["note_description"]}</description>\n'
+    rss2 += f'        <docs>{config["url"]}/rss</docs>\n'
+    rss2 += f'        <generator>ipari-note</generator>\n'
+    rss2 += f'        <lastBuildDate>{build_date}</lastBuildDate>\n'
+    rss2 += rss_items
+    rss2 += f'    </channel>\n'
+    rss2 += f'</rss>'
+
+    path = os.path.join(current_app.instance_path, 'rss.xml')
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(rss2)
+
+
+def update_atom(atom_items, build_date):
+    config = Config.get()
+    user = User.get_user_info()
+
+    atom = ''
+    atom += XML_Declaration
+    atom += f'<feed xmlns="http://www.w3.org/2005/Atom">\n'
+    atom += f'    <title>{config["note_title"]}</title>\n'
+    atom += f'    <subtitle>{config["note_subtitle"]}</subtitle>\n'
+    atom += f'    <author>\n'
+    atom += f'        <name>{user["name"]}</name>\n'
+    atom += f'        <email>{user["email"]}</email>\n'
+    atom += f'    </author>\n'
+    atom += f'    <updated>{build_date}</updated>\n'
+    atom += f'    <id>{config["url"]}</id>\n'
+    atom += f'    <link rel="alternate" href="{config["url"]}" />\n'
+    atom += f'    <link rel="self" href="{config["url"]}/atom" />\n'
+    atom += f'    <generator>ipari-note</generator>'
+    atom += atom_items
+    atom += f'</feed>'
+
+    path = os.path.join(current_app.instance_path, 'atom.xml')
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(atom)
+
+
+def get_feed_from_notes(notes):
+    sitemap = ''
+    rss2 = ''
+    atom = ''
+
+    email = User.get_user_info('email')
+    root_url = Config.get('url')
+    timezone = Config.get('timezone')
+    # TODO: note_url_prefix 설정 적용
+    note_url_prefix = 'note'
+
+    for i, note in enumerate(notes):
+        path = quote(note.path)
+        item_url = f'{root_url}/{note_url_prefix}/{path}'
+
+        # sitemap
+        updated_iso = format_datetime(note.updated, style='iso-8601', timezone=timezone)
+        sitemap += f'    <url>\n'
+        sitemap += f'        <loc>{item_url}</loc>\n'
+        sitemap += f'        <lastmod>{updated_iso}</lastmod>\n'
+        sitemap += f'    </url>\n'
+
+        if i > 10:
+            continue
+
+        # rss
+        updated_rfc = format_datetime(note.updated, style='rfc-822', timezone=timezone)
+        rss2 += f'        <item>\n'
+        rss2 += f'            <title>{note.title}</title>\n'
+        rss2 += f'            <author>{email}</author>\n'
+        rss2 += f'            <pubDate>{updated_rfc}</pubDate>\n'
+        rss2 += f'            <link>{item_url}</link>\n'
+        rss2 += f'            <guid isPermaLink="false">{item_url}</guid>\n'
+        rss2 += f'            <description>{note.summary}</description>\n'
+        rss2 += f'        </item>\n'
+
+        # atom
+        published_iso = format_datetime(note.created, style='iso-8601', timezone=timezone)
+        atom += f'    <entry>\n'
+        atom += f'        <title>{note.title}</title>\n'
+        atom += f'        <id>{item_url}</id>\n'
+        atom += f'        <link rel="alternate" href="{item_url}" />\n'
+        atom += f'        <published>{published_iso}</published>\n'
+        atom += f'        <updated>{updated_iso}</updated>\n'
+        atom += f'        <summary>{note.summary}</summary>\n'
+        atom += f'    </entry>\n'
+
+    return sitemap, rss2, atom
