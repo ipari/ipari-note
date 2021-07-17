@@ -20,11 +20,14 @@ document.addEventListener("DOMContentLoaded", function() {
     // 비디오 폭 설정
     resizeVideos();
 
+    // To Top 버튼
     let toTop = select("div.to-top a");
-    toTop.addEventListener("click", function(e) {
-       window.scrollTo(0, 0);
-       e.preventDefault();
-    });
+    if (toTop != null) {
+        toTop.addEventListener("click", function(e) {
+            window.scrollTo(0, 0);
+            e.preventDefault();
+        });
+    }
 
     // 테이블 헤더 정렬 기능
     // https://stackoverflow.com/questions/14267781/sorting-html-table-with-javascript
