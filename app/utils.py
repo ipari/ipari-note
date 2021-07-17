@@ -40,7 +40,7 @@ def format_datetime(dt, style=None, timezone=None):
     elif style == 'rfc-822':
         dt_str = dt.strftime('%a, %d %b %Y %H:%M:%S')
         if timezone:
-            dt_str += timezone.replace(':', '')
+            dt_str += f' {timezone.replace(":", "")}'
         return dt_str
     else:
         dt_str = dt.strftime('%Y-%m-%d %H:%M:%S')

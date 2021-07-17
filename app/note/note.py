@@ -470,10 +470,11 @@ def update_rss(rss_items, build_date):
 
     rss2 = ''
     rss2 += XML_Declaration
-    rss2 += f'<rss version="2.0">\n'
+    rss2 += f'<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n'
     rss2 += f'    <channel>\n'
     rss2 += f'        <title>{config["note_title"]}</title>\n'
     rss2 += f'        <link>{config["url"]}</link>\n'
+    rss2 += f'        <atom:link href="{config["url"]}/rss" rel="self" type="application/rss+xml" />\n'
     rss2 += f'        <description>{config["note_description"]}</description>\n'
     rss2 += f'        <docs>{config["url"]}/rss</docs>\n'
     rss2 += f'        <generator>ipari-note</generator>\n'
@@ -501,7 +502,7 @@ def update_atom(atom_items, build_date):
     atom += f'        <email>{user["email"]}</email>\n'
     atom += f'    </author>\n'
     atom += f'    <updated>{build_date}</updated>\n'
-    atom += f'    <id>{config["url"]}</id>\n'
+    atom += f'    <id>{config["url"]}/</id>\n'
     atom += f'    <link rel="alternate" href="{config["url"]}" />\n'
     atom += f'    <link rel="self" href="{config["url"]}/atom" />\n'
     atom += f'    <generator>ipari-note</generator>'
@@ -518,6 +519,7 @@ def get_feed_from_notes(notes):
     rss2 = ''
     atom = ''
 
+    name = User.get_user_info('name')
     email = User.get_user_info('email')
     root_url = Config.get('url')
     timezone = Config.get('timezone')
@@ -542,7 +544,7 @@ def get_feed_from_notes(notes):
         updated_rfc = format_datetime(note.updated, style='rfc-822', timezone=timezone)
         rss2 += f'        <item>\n'
         rss2 += f'            <title>{note.title}</title>\n'
-        rss2 += f'            <author>{email}</author>\n'
+        rss2 += f'            <author>{email} ({name})</author>\n'
         rss2 += f'            <pubDate>{updated_rfc}</pubDate>\n'
         rss2 += f'            <link>{item_url}</link>\n'
         rss2 += f'            <guid isPermaLink="false">{item_url}</guid>\n'
