@@ -23,6 +23,10 @@ def create_app(instance_path=None):
     db.init_app(app)
     with app.app_context():
         db.create_all()
+        from app.config.model import Config
+        from app.user.model import User
+        Config.update_config()
+        User.update_user()
 
     # FIXME: 설정에서 가져오도록
     theme = 'yaong'
