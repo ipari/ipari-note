@@ -28,7 +28,7 @@ def route_note():
                            pagename='목록', pages=pages)
 
 
-@bp.route('/<path:page_path>', methods=['GET', 'POST'])
+@bp.route('/<path:page_path>', methods=['GET', 'POST'], strict_slashes=False)
 def route_page(page_path):
     if request.method == 'GET':
         path, ext = os.path.splitext(page_path)
