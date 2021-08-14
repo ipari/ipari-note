@@ -26,6 +26,7 @@ class NoteMeta(object):
     path = None
     filepath = None
     permission = None
+    posted = None
     pinned = None
     created = None
     updated = None
@@ -45,6 +46,7 @@ class NoteMeta(object):
         self.path, _ = os.path.splitext(os.path.relpath(filepath, ROOT_PATH))
         self.filepath = filepath
         self.permission = self.parse_permission()
+        self.posted = self.parse_posted()
         self.pinned = self.parse_pinned()
         self.created = self.parse_datetime('created')
         self.updated = self.parse_datetime('updated')
@@ -103,6 +105,12 @@ class NoteMeta(object):
         if v is None:
             return Permission(0)
         return Permission(int(v[0]))
+
+    def parse_posted(self):
+        v = self._meta.get('posted', None)
+        if v is None:
+            return False
+        return int(v[0])
 
     def parse_pinned(self):
         v = self._meta.get('pinned', None)
@@ -373,6 +381,7 @@ def get_post_info_from_notes(list_of_note):
             'updated': item.updated,
             'path': item.path,
             'permission': item.permission,
+            'posted': item.posted,
             'pinned': item.pinned,
             'summary': item.summary,
             'tags': [tag.tag for tag in item.tags],
@@ -382,8 +391,8 @@ def get_post_info_from_notes(list_of_note):
     return posts
 
 
-def get_page(page=1):
-    base_query = Note.query.filter_by(permission=Permission.PUBLIC).\
+def get_posted_page(page=1):
+    base_query = Note.query.filter_by(permission=Permission.PUBLIC, posted=1).\
         order_by(Note.pinned.desc(), Note.updated.desc())
     page = base_query.paginate(page, Config.get('post_per_page'), False)
 
@@ -431,7 +440,7 @@ def update_feed():
     Returns:
     """
 
-    notes = Note.query.filter_by(permission=Permission.PUBLIC)\
+    notes = Note.query.filter_by(permission=Permission.PUBLIC, posted=1)\
         .order_by(Note.updated.desc()).all()
     sitemap_items, rss_items, atom_items = get_feed_from_notes(notes)
 

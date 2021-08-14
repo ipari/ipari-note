@@ -4,8 +4,8 @@ from flask import Blueprint, current_app, redirect, render_template, send_file, 
 from sqlalchemy import func
 
 from app.note.model import Note, Tag
-from app.note.note import get_base_meta, get_menu_list, get_page, get_tag_page,\
-    error_page, update_all
+from app.note.note import get_base_meta, get_menu_list, get_posted_page, \
+    get_tag_page, error_page, update_all
 from app.note.permission import Permission
 from app.user.model import User
 
@@ -15,7 +15,7 @@ bp = Blueprint('main', __name__)
 
 @bp.route('/')
 def view_index():
-    posts, next_url, prev_url = get_page()
+    posts, next_url, prev_url = get_posted_page()
     return render_template('posts.html',
                            meta=get_base_meta(),
                            menu=get_menu_list(),
@@ -27,7 +27,7 @@ def view_index():
 
 @bp.route('/posts/<int:page>')
 def view_posts(page):
-    posts, next_url, prev_url = get_page(page=page)
+    posts, next_url, prev_url = get_posted_page(page=page)
     return render_template('posts.html',
                            meta=get_base_meta(),
                            menu=get_menu_list(),

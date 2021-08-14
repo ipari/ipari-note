@@ -14,6 +14,7 @@ class Note(db.Model):
     filepath = db.Column(db.String(256), nullable=False)
     title = db.Column(db.String(256), nullable=False)
     permission = db.Column(db.Enum(Permission), nullable=False)
+    posted = db.Column(db.Boolean, nullable=False)
     pinned = db.Column(db.Boolean, nullable=False)
     created = db.Column(db.DateTime(timezone=True), nullable=False)
     updated = db.Column(db.DateTime(timezone=True), nullable=False)
@@ -35,6 +36,7 @@ class Note(db.Model):
         self.encrypted_path = encrypt(meta.path)
         self.filepath = meta.filepath
         self.permission = Permission(meta.permission)
+        self.posted = meta.posted
         self.pinned = meta.pinned
         self.created = meta.created or meta.updated
         self.updated = meta.updated
