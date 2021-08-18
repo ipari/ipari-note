@@ -195,7 +195,7 @@ def serve_file(page_path):
     try:
         return send_file(path)
     except FileNotFoundError:
-        pass
+        return 'File Not Found', 404
 
 
 def check_permission(permission=Permission.PRIVATE, from_encrypted_path=False):
@@ -331,9 +331,9 @@ def delete_page(filepath):
             continue
 
 
-def save_file(page_path, file):
+def save_image(page_path, file):
     filename = request.form.get('filename')
-    if filename is None:
+    if not filename:
         now = datetime.now().strftime('%Y%m%d_%H%M%S')
         filename = f'image-{now}.png'
     name, ext = os.path.splitext(filename)

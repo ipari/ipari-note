@@ -65,11 +65,12 @@ def route_upload(page_path):
             # no file part
             return redirect(request.url)
         file = request.files['file']
-        if file.filename == '':
-            # no selected file
-            return redirect(request.url)
-        if file:
-            return save_file(page_path, file)
+
+        if file is None:
+            return 'Wrong File', 400
+
+        if 'image' in file.mimetype:
+            return save_image(page_path, file)
 
 
 @bp.route('/preview', methods=['POST'])
