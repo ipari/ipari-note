@@ -6,7 +6,8 @@
 {% endblock %}
 
 {% block css %}
-   <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <base href="{{ request.root_url }}/{{ base_url }}/{{ pagename }}" />
 {% endblock %}
 
 {% block pagename %}{{ pagename }}{% endblock %}

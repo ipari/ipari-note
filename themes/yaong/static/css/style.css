@@ -427,7 +427,7 @@ div.meta dd {
 blockquote {
     margin: 0;
     padding-left: 0.6em;
-    border-left: 3px solid #7baabe;
+    border-left: 4px solid #dddddd;
 }
 
 code, pre {
