@@ -57,6 +57,7 @@
     function post_content() {
         const form = document.getElementsByClassName('editor')[0];
         const field = document.createElement('textarea');
+        field.style.display = 'none';
         field.name = 'md';
         field.value = editor.getMarkdown();
         form.appendChild(field);
