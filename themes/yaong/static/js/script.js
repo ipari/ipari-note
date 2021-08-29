@@ -5,10 +5,6 @@ document.addEventListener("DOMContentLoaded", function() {
         toggleNav();
     });
 
-    // nav 에 초기값 지정
-    let nav = select("nav");
-    nav.style.display = "none";
-
     // 노트 권한 폼
     let radios = selects("div.permission input[type=radio]");
     for (let radio of radios) {
@@ -52,7 +48,7 @@ window.addEventListener("resize", function() {
 function toggleNav() {
     // nav 를 토글한다.
     let nav = select("nav");
-    if (nav.style.display === "none") {
+    if (isHidden(nav)) {
         nav.style.display = "block";
     } else {
         nav.style.display = "none";
@@ -65,6 +61,11 @@ function select(query) {
 
 function selects(query) {
     return document.querySelectorAll(query);
+}
+
+function isHidden(e) {
+    let style = window.getComputedStyle(e);
+    return (style.display === 'none');
 }
 
 function previewMarkdown(preview, plainText, url) {

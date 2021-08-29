@@ -175,7 +175,6 @@ header p {
 
 /* Nav */
 nav.menubar {
-    display: none;
     font-size: 16px;
     background-color: #fbfbfb;
 }
@@ -751,6 +750,9 @@ footer {
         background-size: 24px;
     }
 
+    nav.menubar {
+        display: none;
+    }
     nav.menubar li {
         float: none;
     }
