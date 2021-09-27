@@ -1,7 +1,7 @@
 # ipari-note
 
 개인적인 요구 조건을 충족하기 위해 만든 노트 겸 블로그입니다.  
-https://blog.ipari.dev
+https://note.ipari.dev
 
 - 문서는 취향에 맞는 마크다운 에디터로 편집할 수 있습니다.
 - 문서의 변경을 감지하면 렌더링하여 DB에 저장합니다.
