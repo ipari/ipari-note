@@ -167,6 +167,8 @@ def delete_db(abs_path, feed_update=True):
 
 
 def update_all():
+    Note.query.delete()
+    Tag.query.delete()
     for subdir, dirs, files in os.walk(ROOT_PATH):
         for file in files:
             _, ext = os.path.splitext(file)
