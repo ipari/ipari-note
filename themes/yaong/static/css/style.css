@@ -629,6 +629,7 @@ input[type=password] {
     font-size: 90%;
 }
 
+input[type=submit],
 input[type=button] {
     margin-top: .4em;
     padding: .5em .8em;
@@ -639,6 +640,7 @@ input[type=button] {
     cursor: pointer;
 }
 
+input[type=submit]:hover,
 input[type=button]:hover {
     background-color: #6cb0bf;
 }
