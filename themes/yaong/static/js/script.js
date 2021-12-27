@@ -98,8 +98,8 @@ function resizeVideos() {
     iframes.forEach(iframe => {
         iframe.style.display = "block";
         let parentWidth = iframe.parentElement.clientWidth;
-        let ratio = parentWidth / iframe.width;
-        iframe.width = parentWidth;
-        iframe.height = iframe.height * ratio;
+        let ratio = parentWidth / iframe.clientWidth;
+        iframe.width = parentWidth + "px";
+        iframe.height = iframe.clientHeight * ratio + "px";
     });
 }

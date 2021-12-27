@@ -465,6 +465,11 @@ article p > a:not(.wikilink):not(.footnote-ref):not(.footnote-backref) {
     background-size: 16px;
 }
 
+video {
+    width: 100%;
+    height: auto;
+}
+
 figure {
     margin: 0;
     padding: 0;
