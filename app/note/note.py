@@ -374,6 +374,7 @@ def get_template():
     ---
     Created: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
     Permission: 0
+    Posted: 0
     Tags: 
     Summary: 
     ---
