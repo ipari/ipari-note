@@ -1,6 +1,6 @@
 import re
 import time
-from flask import Blueprint, redirect, request
+from flask import Blueprint, redirect
 
 from app.note.note import *
 

@@ -1,12 +1,9 @@
 import os
 from flask import Blueprint, current_app, redirect, render_template, send_file, \
     url_for
-from sqlalchemy import func
 
-from app.note.model import Note, Tag
 from app.note.note import get_base_meta, get_menu_list, get_posted_page, \
-    get_tag_page, error_page, update_all
-from app.note.permission import Permission
+    get_tag_page, get_tag_list, error_page, update_all
 from app.user.model import User
 
 
@@ -39,12 +36,7 @@ def view_posts(page):
 
 @bp.route('/tags')
 def view_tags():
-    tag_info = Tag.query.join(Note, Tag.note_id == Note.id)\
-        .filter(Note.permission == Permission.PUBLIC)\
-        .group_by(Tag.tag)\
-        .with_entities(Tag.tag, func.count())\
-        .order_by(func.count().desc(), Tag.tag)\
-        .all()
+    tag_info = get_tag_list()
     return render_template('tags.html',
                            meta=get_base_meta(),
                            menu=get_menu_list(),

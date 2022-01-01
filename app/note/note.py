@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from flask import current_app, flash, jsonify, request, render_template, \
     send_file, url_for
+from sqlalchemy import func
 from urllib.parse import quote
 
 from app import db
@@ -208,6 +209,12 @@ def check_permission(permission=Permission.PRIVATE, from_encrypted_path=False):
     return False
 
 
+def get_permission():
+    if User.is_logged_in():
+        return Permission.PRIVATE
+    return Permission.PUBLIC
+
+
 def get_base_meta():
     note_config = Config.get()
     meta = dict()
@@ -410,8 +417,9 @@ def get_posted_page(page=1):
 
 
 def get_tag_page(tag, page=1):
+    permission = get_permission()
     base_query = Note.query.join(Tag, Note.id == Tag.note_id)\
-        .filter(Tag.tag == tag, Note.permission == Permission.PUBLIC)\
+        .filter(Tag.tag == tag, Note.permission >= permission)\
         .order_by(Note.updated.desc())
     page = base_query.paginate(page, Config.get('post_per_page'), False)
 
@@ -424,6 +432,16 @@ def get_tag_page(tag, page=1):
 
     posts = get_post_info_from_notes(page.items)
     return posts, next_url, prev_url
+
+
+def get_tag_list():
+    permission = get_permission()
+    return Tag.query.join(Note, Tag.note_id == Note.id)\
+        .filter(Note.permission >= permission)\
+        .group_by(Tag.tag)\
+        .with_entities(Tag.tag, func.count())\
+        .order_by(func.count().desc(), Tag.tag)\
+        .all()
 
 
 ###############################################################################
