@@ -708,6 +708,16 @@ div.archive img.permission {
     width: 18px;
 }
 
+div.archive div.list-meta,
+div.archive div.list-tag {
+    font-size: 90%;
+}
+
+div.archive div.list-tag a {
+    color: #999999;
+}
+
+
 /* Pages */
 th.date {
     min-width: 5em;
@@ -768,6 +778,14 @@ footer {
         border-bottom: 1px solid #eeeeee;
         padding-left: 2em;
     }
+
+    div.archive td.list-date {
+        font-size: 80%;
+    }
+    div.archive div.list-meta,
+    div.archive div.list-tag {
+        font-size: 80%;
+}
 }
 
 
