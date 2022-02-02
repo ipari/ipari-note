@@ -748,6 +748,24 @@ footer {
     color: rgba(255,255,255,0.6);
 }
 
+/* wide */
+@media (min-width: 1400px) {
+    div.toc {
+        position: fixed;
+        top: 80px;
+        bottom: 0;
+        left: calc(50vw + 400px);
+        max-width: calc(50vw - 400px);
+        padding: 0 1em;
+        z-index: 9999;
+        font-size: 0.9em;
+        overflow-y: auto;
+        overflow-x: hidden;
+        border: 0;
+        line-height: 1.5;
+    }
+}
+
 
 /* Mobile */
 @media only screen and (max-width: 600px) {
