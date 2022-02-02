@@ -395,7 +395,7 @@ div.footnote > ol {
 
 div.meta {
     display: flex;
-    margin: 1.6em 0 2em;
+    margin: .6em 0 2.5em;
     padding: .4em 0;
     font-size: 16px;
     border-top: 1px solid #f0f0f0;
@@ -803,7 +803,7 @@ footer {
     div.archive div.list-meta,
     div.archive div.list-tag {
         font-size: 80%;
-}
+    }
 }
 
 

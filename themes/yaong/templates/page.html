@@ -26,6 +26,12 @@
         {% endif %}
     {% endwith %}
 
+    {% if meta.summary %}
+    <div class="summary">
+        {{ meta.summary }}
+    </div>
+    {% endif %}
+
     <div class="meta">
         <div class="tags">
             {% if meta.tags %}

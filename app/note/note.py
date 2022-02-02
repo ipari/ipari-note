@@ -236,6 +236,7 @@ def get_note_meta(note, meta=None):
     meta['is_page'] = True
     meta['encrypted_path'] = note.encrypted_path
     meta['tags'] = [tag.tag for tag in note.tags]
+    meta['summary'] = note.summary
     return meta
 
 
