@@ -24,7 +24,7 @@
     </form>
 
     <script>
-    let content = `{{ raw_md }}`;
+    let content = `{{ raw_md|safe }}`;
     const Editor = toastui.Editor;
     const editor = new Editor({
         el: document.querySelector('#editor'),

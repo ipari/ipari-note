@@ -293,6 +293,10 @@ def edit_page(page_path):
     # https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Template_literals
     raw_md = raw_md.replace('`', '\`')
 
+    # 문자 내에 </script>가 있으면 <\/script> 로 처리해줘야한다.
+    # https://softwareengineering.stackexchange.com/questions/139372/referencing-external-javascript-vs-hosting-my-own-copy/139380#139380
+    raw_md = raw_md.replace('</script>', '<\/script>')
+
     # FIXME: 수정해야함
     base_url = 'note'
     return render_template('edit.html',
