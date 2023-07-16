@@ -64,6 +64,7 @@ class User(db.Model):
         if form.email.data == user.email \
                 and check_password_hash(user.password, form.password.data):
             session['email'] = form.email.data
+            session.permanent = True
             return True
 
     @staticmethod
