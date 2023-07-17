@@ -33,7 +33,7 @@
         frontMatter: true,
         hooks: {
             addImageBlobHook: (blob, callback) => {
-                let filename = prompt("파일명을 입력해주세요", blob.name);
+                let filename = prompt("파일명을 입력해주세요", "_media/" + blob.name);
                 let postUrl = "/{{ base_url }}/{{ pagename }}/upload"
                 let formData = new FormData();
                 formData.append('file', blob, filename);
