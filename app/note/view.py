@@ -31,6 +31,7 @@ def route_note():
 @bp.route('/<path:page_path>', methods=['GET', 'POST'], strict_slashes=False)
 def route_page(page_path):
     if request.method == 'GET':
+        page_path = page_path.rstrip('/')
         path, ext = os.path.splitext(page_path)
         if ext:
             return serve_file(page_path)
