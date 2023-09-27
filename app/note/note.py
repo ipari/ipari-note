@@ -98,7 +98,7 @@ class NoteMeta(object):
         for tag in tags:
             if not tag:
                 continue
-            tag = tag.strip()
+            tag = tag.strip(' "')
             if tag.startswith('#'):
                 tag = tag[1:]
             processed_tags.append(tag)

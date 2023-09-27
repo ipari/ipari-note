@@ -158,6 +158,11 @@ class MetaPreprocessor(Preprocessor):
             if m1:
                 key = m1.group('key').lower().strip()
                 value = m1.group('value').strip()
+
+                # Obsidian 에서 태그가 비어있을 때 `[]` 을 넣는 것을 빈 문자를 넣도록 수정
+                if key == 'tags':
+                    value = ''
+
                 try:
                     meta[key].append(value)
                 except KeyError:
