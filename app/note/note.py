@@ -74,19 +74,35 @@ class NoteMeta(object):
         }
 
     def parse_tags(self, key):
-        tags = self._meta.get(key, [])
-        tags = [tag.strip() for tag in tags if tag.strip()]
-        if not tags:
-            return tags
+        """
+        meta 에서 tags 키에 있는 항목을 파싱한다.
+        데이터는 다음과 같은 식으로 주어진다.
 
-        tags = tags[0].split(',')
-        new_tags = []
+            1. tags: 2023, 2024 -> tags: ["2023, 2024"]
+            2. tags:
+                - 2023
+                - 2024          -> tags: ["", "2023", "2024"]
+
+        Args:
+            key: meta dict 에서 태그에 해당하는 키.
+
+        Returns: list
+        """
+        _tags = self._meta.get(key, [])
+        tags = []
+
+        for item in _tags:
+            tags += item.split(',')
+
+        processed_tags = []
         for tag in tags:
+            if not tag:
+                continue
             tag = tag.strip()
             if tag.startswith('#'):
                 tag = tag[1:]
-            new_tags.append(tag)
-        return new_tags
+            processed_tags.append(tag)
+        return processed_tags
 
     def parse_datetime(self, key):
         value = self._meta.get(key, None)

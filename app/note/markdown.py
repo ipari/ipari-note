@@ -6,13 +6,14 @@ from markdown.extensions.toc import TocExtension
 from markdown.extensions.wikilinks \
     import WikiLinkExtension, WikiLinksInlineProcessor
 from markdown.inlinepatterns import InlineProcessor, LinkInlineProcessor
+from markdown.preprocessors import Preprocessor
 from app.config.model import Config
 
 
 def md_extensions():
     extensions = []
     # https://python-markdown.github.io/extensions/
-    extensions.append('markdown.extensions.meta')
+    # extensions.append('markdown.extensions.meta')
     extensions.append('markdown.extensions.fenced_code')
     extensions.append('markdown.extensions.codehilite')
     extensions.append('markdown.extensions.tables')
@@ -32,6 +33,7 @@ def md_extensions():
 
     extensions.append(AutolinkExtensionCustom())
     extensions.append(LinkInlineExtension())
+    extensions.append(MetaExtension())
 
     return extensions
 
@@ -113,6 +115,63 @@ class LinkInlineExtension(Extension):
         md.inlinePatterns.deregister('link')
         md.inlinePatterns.register(
             LinkInlineProcessorCustom(link_re, md), 'link', 160)
+
+
+##############################################################################
+# 메타 데이터에서 yaml list 포맷을 허용하도록
+# 기본 메타 익스텐션은 공백 4칸으로 목록을 지정하는데 이것을 - 으로 시작하도록 수정한다.
+##############################################################################
+
+META_RE = re.compile(r'^[ ]{0,3}(?P<key>[A-Za-z0-9_-]+):\s*(?P<value>.*)')
+META_MORE_RE = re.compile(r'^[ ]{2,}[-]{1}[ ]{1}(?P<value>.*)')
+BEGIN_RE = re.compile(r'^-{3}(\s.*)?')
+END_RE = re.compile(r'^(-{3}|\.{3})(\s.*)?')
+
+
+class MetaExtension (Extension):
+    """ Meta-Data extension for Python-Markdown. """
+
+    def extendMarkdown(self, md):
+        """ Add MetaPreprocessor to Markdown instance. """
+        md.registerExtension(self)
+        self.md = md
+        md.preprocessors.register(MetaPreprocessor(md), 'meta', 27)
+
+    def reset(self):
+        self.md.Meta = {}
+
+
+class MetaPreprocessor(Preprocessor):
+    """ Get Meta-Data. """
+
+    def run(self, lines):
+        """ Parse Meta-Data and store in Markdown.Meta. """
+        meta = {}
+        key = None
+        if lines and BEGIN_RE.match(lines[0]):
+            lines.pop(0)
+        while lines:
+            line = lines.pop(0)
+            m1 = META_RE.match(line)
+            if line.strip() == '' or END_RE.match(line):
+                break  # blank line or end of YAML header - done
+            if m1:
+                key = m1.group('key').lower().strip()
+                value = m1.group('value').strip()
+                try:
+                    meta[key].append(value)
+                except KeyError:
+                    meta[key] = [value]
+            else:
+                m2 = META_MORE_RE.match(line)
+                if m2 and key:
+                    # Add another line to existing key
+                    meta[key].append(m2.group('value').strip())
+                else:
+                    lines.insert(0, line)
+                    break  # no meta data - done
+        self.md.Meta = meta
+        return lines
 
 
 def _slugify(value, _):
