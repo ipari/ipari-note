@@ -2,7 +2,6 @@ from flask import Blueprint, flash, redirect, request, render_template, session
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, PasswordField, StringField, SubmitField
 
-from app.note.note import get_base_meta, get_menu_list
 from app.user.model import User
 
 
@@ -23,6 +22,7 @@ def route_login():
 
     form = LoginForm()
     if request.method == 'GET':
+        from app.note.note import get_base_meta, get_menu_list
         form.referrer.data = request.referrer
         meta = get_base_meta()
         menu = get_menu_list()
