@@ -274,7 +274,7 @@ div.permission {
     border-radius: 4px;
     overflow-x: auto;
     font-size: 85%;
-    background-color: #f5f5f5;
+    background-color: #e5e5e5;
 }
 
 div.permission strong {
@@ -417,8 +417,8 @@ div.meta {
     margin: .6em 0 2.5em;
     padding: .4em 0;
     font-size: 16px;
-    border-top: 1px solid #f0f0f0;
-    border-bottom: 1px solid #f0f0f0;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
 }
 div.meta dt:after {
     content: ':';
