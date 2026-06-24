@@ -3,7 +3,6 @@
 venv
 venv-windows
 *.sh
-
 *.pyc
 *.sqlite
 config.py
@@ -13,3 +12,4 @@ data/pages/*
 !data/pages/ipari-note
 robots.txt
 *.xml
+AGENTS.md
