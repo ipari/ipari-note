@@ -136,10 +136,10 @@ class ObsidianLinkInlineProcessor(InlineProcessor):
             href += '#{}'.format(_slugify(heading, '-'))
         return href or '#'
 
-    @staticmethod
-    def build_file_url(target):
+    def build_file_url(self, target):
         page, _ = ObsidianLinkInlineProcessor.split_heading(target)
-        return quote(page, safe='/')
+        base_url = self.config.get('base_url', '/')
+        return '{}{}'.format(base_url, quote(page, safe='/'))
 
 
 class AutolinkInlineProcessor(InlineProcessor):

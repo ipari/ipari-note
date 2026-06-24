@@ -69,8 +69,22 @@ class ObsidianMarkdownTest(unittest.TestCase):
         html = render('![[attachments/photo 1.png]]')
 
         self.assertIn('<img', html)
-        self.assertIn('src="attachments/photo%201.png"', html)
+        self.assertIn('src="/note/attachments/photo%201.png"', html)
         self.assertIn('alt="attachments/photo 1.png"', html)
+
+    def test_image_embed_renders_vault_root_path(self):
+        html = render(
+            '![[2_Areas/건강/건강기록/_media/'
+            '251021 안과 검진_20251021_192414.jpg]]'
+        )
+
+        self.assertIn(
+            'src="/note/2_Areas/%EA%B1%B4%EA%B0%95/'
+            '%EA%B1%B4%EA%B0%95%EA%B8%B0%EB%A1%9D/_media/'
+            '251021%20%EC%95%88%EA%B3%BC%20%EA%B2%80%EC%A7%84'
+            '_20251021_192414.jpg"',
+            html,
+        )
 
 
 if __name__ == '__main__':
