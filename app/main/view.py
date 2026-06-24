@@ -44,7 +44,7 @@ def view_tags():
                            tag_info=tag_info)
 
 
-@bp.route('/tags/<tag>')
+@bp.route('/tags/<path:tag>')
 def view_tag(tag):
     posts, next_url, prev_url = get_tag_page(tag)
     return render_template('posts.html',
@@ -56,7 +56,7 @@ def view_tag(tag):
                            prev_url=prev_url)
 
 
-@bp.route('/tags/<tag>/<int:page>')
+@bp.route('/tags/<path:tag>/<int:page>')
 def view_tag_posts(tag, page):
     posts, next_url, prev_url = get_tag_page(tag, page=page)
     return render_template('posts.html',

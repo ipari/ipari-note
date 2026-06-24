@@ -36,7 +36,7 @@
         <div class="tags">
             {% if meta.tags %}
             {% for tag in meta.tags %}
-                <a href="/tags/{{ tag }}" class="wikilink">#{{ tag }}</a>{% if not loop.last %}, {% endif %}
+                <a href="{{ url_for('main.view_tag', tag=tag) }}" class="wikilink">#{{ tag }}</a>{% if not loop.last %}, {% endif %}
             {% endfor %}
             {% endif %}
         </div>
