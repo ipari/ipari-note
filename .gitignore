@@ -1,5 +1,6 @@
 .idea
 .venv
+.venv-win
 venv
 venv-windows
 *.sh
