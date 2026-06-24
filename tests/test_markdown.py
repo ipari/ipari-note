@@ -86,6 +86,28 @@ class ObsidianMarkdownTest(unittest.TestCase):
             html,
         )
 
+    def test_list_after_paragraph_without_blank_line(self):
+        html = render('Some Text\n- Render\n- List')
+
+        self.assertIn('<p>Some Text</p>', html)
+        self.assertIn('<ul>', html)
+        self.assertIn('<li>Render</li>', html)
+        self.assertIn('<li>List</li>', html)
+
+    def test_ordered_list_after_paragraph_without_blank_line(self):
+        html = render('Some Text\n1. Render\n2. List')
+
+        self.assertIn('<p>Some Text</p>', html)
+        self.assertIn('<ol>', html)
+        self.assertIn('<li>Render</li>', html)
+        self.assertIn('<li>List</li>', html)
+
+    def test_list_marker_in_fenced_code_is_not_changed(self):
+        html = render('```markdown\nSome Text\n- Not List\n```')
+
+        self.assertIn('<code>', html)
+        self.assertNotIn('<ul>', html)
+
 
 if __name__ == '__main__':
     unittest.main()

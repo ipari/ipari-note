@@ -40,6 +40,7 @@ def md_extensions():
 
     extensions.append(AutolinkExtensionCustom())
     extensions.append(LinkInlineExtension())
+    extensions.append(ObsidianBlockExtension())
     extensions.append(MetaExtension())
 
     return extensions
@@ -195,6 +196,52 @@ class LinkInlineExtension(Extension):
         md.inlinePatterns.deregister('link')
         md.inlinePatterns.register(
             LinkInlineProcessorCustom(link_re, md), 'link', 160)
+
+
+class ObsidianBlockExtension(Extension):
+
+    def extendMarkdown(self, md):
+        md.preprocessors.register(ObsidianBlockPreprocessor(md),
+                                  'obsidian_block', 26)
+
+
+class ObsidianBlockPreprocessor(Preprocessor):
+
+    LIST_RE = re.compile(r'^[ ]{0,3}(([-+*])|([0-9]+[.)]))[ \t]+')
+    FENCE_RE = re.compile(r'^[ ]{0,3}(`{3,}|~{3,})')
+
+    def run(self, lines):
+        processed = []
+        in_fence = False
+        fence_marker = None
+
+        for line in lines:
+            fence_match = self.FENCE_RE.match(line)
+            if fence_match:
+                marker = fence_match.group(1)
+                if not in_fence:
+                    in_fence = True
+                    fence_marker = marker[0]
+                elif marker.startswith(fence_marker):
+                    in_fence = False
+                    fence_marker = None
+
+            if self.needs_blank_before_list(processed, line, in_fence):
+                processed.append('')
+            processed.append(line)
+
+        return processed
+
+    def needs_blank_before_list(self, processed, line, in_fence):
+        if in_fence or not processed:
+            return False
+        if not self.LIST_RE.match(line):
+            return False
+
+        prev_line = processed[-1]
+        if prev_line.strip() == '':
+            return False
+        return not self.LIST_RE.match(prev_line)
 
 
 ##############################################################################
