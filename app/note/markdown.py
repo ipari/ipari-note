@@ -1,13 +1,20 @@
 import re
 import xml.etree.ElementTree as etree
+from urllib.parse import quote
 from markdown import util
 from markdown.extensions import Extension
 from markdown.extensions.toc import TocExtension
 from markdown.extensions.wikilinks \
-    import WikiLinkExtension, WikiLinksInlineProcessor
+    import WikiLinkExtension
 from markdown.inlinepatterns import InlineProcessor, LinkInlineProcessor
 from markdown.preprocessors import Preprocessor
 from app.config.model import Config
+
+
+IMAGE_EXTENSIONS = {
+    '.apng', '.avif', '.bmp', '.gif', '.ico', '.jpeg', '.jpg',
+    '.png', '.svg', '.webp',
+}
 
 
 def md_extensions():
@@ -53,13 +60,86 @@ class WikiLinkExtensionCustom(WikiLinkExtension):
         self.md = md
 
         # append to end of inline patterns
-        wikilink_re = r'\[\[([\w0-9_ -/]+)\]\]'
+        wikilink_re = r'(!?)\[\[([^\]\n]+)\]\]'
         config = self.getConfigs()
-        config['build_url'] = lambda label, base, end:  '{}{}{}'.format(base, label, end)
-        wikilink_pattern = \
-            WikiLinksInlineProcessor(wikilink_re, config)
+        wikilink_pattern = ObsidianLinkInlineProcessor(wikilink_re, config)
         wikilink_pattern.md = md
         md.inlinePatterns.register(wikilink_pattern, 'wikilink', 75)
+
+
+class ObsidianLinkInlineProcessor(InlineProcessor):
+
+    def __init__(self, pattern, config):
+        super(ObsidianLinkInlineProcessor, self).__init__(pattern)
+        self.config = config
+
+    def handleMatch(self, m, data):
+        is_embed = bool(m.group(1))
+        raw_link = m.group(2).strip()
+        target, label = self.parse_link(raw_link)
+
+        if is_embed and self.is_image(target):
+            el = etree.Element('img')
+            el.set('src', self.build_file_url(target))
+            el.set('alt', label or target)
+            return el, m.start(0), m.end(0)
+
+        el = etree.Element('a')
+        el.set('href', self.build_note_url(target))
+        el.set('class', self.config.get('html_class', 'wikilink'))
+        el.text = label or self.default_label(target)
+        return el, m.start(0), m.end(0)
+
+    @staticmethod
+    def parse_link(raw_link):
+        parts = raw_link.split('|', 1)
+        target = parts[0].strip()
+        label = parts[1].strip() if len(parts) > 1 else None
+        return target, label
+
+    @staticmethod
+    def is_image(target):
+        path = target.split('#', 1)[0].split('?', 1)[0]
+        dot_index = path.rfind('.')
+        if dot_index < 0:
+            return False
+        return path[dot_index:].lower() in IMAGE_EXTENSIONS
+
+    @staticmethod
+    def default_label(target):
+        page, heading = ObsidianLinkInlineProcessor.split_heading(target)
+        if page:
+            return page
+        return heading or target
+
+    @staticmethod
+    def split_heading(target):
+        if '#' not in target:
+            return target, None
+        page, heading = target.split('#', 1)
+        return page, heading
+
+    def build_note_url(self, target):
+        page, heading = self.split_heading(target)
+        if page:
+            base_url = self.config.get('base_url', '/')
+            end_url = self.config.get('end_url', '')
+            href = '{}{}{}'.format(
+                base_url,
+                quote(page, safe='/'),
+                end_url,
+            )
+        else:
+            href = ''
+
+        if heading:
+            href += '#{}'.format(_slugify(heading, '-'))
+        return href or '#'
+
+    @staticmethod
+    def build_file_url(target):
+        page, _ = ObsidianLinkInlineProcessor.split_heading(target)
+        return quote(page, safe='/')
 
 
 class AutolinkInlineProcessor(InlineProcessor):
