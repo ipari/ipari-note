@@ -43,7 +43,7 @@ class NoteMeta(object):
         self._meta = {k.lower(): v for k, v in _meta.items()}
 
         path, ext = os.path.splitext(filepath)
-        self.title = path.split('/')[-1]
+        self.title = os.path.basename(path)
         self.path, _ = os.path.splitext(os.path.relpath(filepath, ROOT_PATH))
         self.filepath = filepath
         self.permission = self.parse_permission()
@@ -307,11 +307,11 @@ def edit_page(page_path):
 
     # ` 문자는 ES6에서 템플릿 문자로 사용되므로 escape 해줘야 한다.
     # https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Template_literals
-    raw_md = raw_md.replace('`', '\`')
+    raw_md = raw_md.replace('`', '\\`')
 
     # 문자 내에 </script>가 있으면 <\/script> 로 처리해줘야한다.
     # https://softwareengineering.stackexchange.com/questions/139372/referencing-external-javascript-vs-hosting-my-own-copy/139380#139380
-    raw_md = raw_md.replace('</script>', '<\/script>')
+    raw_md = raw_md.replace('</script>', '<\\/script>')
 
     # FIXME: 수정해야함
     base_url = 'note'
@@ -425,7 +425,11 @@ def get_post_info_from_notes(list_of_note):
 def get_posted_page(page=1):
     base_query = Note.query.filter_by(permission=Permission.PUBLIC, posted=1).\
         order_by(Note.pinned.desc(), Note.updated.desc())
-    page = base_query.paginate(page, Config.get('post_per_page'), False)
+    page = base_query.paginate(
+        page=page,
+        per_page=Config.get('post_per_page'),
+        error_out=False,
+    )
 
     next_url = None
     prev_url = None
@@ -443,7 +447,11 @@ def get_tag_page(tag, page=1):
     base_query = Note.query.join(Tag, Note.id == Tag.note_id)\
         .filter(Tag.tag == tag, Note.permission >= permission)\
         .order_by(Note.updated.desc())
-    page = base_query.paginate(page, Config.get('post_per_page'), False)
+    page = base_query.paginate(
+        page=page,
+        per_page=Config.get('post_per_page'),
+        error_out=False,
+    )
 
     next_url = None
     prev_url = None

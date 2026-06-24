@@ -49,7 +49,7 @@ class PageWatcher(object):
         buffer = self.page_handler.buffer
         buffer = list(set(buffer))
         # 파일 이동 시 새 경로에 생성을 먼저 하고 삭제 처리 하도록 한다.
-        buffer = sorted(buffer, key=lambda x: self.event_order.index(x.key[0]))
+        buffer = sorted(buffer, key=self.event_sort_key)
         for event in buffer:
             _, ext = os.path.splitext(event.src_path)
             if ext != MARKDOWN_EXT:
@@ -63,6 +63,12 @@ class PageWatcher(object):
                     update_db(event.src_path)
 
         self.page_handler.clear_buffer()
+
+    def event_sort_key(self, event):
+        try:
+            return self.event_order.index(event.event_type)
+        except ValueError:
+            return len(self.event_order)
 
     def handle_user_events(self):
         if not self.user_handler.buffer:
@@ -86,7 +92,8 @@ class PageWatcher(object):
 
 class EventHandler(FileSystemEventHandler):
 
-    buffer = []
+    def __init__(self):
+        self.buffer = []
 
     def clear_buffer(self):
         self.buffer = []
