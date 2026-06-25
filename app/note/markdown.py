@@ -253,10 +253,14 @@ class ObsidianBlockPreprocessor(Preprocessor):
 
         checked = match.group('checked').lower() == 'x'
         checked_attr = ' checked="checked"' if checked else ''
-        return '{}<input type="checkbox" disabled="disabled"{}>{}'.format(
+        return (
+            '{}<input class="task-list-item-checkbox" type="checkbox" '
+            'disabled="disabled"{}>'
+            '<span class="task-list-item-text">{}</span>'
+        ).format(
             match.group('prefix'),
             checked_attr,
-            match.group('rest'),
+            match.group('rest').lstrip(),
         )
 
     def is_list_item_context(self, prefix, list_indents):

@@ -113,25 +113,28 @@ class ObsidianMarkdownTest(unittest.TestCase):
 
         self.assertIn('<ul>', html)
         self.assertIn(
-            '<input type="checkbox" disabled="disabled">',
+            '<input class="task-list-item-checkbox" '
+            'type="checkbox" disabled="disabled">',
             html,
         )
-        self.assertIn('Todo</li>', html)
+        self.assertIn('<span class="task-list-item-text">Todo</span>', html)
 
     def test_checked_checkbox_renders_checked_input(self):
         html = render('- [x] Done')
 
         self.assertIn(
-            '<input type="checkbox" disabled="disabled" checked="checked">',
+            '<input class="task-list-item-checkbox" '
+            'type="checkbox" disabled="disabled" checked="checked">',
             html,
         )
-        self.assertIn('Done</li>', html)
+        self.assertIn('<span class="task-list-item-text">Done</span>', html)
 
     def test_empty_checkbox_renders_input(self):
         html = render('- [ ]')
 
         self.assertIn(
-            '<input type="checkbox" disabled="disabled">',
+            '<input class="task-list-item-checkbox" '
+            'type="checkbox" disabled="disabled">',
             html,
         )
 
@@ -140,7 +143,14 @@ class ObsidianMarkdownTest(unittest.TestCase):
 
         self.assertEqual(html.count('type="checkbox"'), 6)
         self.assertEqual(html.count('checked="checked"'), 3)
+        self.assertEqual(html.count('class="task-list-item-text"'), 6)
         self.assertNotIn('<li>[x]</li>', html)
+
+    def test_checkbox_text_renders_inline_markdown(self):
+        html = render('- [x] [Done](https://example.com)')
+
+        self.assertIn('<span class="task-list-item-text">', html)
+        self.assertIn('<a href="https://example.com" target="_blank">Done</a>', html)
 
     def test_indented_code_checkbox_is_not_changed(self):
         html = render('    - [x] Not Done')

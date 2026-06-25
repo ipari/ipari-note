@@ -407,6 +407,33 @@ div.article li p {
     margin: 0;
 }
 
+div.article input.task-list-item-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1em;
+    height: 1em;
+    margin: 0 .35em 0 0;
+    border: 1px solid #b9c5ca;
+    border-radius: .2em;
+    background-color: #ffffff;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: .75em .75em;
+    vertical-align: -0.12em;
+    opacity: 1;
+}
+
+div.article input.task-list-item-checkbox:checked {
+    border-color: #2a99b6;
+    background-color: #2a99b6;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 12 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 5l3 3 7-7' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+div.article input.task-list-item-checkbox:checked + span.task-list-item-text {
+    color: #999;
+    text-decoration: line-through;
+}
+
 div.article > ul,
 div.article > ol,
 div.footnote > ol {
