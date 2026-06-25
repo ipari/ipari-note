@@ -10,7 +10,7 @@ from app import db
 from app.utils import format_datetime
 from app.config.model import Config
 from app.user.model import User
-from app.note.markdown import md_extensions
+from app.note.markdown import md_extensions, set_task_checkbox
 from app.note.model import Note, Tag
 from app.note.permission import Permission
 
@@ -207,6 +207,34 @@ def serve_page(note, from_encrypted_path=False):
                                pagename=note.path,
                                content=note.html)
     return error_page(page_path=note.path)
+
+
+def update_task_checkbox(page_path):
+    if not User.is_logged_in():
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    note = Note.query.filter_by(path=page_path).first()
+    if note is None:
+        return jsonify({'error': 'Not Found'}), 404
+
+    payload = request.get_json() or {}
+    try:
+        task_index = int(payload['task_index'])
+    except (KeyError, TypeError, ValueError):
+        return jsonify({'error': 'Invalid task index'}), 400
+
+    checked = bool(payload.get('checked', False))
+    raw_md = read_md(note.filepath)
+    if raw_md is None:
+        return jsonify({'error': 'Not Found'}), 404
+
+    updated_md = set_task_checkbox(raw_md, task_index, checked)
+    if updated_md is None:
+        return jsonify({'error': 'Task checkbox not found'}), 404
+
+    save_page(note.filepath, updated_md)
+    update_db(note.filepath)
+    return jsonify({'checked': checked})
 
 
 def serve_file(page_path):

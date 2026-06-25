@@ -46,6 +46,50 @@ def md_extensions():
     return extensions
 
 
+def set_task_checkbox(raw_md, task_index, checked):
+    processor = ObsidianBlockPreprocessor()
+    lines = raw_md.splitlines(keepends=True)
+    list_indents = []
+    in_fence = False
+    fence_marker = None
+    current_index = 0
+
+    for i, line in enumerate(lines):
+        line_body = line.rstrip('\r\n')
+        line_break = line[len(line_body):]
+
+        fence_match = processor.FENCE_RE.match(line_body)
+        if fence_match:
+            marker = fence_match.group(1)
+            if not in_fence:
+                in_fence = True
+                fence_marker = marker[0]
+            elif marker.startswith(fence_marker):
+                in_fence = False
+                fence_marker = None
+
+        if in_fence:
+            continue
+
+        match = processor.CHECKBOX_RE.match(line_body)
+        if match and processor.is_list_item_context(match.group('prefix'),
+                                                    list_indents):
+            if current_index == task_index:
+                marker = 'x' if checked else ' '
+                lines[i] = '{}[{}]{}{}'.format(
+                    match.group('prefix'),
+                    marker,
+                    match.group('rest'),
+                    line_break,
+                )
+                return ''.join(lines)
+            current_index += 1
+
+        processor.update_list_indents(line_body, list_indents)
+
+    return None
+
+
 class WikiLinkExtensionCustom(WikiLinkExtension):
     """
     기본 WikiLinkExtension 은  '/'가 있으면 링크로 인식하지 않는다.
@@ -222,6 +266,7 @@ class ObsidianBlockPreprocessor(Preprocessor):
         in_fence = False
         fence_marker = None
         list_indents = []
+        task_index = 0
 
         for line in lines:
             fence_match = self.FENCE_RE.match(line)
@@ -237,31 +282,33 @@ class ObsidianBlockPreprocessor(Preprocessor):
             if self.needs_blank_before_list(processed, line, in_fence):
                 processed.append('')
             if not in_fence:
-                line = self.render_checkbox(line, list_indents)
+                line, task_index = self.render_checkbox(line, list_indents,
+                                                        task_index)
                 self.update_list_indents(line, list_indents)
             processed.append(line)
 
         return processed
 
-    def render_checkbox(self, line, list_indents):
+    def render_checkbox(self, line, list_indents, task_index):
         match = self.CHECKBOX_RE.match(line)
         if not match:
-            return line
+            return line, task_index
         if not self.is_list_item_context(match.group('prefix'),
                                          list_indents):
-            return line
+            return line, task_index
 
         checked = match.group('checked').lower() == 'x'
         checked_attr = ' checked="checked"' if checked else ''
         return (
             '{}<input class="task-list-item-checkbox" type="checkbox" '
-            'disabled="disabled"{}>'
+            'disabled="disabled" data-task-index="{}"{}>'
             '<span class="task-list-item-text">{}</span>'
         ).format(
             match.group('prefix'),
+            task_index,
             checked_attr,
             match.group('rest').lstrip(),
-        )
+        ), task_index + 1
 
     def is_list_item_context(self, prefix, list_indents):
         indent = len(prefix) - len(prefix.lstrip(' '))

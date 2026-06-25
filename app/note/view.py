@@ -59,6 +59,11 @@ def route_edit(page_path):
         return redirect(url_for('note.route_page', page_path=page_path))
 
 
+@bp.route('/<path:page_path>/task-checkbox', methods=['POST'])
+def route_task_checkbox(page_path):
+    return update_task_checkbox(page_path)
+
+
 @bp.route('/<path:page_path>/upload', methods=['POST'])
 def route_upload(page_path):
     if request.method == 'POST':

@@ -3,7 +3,11 @@
 {% block pagename %}{{ pagename }}{% endblock %}
 
 {% block content %}
-    <div class="article">
+    <div class="article"
+        {% if meta.logged_in and meta.is_page %}
+        data-task-checkbox-url="{{ url_for('note.route_task_checkbox', page_path=pagename) }}"
+        {% endif %}
+    >
     {% set path_elems = pagename.split('/') %}
     <h1>
         <p>

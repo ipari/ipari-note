@@ -16,6 +16,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // 비디오 폭 설정
     resizeVideos();
 
+    // 렌더링된 체크박스 편집
+    bindTaskCheckboxes();
+
     // To Top 버튼
     let toTop = select("div.to-top a");
     if (toTop != null) {
@@ -66,6 +69,48 @@ function selects(query) {
 function isHidden(e) {
     let style = window.getComputedStyle(e);
     return (style.display === 'none');
+}
+
+function bindTaskCheckboxes() {
+    let article = select("div.article[data-task-checkbox-url]");
+    if (article == null) {
+        return;
+    }
+
+    let checkboxes = article.querySelectorAll("input.task-list-item-checkbox");
+    checkboxes.forEach(checkbox => {
+        checkbox.disabled = false;
+        checkbox.addEventListener("change", function() {
+            updateTaskCheckbox(article.dataset.taskCheckboxUrl, checkbox);
+        });
+    });
+}
+
+function updateTaskCheckbox(url, checkbox) {
+    let checked = checkbox.checked;
+    checkbox.disabled = true;
+
+    fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            task_index: checkbox.dataset.taskIndex,
+            checked: checked
+        })
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error("Failed to update task checkbox.");
+        }
+        return response.json();
+    }).then(() => {
+        checkbox.disabled = false;
+    }).catch(() => {
+        checkbox.checked = !checked;
+        checkbox.disabled = false;
+        alert("체크박스를 저장하지 못했습니다.");
+    });
 }
 
 function previewMarkdown(preview, plainText, url) {

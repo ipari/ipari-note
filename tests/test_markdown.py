@@ -114,7 +114,7 @@ class ObsidianMarkdownTest(unittest.TestCase):
         self.assertIn('<ul>', html)
         self.assertIn(
             '<input class="task-list-item-checkbox" '
-            'type="checkbox" disabled="disabled">',
+            'type="checkbox" disabled="disabled" data-task-index="0">',
             html,
         )
         self.assertIn('<span class="task-list-item-text">Todo</span>', html)
@@ -124,7 +124,8 @@ class ObsidianMarkdownTest(unittest.TestCase):
 
         self.assertIn(
             '<input class="task-list-item-checkbox" '
-            'type="checkbox" disabled="disabled" checked="checked">',
+            'type="checkbox" disabled="disabled" data-task-index="0" '
+            'checked="checked">',
             html,
         )
         self.assertIn('<span class="task-list-item-text">Done</span>', html)
@@ -134,7 +135,7 @@ class ObsidianMarkdownTest(unittest.TestCase):
 
         self.assertIn(
             '<input class="task-list-item-checkbox" '
-            'type="checkbox" disabled="disabled">',
+            'type="checkbox" disabled="disabled" data-task-index="0">',
             html,
         )
 
@@ -144,6 +145,7 @@ class ObsidianMarkdownTest(unittest.TestCase):
         self.assertEqual(html.count('type="checkbox"'), 6)
         self.assertEqual(html.count('checked="checked"'), 3)
         self.assertEqual(html.count('class="task-list-item-text"'), 6)
+        self.assertIn('data-task-index="5"', html)
         self.assertNotIn('<li>[x]</li>', html)
 
     def test_checkbox_text_renders_inline_markdown(self):
@@ -151,6 +153,27 @@ class ObsidianMarkdownTest(unittest.TestCase):
 
         self.assertIn('<span class="task-list-item-text">', html)
         self.assertIn('<a href="https://example.com" target="_blank">Done</a>', html)
+
+    def test_set_task_checkbox_updates_by_index(self):
+        raw_md = '- [ ] One\n- [ ] Two\n  - [x] Three\n'
+
+        updated = markdown_module.set_task_checkbox(raw_md, 1, True)
+
+        self.assertEqual(updated, '- [ ] One\n- [x] Two\n  - [x] Three\n')
+
+    def test_set_task_checkbox_updates_nested_checkbox(self):
+        raw_md = '- [ ] One\n  - [x] Two\n    - [ ] Three\n'
+
+        updated = markdown_module.set_task_checkbox(raw_md, 2, True)
+
+        self.assertEqual(updated, '- [ ] One\n  - [x] Two\n    - [x] Three\n')
+
+    def test_set_task_checkbox_ignores_fenced_code(self):
+        raw_md = '```markdown\n- [ ] Code\n```\n- [ ] Task\n'
+
+        updated = markdown_module.set_task_checkbox(raw_md, 0, True)
+
+        self.assertEqual(updated, '```markdown\n- [ ] Code\n```\n- [x] Task\n')
 
     def test_indented_code_checkbox_is_not_changed(self):
         html = render('    - [x] Not Done')
