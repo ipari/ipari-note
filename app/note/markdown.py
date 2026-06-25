@@ -208,12 +208,20 @@ class ObsidianBlockExtension(Extension):
 class ObsidianBlockPreprocessor(Preprocessor):
 
     LIST_RE = re.compile(r'^[ ]{0,3}(([-+*])|([0-9]+[.)]))[ \t]+')
+    LIST_ITEM_RE = re.compile(
+        r'^(?P<indent> *)(([-+*])|([0-9]+[.)]))[ \t]+'
+    )
+    CHECKBOX_RE = re.compile(
+        r'^(?P<prefix> *(([-+*])|([0-9]+[.)]))[ \t]+)'
+        r'\[(?P<checked>[ xX])\](?P<rest>[ \t].*|[ \t]*$)'
+    )
     FENCE_RE = re.compile(r'^[ ]{0,3}(`{3,}|~{3,})')
 
     def run(self, lines):
         processed = []
         in_fence = False
         fence_marker = None
+        list_indents = []
 
         for line in lines:
             fence_match = self.FENCE_RE.match(line)
@@ -228,9 +236,49 @@ class ObsidianBlockPreprocessor(Preprocessor):
 
             if self.needs_blank_before_list(processed, line, in_fence):
                 processed.append('')
+            if not in_fence:
+                line = self.render_checkbox(line, list_indents)
+                self.update_list_indents(line, list_indents)
             processed.append(line)
 
         return processed
+
+    def render_checkbox(self, line, list_indents):
+        match = self.CHECKBOX_RE.match(line)
+        if not match:
+            return line
+        if not self.is_list_item_context(match.group('prefix'),
+                                         list_indents):
+            return line
+
+        checked = match.group('checked').lower() == 'x'
+        checked_attr = ' checked="checked"' if checked else ''
+        return '{}<input type="checkbox" disabled="disabled"{}>{}'.format(
+            match.group('prefix'),
+            checked_attr,
+            match.group('rest'),
+        )
+
+    def is_list_item_context(self, prefix, list_indents):
+        indent = len(prefix) - len(prefix.lstrip(' '))
+        if indent <= 3:
+            return True
+        return any(list_indent < indent for list_indent in list_indents)
+
+    def update_list_indents(self, line, list_indents):
+        match = self.LIST_ITEM_RE.match(line)
+        if not match:
+            if line.strip() == '':
+                return
+            list_indents[:] = []
+            return
+
+        indent = len(match.group('indent'))
+        list_indents[:] = [
+            list_indent for list_indent in list_indents
+            if list_indent < indent
+        ]
+        list_indents.append(indent)
 
     def needs_blank_before_list(self, processed, line, in_fence):
         if in_fence or not processed:

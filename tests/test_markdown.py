@@ -108,6 +108,52 @@ class ObsidianMarkdownTest(unittest.TestCase):
         self.assertIn('<code>', html)
         self.assertNotIn('<ul>', html)
 
+    def test_unchecked_checkbox_renders_input(self):
+        html = render('- [ ] Todo')
+
+        self.assertIn('<ul>', html)
+        self.assertIn(
+            '<input type="checkbox" disabled="disabled">',
+            html,
+        )
+        self.assertIn('Todo</li>', html)
+
+    def test_checked_checkbox_renders_checked_input(self):
+        html = render('- [x] Done')
+
+        self.assertIn(
+            '<input type="checkbox" disabled="disabled" checked="checked">',
+            html,
+        )
+        self.assertIn('Done</li>', html)
+
+    def test_empty_checkbox_renders_input(self):
+        html = render('- [ ]')
+
+        self.assertIn(
+            '<input type="checkbox" disabled="disabled">',
+            html,
+        )
+
+    def test_nested_checkbox_renders_input(self):
+        html = render('- [ ]\n- [ ]\n  - [x]\n    - [x]\n  - [ ]\n- [x]')
+
+        self.assertEqual(html.count('type="checkbox"'), 6)
+        self.assertEqual(html.count('checked="checked"'), 3)
+        self.assertNotIn('<li>[x]</li>', html)
+
+    def test_indented_code_checkbox_is_not_changed(self):
+        html = render('    - [x] Not Done')
+
+        self.assertIn('<code>', html)
+        self.assertNotIn('type="checkbox"', html)
+
+    def test_checkbox_in_fenced_code_is_not_changed(self):
+        html = render('```markdown\n- [x] Not Done\n```')
+
+        self.assertIn('<code>', html)
+        self.assertNotIn('type="checkbox"', html)
+
 
 if __name__ == '__main__':
     unittest.main()

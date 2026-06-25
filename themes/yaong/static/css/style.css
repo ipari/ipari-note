@@ -404,6 +404,7 @@ div.article li::marker {
 
 div.article li p {
     vertical-align: top;
+    margin: 0;
 }
 
 div.article > ul,
