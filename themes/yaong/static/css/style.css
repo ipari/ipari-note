@@ -673,6 +673,15 @@ div.error {
     margin-bottom: .6em;
 }
 
+div.messages {
+    margin-bottom: .6em;
+    color: #2a99b6;
+}
+
+div.messages p {
+    margin: 0 0 .3em;
+}
+
 div.login form div {
     margin-bottom: .6em;
 }
@@ -683,9 +692,17 @@ div.login label {
 }
 
 input[type=text],
-input[type=password] {
+input[type=password],
+input[type=number],
+input[type=url],
+textarea {
+    box-sizing: border-box;
     padding: .2em .4em;
     font-size: 90%;
+}
+
+textarea {
+    vertical-align: top;
 }
 
 input[type=submit],
@@ -702,6 +719,64 @@ input[type=button] {
 input[type=submit]:hover,
 input[type=button]:hover {
     background-color: #6cb0bf;
+}
+
+form.config {
+    margin: 1.5em 0;
+}
+
+form.config fieldset {
+    margin: 0 0 1em;
+    padding: .8em 1em 1em;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+}
+
+form.config legend {
+    padding: 0 .4em;
+    color: #2a99b6;
+}
+
+form.config fieldset div {
+    display: flex;
+    gap: .8em;
+    margin-bottom: .6em;
+}
+
+form.config fieldset div:last-child {
+    margin-bottom: 0;
+}
+
+form.config label {
+    flex: 0 0 9em;
+    text-align: right;
+}
+
+form.config input[type=text],
+form.config input[type=number],
+form.config input[type=url],
+form.config textarea {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+@media (max-width: 560px) {
+    form.config fieldset div {
+        display: block;
+    }
+
+    form.config label {
+        display: block;
+        margin-bottom: .2em;
+        text-align: left;
+    }
+
+    form.config input[type=text],
+    form.config input[type=number],
+    form.config input[type=url],
+    form.config textarea {
+        width: 100%;
+    }
 }
 
 

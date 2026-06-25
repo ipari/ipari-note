@@ -16,7 +16,8 @@ def dump_yaml(data, path):
     with open(path, 'w', encoding='utf-8') as f:
         # https://stackoverflow.com/questions/13518819/avoid-references-in-pyyaml
         yaml.Dumper.ignore_aliases = lambda *args: True
-        yaml.safe_dump(data, f,  default_flow_style=False, allow_unicode=True)
+        yaml.safe_dump(data, f,  default_flow_style=False, allow_unicode=True,
+                       sort_keys=False)
 
 
 def is_file_exist(path):
