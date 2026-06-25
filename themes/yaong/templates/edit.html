@@ -16,6 +16,7 @@
     <h1>{{ pagename }}</h1>
 
     <form method="post" class="editor">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div id="editor"></div>
         <div class="buttons">
             <input type="button" value="저장" onclick="post_content()" />
@@ -43,7 +44,10 @@
                     method: "post",
                     url: postUrl,
                     data: formData,
-                    headers: { "Content-Type": "multipart/form-data" }
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        "X-CSRFToken": document.querySelector('meta[name="csrf-token"]').content
+                    }
                 }).then(function(response) {
                     callback(response.data.filename, 'alt text');
                     return false;

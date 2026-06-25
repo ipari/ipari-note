@@ -89,11 +89,13 @@ function bindTaskCheckboxes() {
 function updateTaskCheckbox(url, checkbox) {
     let checked = checkbox.checked;
     checkbox.disabled = true;
+    let csrfToken = select('meta[name="csrf-token"]').content;
 
     fetch(url, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
         },
         body: JSON.stringify({
             task_index: checkbox.dataset.taskIndex,
@@ -118,9 +120,11 @@ function previewMarkdown(preview, plainText, url) {
   let parameters = {
     "raw_md": plainText
   };
+  let csrfToken = select('meta[name="csrf-token"]').content;
 
   ajax.open("POST", url, true);
   ajax.setRequestHeader("Content-type", "application/json");
+  ajax.setRequestHeader("X-CSRFToken", csrfToken);
   ajax.onreadystatechange = function() {
       if (ajax.readyState === 4 && ajax.status === 200) {
           preview.innerHTML = ajax.responseText;
