@@ -1,7 +1,7 @@
 import markdown
 import os
 from datetime import datetime
-from flask import current_app, flash, jsonify, request, render_template, \
+from flask import abort, current_app, flash, jsonify, request, render_template, \
     send_file, url_for
 from sqlalchemy import func
 from urllib.parse import quote
@@ -10,7 +10,7 @@ from app import db
 from app.utils import format_datetime
 from app.config.model import Config
 from app.user.model import User
-from app.note.markdown import md_extensions
+from app.note.markdown import md_extensions, set_task_checkbox
 from app.note.model import Note, Tag
 from app.note.permission import Permission
 
@@ -43,7 +43,7 @@ class NoteMeta(object):
         self._meta = {k.lower(): v for k, v in _meta.items()}
 
         path, ext = os.path.splitext(filepath)
-        self.title = path.split('/')[-1]
+        self.title = os.path.basename(path)
         self.path, _ = os.path.splitext(os.path.relpath(filepath, ROOT_PATH))
         self.filepath = filepath
         self.permission = self.parse_permission()
@@ -209,12 +209,100 @@ def serve_page(note, from_encrypted_path=False):
     return error_page(page_path=note.path)
 
 
+def update_task_checkbox(page_path):
+    if not User.is_logged_in():
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    note = Note.query.filter_by(path=page_path).first()
+    if note is None:
+        return jsonify({'error': 'Not Found'}), 404
+
+    payload = request.get_json() or {}
+    try:
+        task_index = int(payload['task_index'])
+    except (KeyError, TypeError, ValueError):
+        return jsonify({'error': 'Invalid task index'}), 400
+
+    checked = bool(payload.get('checked', False))
+    raw_md = read_md(note.filepath)
+    if raw_md is None:
+        return jsonify({'error': 'Not Found'}), 404
+
+    updated_md = set_task_checkbox(raw_md, task_index, checked)
+    if updated_md is None:
+        return jsonify({'error': 'Task checkbox not found'}), 404
+
+    save_page(note.filepath, updated_md)
+    update_db(note.filepath)
+    return jsonify({'checked': checked})
+
+
 def serve_file(page_path):
-    path = os.path.join(ROOT_PATH, page_path)
+    path = get_safe_page_path(page_path)
+    if path is None:
+        abort(404)
+    if not can_serve_file(page_path):
+        return error_page(page_path=page_path)
     try:
         return send_file(path)
     except FileNotFoundError:
         return 'File Not Found', 404
+
+
+def get_safe_page_path(*parts, allow_root=True):
+    path = os.path.realpath(os.path.join(ROOT_PATH, *parts))
+    if path == ROOT_PATH:
+        return path if allow_root else None
+    if path.startswith(ROOT_PATH + os.path.sep):
+        return path
+    return None
+
+
+def can_serve_file(page_path):
+    if User.is_logged_in():
+        return True
+
+    parent_note = find_parent_note_for_file(page_path)
+    if parent_note is None:
+        return False
+    return check_permission(parent_note.permission)
+
+
+def find_parent_note_for_file(page_path):
+    normalized_path = os.path.normpath(page_path).replace(os.path.sep, '/')
+    path, _ = os.path.splitext(normalized_path)
+    exact_note = Note.query.filter_by(path=path).first()
+
+    candidates = []
+    if exact_note:
+        candidates.append(exact_note)
+
+    parts = normalized_path.split('/')
+    for index, part in enumerate(parts):
+        if part != '_media' or index == 0:
+            continue
+        note_dir = '/'.join(parts[:index])
+        candidates.extend(
+            Note.query.filter(Note.path.startswith(note_dir + '/')).all()
+        )
+
+    for note in candidates:
+        if is_note_file_reference(note, normalized_path):
+            return note
+    return exact_note
+
+
+def is_note_file_reference(note, file_path):
+    quoted_path = quote(file_path, safe='/')
+    file_name = os.path.basename(file_path)
+    markdown_text = note.markdown or ''
+    html_text = note.html or ''
+    return (
+        file_path in markdown_text
+        or file_name in markdown_text
+        or quoted_path in html_text
+        or file_name in html_text
+    )
 
 
 def check_permission(permission=Permission.PRIVATE, from_encrypted_path=False):
@@ -307,11 +395,11 @@ def edit_page(page_path):
 
     # ` 문자는 ES6에서 템플릿 문자로 사용되므로 escape 해줘야 한다.
     # https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Template_literals
-    raw_md = raw_md.replace('`', '\`')
+    raw_md = raw_md.replace('`', '\\`')
 
     # 문자 내에 </script>가 있으면 <\/script> 로 처리해줘야한다.
     # https://softwareengineering.stackexchange.com/questions/139372/referencing-external-javascript-vs-hosting-my-own-copy/139380#139380
-    raw_md = raw_md.replace('</script>', '<\/script>')
+    raw_md = raw_md.replace('</script>', '<\\/script>')
 
     # FIXME: 수정해야함
     base_url = 'note'
@@ -339,21 +427,27 @@ def update_page(page_path, raw_md):
 
 
 def save_page(filepath, raw_md):
+    if filepath is None:
+        abort(404)
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(raw_md)
 
 
 def delete_page(filepath):
+    if filepath is None:
+        abort(404)
     try:
         os.remove(filepath)
     except FileNotFoundError:
         pass
-    # 빈 디렉터리 제거 (첫 2개는 data/pages)
-    page_dir_length = len(PAGE_ROOT.split(os.path.sep))
-    dirs = os.path.dirname(filepath).split(os.path.sep)[page_dir_length:]
+    # Remove empty page directories from the leaf back to the page root.
+    rel_dir = os.path.relpath(os.path.dirname(filepath), ROOT_PATH)
+    if rel_dir == '.':
+        return
+    dirs = rel_dir.split(os.path.sep)
     for x in range(len(dirs), 0, -1):
-        subdir = os.path.join(PAGE_ROOT, *dirs[:x])
+        subdir = os.path.join(ROOT_PATH, *dirs[:x])
         try:
             if len(os.listdir(subdir)) == 0:
                 os.rmdir(subdir)
@@ -375,7 +469,9 @@ def save_image(page_path, file):
     while True:
         if i > 0:
             filename = f'{name}-{i}{ext}'
-        file_path = os.path.join(PAGE_ROOT, page_dir, filename)
+        file_path = get_safe_page_path(page_dir, filename)
+        if file_path is None:
+            return jsonify(error='Invalid filename'), 400
         if not os.path.isfile(file_path):
             break
         i += 1
@@ -385,7 +481,9 @@ def save_image(page_path, file):
 
 
 def get_filepath(page_path, ext):
-    path = os.path.join(PAGE_ROOT, page_path)
+    path = get_safe_page_path(page_path, allow_root=False)
+    if path is None:
+        return None
     return os.path.normpath(path) + ext
 
 
@@ -425,7 +523,11 @@ def get_post_info_from_notes(list_of_note):
 def get_posted_page(page=1):
     base_query = Note.query.filter_by(permission=Permission.PUBLIC, posted=1).\
         order_by(Note.pinned.desc(), Note.updated.desc())
-    page = base_query.paginate(page, Config.get('post_per_page'), False)
+    page = base_query.paginate(
+        page=page,
+        per_page=Config.get('post_per_page'),
+        error_out=False,
+    )
 
     next_url = None
     prev_url = None
@@ -443,7 +545,11 @@ def get_tag_page(tag, page=1):
     base_query = Note.query.join(Tag, Note.id == Tag.note_id)\
         .filter(Tag.tag == tag, Note.permission >= permission)\
         .order_by(Note.updated.desc())
-    page = base_query.paginate(page, Config.get('post_per_page'), False)
+    page = base_query.paginate(
+        page=page,
+        per_page=Config.get('post_per_page'),
+        error_out=False,
+    )
 
     next_url = None
     prev_url = None

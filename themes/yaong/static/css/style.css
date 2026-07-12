@@ -274,7 +274,7 @@ div.permission {
     border-radius: 4px;
     overflow-x: auto;
     font-size: 85%;
-    background-color: #f5f5f5;
+    background-color: #e5e5e5;
 }
 
 div.permission strong {
@@ -404,6 +404,34 @@ div.article li::marker {
 
 div.article li p {
     vertical-align: top;
+    margin: 0;
+}
+
+div.article input.task-list-item-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1em;
+    height: 1em;
+    margin: 0 .35em 0 0;
+    border: 1px solid #b9c5ca;
+    border-radius: .2em;
+    background-color: #ffffff;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: .75em .75em;
+    vertical-align: -0.12em;
+    opacity: 1;
+}
+
+div.article input.task-list-item-checkbox:checked {
+    border-color: #2a99b6;
+    background-color: #2a99b6;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 12 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 5l3 3 7-7' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+div.article input.task-list-item-checkbox:checked + span.task-list-item-text {
+    color: #999;
+    text-decoration: line-through;
 }
 
 div.article > ul,
@@ -417,8 +445,8 @@ div.meta {
     margin: .6em 0 2.5em;
     padding: .4em 0;
     font-size: 16px;
-    border-top: 1px solid #f0f0f0;
-    border-bottom: 1px solid #f0f0f0;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
 }
 div.meta dt:after {
     content: ':';
@@ -645,6 +673,15 @@ div.error {
     margin-bottom: .6em;
 }
 
+div.messages {
+    margin-bottom: .6em;
+    color: #2a99b6;
+}
+
+div.messages p {
+    margin: 0 0 .3em;
+}
+
 div.login form div {
     margin-bottom: .6em;
 }
@@ -655,9 +692,17 @@ div.login label {
 }
 
 input[type=text],
-input[type=password] {
+input[type=password],
+input[type=number],
+input[type=url],
+textarea {
+    box-sizing: border-box;
     padding: .2em .4em;
     font-size: 90%;
+}
+
+textarea {
+    vertical-align: top;
 }
 
 input[type=submit],
@@ -674,6 +719,64 @@ input[type=button] {
 input[type=submit]:hover,
 input[type=button]:hover {
     background-color: #6cb0bf;
+}
+
+form.config {
+    margin: 1.5em 0;
+}
+
+form.config fieldset {
+    margin: 0 0 1em;
+    padding: .8em 1em 1em;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+}
+
+form.config legend {
+    padding: 0 .4em;
+    color: #2a99b6;
+}
+
+form.config fieldset div {
+    display: flex;
+    gap: .8em;
+    margin-bottom: .6em;
+}
+
+form.config fieldset div:last-child {
+    margin-bottom: 0;
+}
+
+form.config label {
+    flex: 0 0 9em;
+    text-align: right;
+}
+
+form.config input[type=text],
+form.config input[type=number],
+form.config input[type=url],
+form.config textarea {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+@media (max-width: 560px) {
+    form.config fieldset div {
+        display: block;
+    }
+
+    form.config label {
+        display: block;
+        margin-bottom: .2em;
+        text-align: left;
+    }
+
+    form.config input[type=text],
+    form.config input[type=number],
+    form.config input[type=url],
+    form.config textarea {
+        width: 100%;
+    }
 }
 
 

@@ -1,9 +1,9 @@
 .idea
 .venv
+.venv-win
 venv
 venv-windows
 *.sh
-
 *.pyc
 *.sqlite
 config.py

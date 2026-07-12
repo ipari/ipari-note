@@ -16,6 +16,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // 비디오 폭 설정
     resizeVideos();
 
+    // 렌더링된 체크박스 편집
+    bindTaskCheckboxes();
+
     // To Top 버튼
     let toTop = select("div.to-top a");
     if (toTop != null) {
@@ -68,14 +71,60 @@ function isHidden(e) {
     return (style.display === 'none');
 }
 
+function bindTaskCheckboxes() {
+    let article = select("div.article[data-task-checkbox-url]");
+    if (article == null) {
+        return;
+    }
+
+    let checkboxes = article.querySelectorAll("input.task-list-item-checkbox");
+    checkboxes.forEach(checkbox => {
+        checkbox.disabled = false;
+        checkbox.addEventListener("change", function() {
+            updateTaskCheckbox(article.dataset.taskCheckboxUrl, checkbox);
+        });
+    });
+}
+
+function updateTaskCheckbox(url, checkbox) {
+    let checked = checkbox.checked;
+    checkbox.disabled = true;
+    let csrfToken = select('meta[name="csrf-token"]').content;
+
+    fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({
+            task_index: checkbox.dataset.taskIndex,
+            checked: checked
+        })
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error("Failed to update task checkbox.");
+        }
+        return response.json();
+    }).then(() => {
+        checkbox.disabled = false;
+    }).catch(() => {
+        checkbox.checked = !checked;
+        checkbox.disabled = false;
+        alert("체크박스를 저장하지 못했습니다.");
+    });
+}
+
 function previewMarkdown(preview, plainText, url) {
   let ajax = new XMLHttpRequest();
   let parameters = {
     "raw_md": plainText
   };
+  let csrfToken = select('meta[name="csrf-token"]').content;
 
   ajax.open("POST", url, true);
   ajax.setRequestHeader("Content-type", "application/json");
+  ajax.setRequestHeader("X-CSRFToken", csrfToken);
   ajax.onreadystatechange = function() {
       if (ajax.readyState === 4 && ajax.status === 200) {
           preview.innerHTML = ajax.responseText;

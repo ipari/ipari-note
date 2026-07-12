@@ -1,7 +1,7 @@
 import html2text
+import secrets
 
 from app import db
-from app.crypto import encrypt
 from app.note.permission import Permission
 
 
@@ -33,7 +33,8 @@ class Note(db.Model):
     def update(self, meta, raw_md, html):
         self.title = meta.title
         self.path = meta.path
-        self.encrypted_path = encrypt(meta.path)
+        if not self.encrypted_path:
+            self.encrypted_path = secrets.token_urlsafe(24)
         self.filepath = meta.filepath
         self.permission = Permission(meta.permission)
         self.posted = meta.posted

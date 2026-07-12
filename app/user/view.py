@@ -23,6 +23,7 @@ def route_login():
     form = LoginForm()
     if request.method == 'GET':
         from app.note.note import get_base_meta, get_menu_list
+
         form.referrer.data = request.referrer
         meta = get_base_meta()
         menu = get_menu_list()

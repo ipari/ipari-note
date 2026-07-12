@@ -1,13 +1,20 @@
 import re
 import xml.etree.ElementTree as etree
+from urllib.parse import quote
 from markdown import util
 from markdown.extensions import Extension
 from markdown.extensions.toc import TocExtension
 from markdown.extensions.wikilinks \
-    import WikiLinkExtension, WikiLinksInlineProcessor
+    import WikiLinkExtension
 from markdown.inlinepatterns import InlineProcessor, LinkInlineProcessor
 from markdown.preprocessors import Preprocessor
 from app.config.model import Config
+
+
+IMAGE_EXTENSIONS = {
+    '.apng', '.avif', '.bmp', '.gif', '.ico', '.jpeg', '.jpg',
+    '.png', '.svg', '.webp',
+}
 
 
 def md_extensions():
@@ -33,9 +40,54 @@ def md_extensions():
 
     extensions.append(AutolinkExtensionCustom())
     extensions.append(LinkInlineExtension())
+    extensions.append(ObsidianBlockExtension())
     extensions.append(MetaExtension())
 
     return extensions
+
+
+def set_task_checkbox(raw_md, task_index, checked):
+    processor = ObsidianBlockPreprocessor()
+    lines = raw_md.splitlines(keepends=True)
+    list_indents = []
+    in_fence = False
+    fence_marker = None
+    current_index = 0
+
+    for i, line in enumerate(lines):
+        line_body = line.rstrip('\r\n')
+        line_break = line[len(line_body):]
+
+        fence_match = processor.FENCE_RE.match(line_body)
+        if fence_match:
+            marker = fence_match.group(1)
+            if not in_fence:
+                in_fence = True
+                fence_marker = marker[0]
+            elif marker.startswith(fence_marker):
+                in_fence = False
+                fence_marker = None
+
+        if in_fence:
+            continue
+
+        match = processor.CHECKBOX_RE.match(line_body)
+        if match and processor.is_list_item_context(match.group('prefix'),
+                                                    list_indents):
+            if current_index == task_index:
+                marker = 'x' if checked else ' '
+                lines[i] = '{}[{}]{}{}'.format(
+                    match.group('prefix'),
+                    marker,
+                    match.group('rest'),
+                    line_break,
+                )
+                return ''.join(lines)
+            current_index += 1
+
+        processor.update_list_indents(line_body, list_indents)
+
+    return None
 
 
 class WikiLinkExtensionCustom(WikiLinkExtension):
@@ -53,13 +105,86 @@ class WikiLinkExtensionCustom(WikiLinkExtension):
         self.md = md
 
         # append to end of inline patterns
-        wikilink_re = r'\[\[([\w0-9_ -/]+)\]\]'
+        wikilink_re = r'(!?)\[\[([^\]\n]+)\]\]'
         config = self.getConfigs()
-        config['build_url'] = lambda label, base, end:  '{}{}{}'.format(base, label, end)
-        wikilink_pattern = \
-            WikiLinksInlineProcessor(wikilink_re, config)
+        wikilink_pattern = ObsidianLinkInlineProcessor(wikilink_re, config)
         wikilink_pattern.md = md
         md.inlinePatterns.register(wikilink_pattern, 'wikilink', 75)
+
+
+class ObsidianLinkInlineProcessor(InlineProcessor):
+
+    def __init__(self, pattern, config):
+        super(ObsidianLinkInlineProcessor, self).__init__(pattern)
+        self.config = config
+
+    def handleMatch(self, m, data):
+        is_embed = bool(m.group(1))
+        raw_link = m.group(2).strip()
+        target, label = self.parse_link(raw_link)
+
+        if is_embed and self.is_image(target):
+            el = etree.Element('img')
+            el.set('src', self.build_file_url(target))
+            el.set('alt', label or target)
+            return el, m.start(0), m.end(0)
+
+        el = etree.Element('a')
+        el.set('href', self.build_note_url(target))
+        el.set('class', self.config.get('html_class', 'wikilink'))
+        el.text = label or self.default_label(target)
+        return el, m.start(0), m.end(0)
+
+    @staticmethod
+    def parse_link(raw_link):
+        parts = raw_link.split('|', 1)
+        target = parts[0].strip()
+        label = parts[1].strip() if len(parts) > 1 else None
+        return target, label
+
+    @staticmethod
+    def is_image(target):
+        path = target.split('#', 1)[0].split('?', 1)[0]
+        dot_index = path.rfind('.')
+        if dot_index < 0:
+            return False
+        return path[dot_index:].lower() in IMAGE_EXTENSIONS
+
+    @staticmethod
+    def default_label(target):
+        page, heading = ObsidianLinkInlineProcessor.split_heading(target)
+        if page:
+            return page
+        return heading or target
+
+    @staticmethod
+    def split_heading(target):
+        if '#' not in target:
+            return target, None
+        page, heading = target.split('#', 1)
+        return page, heading
+
+    def build_note_url(self, target):
+        page, heading = self.split_heading(target)
+        if page:
+            base_url = self.config.get('base_url', '/')
+            end_url = self.config.get('end_url', '')
+            href = '{}{}{}'.format(
+                base_url,
+                quote(page, safe='/'),
+                end_url,
+            )
+        else:
+            href = ''
+
+        if heading:
+            href += '#{}'.format(_slugify(heading, '-'))
+        return href or '#'
+
+    def build_file_url(self, target):
+        page, _ = ObsidianLinkInlineProcessor.split_heading(target)
+        base_url = self.config.get('base_url', '/')
+        return '{}{}'.format(base_url, quote(page, safe='/'))
 
 
 class AutolinkInlineProcessor(InlineProcessor):
@@ -115,6 +240,107 @@ class LinkInlineExtension(Extension):
         md.inlinePatterns.deregister('link')
         md.inlinePatterns.register(
             LinkInlineProcessorCustom(link_re, md), 'link', 160)
+
+
+class ObsidianBlockExtension(Extension):
+
+    def extendMarkdown(self, md):
+        md.preprocessors.register(ObsidianBlockPreprocessor(md),
+                                  'obsidian_block', 26)
+
+
+class ObsidianBlockPreprocessor(Preprocessor):
+
+    LIST_RE = re.compile(r'^[ ]{0,3}(([-+*])|([0-9]+[.)]))[ \t]+')
+    LIST_ITEM_RE = re.compile(
+        r'^(?P<indent> *)(([-+*])|([0-9]+[.)]))[ \t]+'
+    )
+    CHECKBOX_RE = re.compile(
+        r'^(?P<prefix> *(([-+*])|([0-9]+[.)]))[ \t]+)'
+        r'\[(?P<checked>[ xX])\](?P<rest>[ \t].*|[ \t]*$)'
+    )
+    FENCE_RE = re.compile(r'^[ ]{0,3}(`{3,}|~{3,})')
+
+    def run(self, lines):
+        processed = []
+        in_fence = False
+        fence_marker = None
+        list_indents = []
+        task_index = 0
+
+        for line in lines:
+            fence_match = self.FENCE_RE.match(line)
+            if fence_match:
+                marker = fence_match.group(1)
+                if not in_fence:
+                    in_fence = True
+                    fence_marker = marker[0]
+                elif marker.startswith(fence_marker):
+                    in_fence = False
+                    fence_marker = None
+
+            if self.needs_blank_before_list(processed, line, in_fence):
+                processed.append('')
+            if not in_fence:
+                line, task_index = self.render_checkbox(line, list_indents,
+                                                        task_index)
+                self.update_list_indents(line, list_indents)
+            processed.append(line)
+
+        return processed
+
+    def render_checkbox(self, line, list_indents, task_index):
+        match = self.CHECKBOX_RE.match(line)
+        if not match:
+            return line, task_index
+        if not self.is_list_item_context(match.group('prefix'),
+                                         list_indents):
+            return line, task_index
+
+        checked = match.group('checked').lower() == 'x'
+        checked_attr = ' checked="checked"' if checked else ''
+        return (
+            '{}<input class="task-list-item-checkbox" type="checkbox" '
+            'disabled="disabled" data-task-index="{}"{}>'
+            '<span class="task-list-item-text">{}</span>'
+        ).format(
+            match.group('prefix'),
+            task_index,
+            checked_attr,
+            match.group('rest').lstrip(),
+        ), task_index + 1
+
+    def is_list_item_context(self, prefix, list_indents):
+        indent = len(prefix) - len(prefix.lstrip(' '))
+        if indent <= 3:
+            return True
+        return any(list_indent < indent for list_indent in list_indents)
+
+    def update_list_indents(self, line, list_indents):
+        match = self.LIST_ITEM_RE.match(line)
+        if not match:
+            if line.strip() == '':
+                return
+            list_indents[:] = []
+            return
+
+        indent = len(match.group('indent'))
+        list_indents[:] = [
+            list_indent for list_indent in list_indents
+            if list_indent < indent
+        ]
+        list_indents.append(indent)
+
+    def needs_blank_before_list(self, processed, line, in_fence):
+        if in_fence or not processed:
+            return False
+        if not self.LIST_RE.match(line):
+            return False
+
+        prev_line = processed[-1]
+        if prev_line.strip() == '':
+            return False
+        return not self.LIST_RE.match(prev_line)
 
 
 ##############################################################################

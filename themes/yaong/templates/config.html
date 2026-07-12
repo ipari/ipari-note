@@ -1,0 +1,79 @@
+{% extends "_base.html" %}
+
+{% block pagename %}{{ pagename }}{% endblock %}
+
+{% block content %}
+    <h1>{{ pagename }}</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="messages">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <form method="post" class="config">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <fieldset>
+            <legend>노트</legend>
+            <div>
+                <label for="note_title">제목</label>
+                <input id="note_title" name="note_title" type="text" value="{{ config.note.title }}">
+            </div>
+            <div>
+                <label for="note_subtitle">부제</label>
+                <input id="note_subtitle" name="note_subtitle" type="text" value="{{ config.note.subtitle }}">
+            </div>
+            <div>
+                <label for="note_description">설명</label>
+                <textarea id="note_description" name="note_description" rows="4">{{ config.note.description }}</textarea>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>앱</legend>
+            <div>
+                <label for="theme">테마</label>
+                <input id="theme" name="theme" type="text" value="{{ config.app.theme }}">
+            </div>
+            <div>
+                <label for="post_per_page">페이지당 포스트 수</label>
+                <input id="post_per_page" name="post_per_page" type="number" min="1" value="{{ config.app.post_per_page }}">
+            </div>
+            <div>
+                <label for="url">URL</label>
+                <input id="url" name="url" type="url" value="{{ config.app.url }}">
+            </div>
+            <div>
+                <label for="timezone">타임존</label>
+                <input id="timezone" name="timezone" type="text" value="{{ config.app.timezone }}" placeholder="+09:00">
+            </div>
+            <div>
+                <label for="ga_tracking_id">GA 추적 ID</label>
+                <input id="ga_tracking_id" name="ga_tracking_id" type="text" value="{{ config.app.ga_tracking_id }}">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>마크다운</legend>
+            <div>
+                <label for="md_toc_marker">목차 표시자</label>
+                <input id="md_toc_marker" name="md_toc_marker" type="text" value="{{ config.markdown.toc_marker }}">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>암호화</legend>
+            <div>
+                <label for="aes_key">AES 키</label>
+                <input id="aes_key" name="aes_key" type="text" maxlength="32" value="{{ config.aes_key }}">
+            </div>
+        </fieldset>
+
+        <div class="buttons">
+            <input type="submit" value="저장">
+            <a class="button" href="/">취소</a>
+        </div>
+    </form>
+{% endblock %}

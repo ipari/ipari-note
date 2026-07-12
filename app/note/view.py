@@ -59,8 +59,16 @@ def route_edit(page_path):
         return redirect(url_for('note.route_page', page_path=page_path))
 
 
+@bp.route('/<path:page_path>/task-checkbox', methods=['POST'])
+def route_task_checkbox(page_path):
+    return update_task_checkbox(page_path)
+
+
 @bp.route('/<path:page_path>/upload', methods=['POST'])
 def route_upload(page_path):
+    if not User.is_logged_in():
+        return 'Unauthorized', 401
+
     if request.method == 'POST':
         if 'file' not in request.files:
             # no file part
@@ -76,6 +84,9 @@ def route_upload(page_path):
 
 @bp.route('/preview', methods=['POST'])
 def preview():
+    if not User.is_logged_in():
+        return 'Unauthorized', 401
+
     if request.method == 'POST':
         html, _ = render_markdown(request.get_json()['raw_md'])
 

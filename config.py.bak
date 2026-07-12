@@ -7,3 +7,8 @@ SECRET_KEY = ""
 # SQLALCHEMY
 SQLALCHEMY_DATABASE_URI = "sqlite:///../data/db.sqlite"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+# WATCHDOG
+# available: native, polling
+# use polling on wsl2
+WATCHDOG_OBSERVER = "native"
